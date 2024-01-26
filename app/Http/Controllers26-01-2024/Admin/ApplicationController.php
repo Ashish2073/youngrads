@@ -1,0 +1,434 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+// Core
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+
+// Third Party Packages
+use Yajra\Datatables\Datatables;
+
+// Events
+use App\Events\ApplicationUpdated;
+
+// Models
+use App\Models\UserApplication;
+use App\Models\ApplicationMessage;
+use App\Models\Campus;
+use App\Models\Program;
+use App\Models\University;
+use App\Models\User;
+
+class ApplicationController extends Controller
+{
+	public function __construct()
+	{
+		$this->middleware('auth:admin');
+	}
+
+	public function index(Request $request)
+	{
+		$breadcrumbs = [
+			['link' => "admin.home", 'name' => "Dashboard"], ['name' => 'Application']
+		];
+
+		$pageConfigs = [
+			//'pageHeader' => false,
+			//'contentLayout' => "content-left-sidebar",
+			'bodyClass' => 'chat-application',
+			'sidebarCollapsed' => true
+		];
+
+		$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
+			->join('campus_programs', 'users_applications.campus_program_id', '=', 'campus_programs.id')
+			->join('intakes', 'users_applications.intake_id', '=', 'intakes.id')
+			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
+			->join('universities', 'campus.university_id', '=', 'universities.id')
+			->select('intakes.name as intake', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))
+			->groupBy('users_applications.id');
+
+		if ($request->has('program')) {
+			$userApplications->whereIn('programs.id', $request->program);
+		}
+
+		if ($request->has('university')) {
+			$userApplications->whereIn('universities.id', $request->university);
+		}
+
+		if ($request->has('campus')) {
+			$userApplications->whereIn('campus.id', $request->campus);
+		}
+
+		if ($request->has('status')) {
+			$userApplications->whereIn('users_applications.status', $request->status);
+		}
+
+		switch (request()->get('view')) {
+			case UserApplication::INACTIVE:
+				$userApplications->where('admin_status', UserApplication::INACTIVE);
+				break;
+
+			case 'favourite':
+				$userApplications->where('admin_status', UserApplication::ACTIVE)->where('is_favorite', 1);
+				break;
+
+			default:
+				$userApplications->where('admin_status', UserApplication::ACTIVE);
+		}
+
+
+
+
+
+
+		//  $result =  $userApplications->get();
+		if (request()->ajax()) {
+			return Datatables::of($userApplications)
+
+				->editColumn('university', function ($row) {
+					return tooltip(Str::limit($row->university, 25, '...'), $row->university);
+				})
+				->editColumn('program', function ($row) {
+					return tooltip(Str::limit($row->program, 25, '...'), $row->program);
+				})
+				->editColumn('campus', function ($row) {
+					return tooltip(Str::limit($row->campus, 25, '...'), $row->campus);
+				})
+				->editColumn('apply_date', function ($row) {
+					return date('d M Y', strtotime($row->apply_date));
+				})
+				->editColumn('year', function ($row) {
+					return $row->intake . "-" . $row->year;
+				})
+				->editColumn('application_number', function ($row) {
+					return $row->application_number ?? "N/A";
+				})
+				->addColumn('toggle_status', function ($row) {
+					if ($row->admin_status == UserApplication::ACTIVE) {
+						$color = "danger";
+						$text = ucfirst(UserApplication::INACTIVE);
+					}
+					if ($row->admin_status == UserApplication::INACTIVE) {
+						$color = "success";
+						$text = ucfirst(UserApplication::ACTIVE);
+					}
+
+					return "<button class='btn btn-$color application-toggle-status btn-icon btn-round' data-id={$row->application_id}>
+						Make {$text}
+					</button>";
+				})
+				->editColumn('favorite', function ($row) {
+
+					if ($row->favorite == 0) {
+						$html = "<button class='btn favorite' data-id='" . $row->application_id . "'>";
+						$html .= "<i class='feather icon-heart pink text-danger'></i>";
+						$html .= "</button>";
+					} else {
+						$html = "<button class='btn favorite' data-id='" . $row->application_id . "'>";
+						$html .= "<i class='fa fa-heart  text-danger'></i>";
+						$html .= "</button>";
+					}
+
+					return $html;
+				})
+				->addColumn('name', function ($row) {
+					return "<a href='javascript:void(0)' class='profile' data-id='" . $row->user_id . "' data-application='" . $row->application_id . "'>" . $row->first . " " . $row->last_name . "</a>";
+				})
+				->editColumn('count', function ($row) {
+
+					$html = "<button class='btn btn-icon btn-outline-primary admin-message' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#dynamic-modal' >";
+					// $html .= "<i class='ficon feather icon-bell'></i><span
+					// class='badge badge-pill badge-primary badge-up'>5</span>";
+	
+					$html .= "<i class='ficon feather icon-message-circle'></i>";
+					// $row->count = 5;
+					if ($row->count > 0) {
+						$html .= "<span class=
+            badge badge-pill badge-default badge-up'>$row->count</span>";
+					}
+					$html .= "</button>";
+					// return $html;
+					if ($row->count > 0) {
+						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->count . '</span>';
+					} else {
+						$count = '';
+					}
+					$html = '<div class="avatar bg-primary admin-message" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
+            <div class="avatar-content position-relative">
+              <i class="avatar-icon feather icon-message-circle"></i>
+              ' . $count . '
+            </div>
+          </div>';
+					return $html;
+				})
+				//  ->editColumn('count',function($row){
+				//     return $row->count;
+
+				//  })
+				->editColumn('status', function ($row) {
+
+					if ($row->status == 'pending') {
+						$class = 'badge-warning';
+					} elseif ($row->status == 'open') {
+						$class = 'badge-success';
+					} elseif ($row->status == "close") {
+						$class = 'badge-danger';
+					} else {
+						$class = 'badge-success';
+					}
+					$status_meta = config('setting.application.status_meta.' . $row->status);
+					$class = "badge-" . $status_meta['color'];
+					$icon = $status_meta['icon_class'];
+					return "<span class='p-50 badge $class font-weight-bold status' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#apply-model'><i class='$icon'></i> " . config('setting.application.status')[$row->status] . "</span>";
+				})
+				->rawColumns(['favorite', 'toggle_status', 'apply_date', 'name', 'message', 'status', 'campus', 'university', 'program', 'count', 'delete'])
+				->make(true);
+		} else {
+			$univs = University::all();
+			$programs = Program::all();
+			$campuses = Campus::all();
+			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses'));
+		}
+	}
+
+	public function applicationMessage($id)
+	{
+		$messageStatis = ApplicationMessage::where('user_id', '!=', Auth::id())->where('application_id', '=', $id)->update(['message_status' => 'read']);
+
+		return view('application_message.index', ['id' => $id, 'gaurd' => 'admin', 'auth' => Auth::id()]);
+	}
+
+	public function status($id)
+	{
+		$application = UserApplication::find($id);
+		return view('dashboard.applications.status', compact('id', 'application'));
+	}
+
+	public function updateStatus(Request $request)
+	{
+		$userApplication = UserApplication::find($request->id);
+		$old_status = $userApplication->status;
+		$userApplication->status = $request->status;
+		if ($userApplication->save()) {
+
+			if ($request->status != $old_status) {
+				$userApplication->createActivity();
+			}
+			return response()->json([
+				'code' => 'success',
+				'title' => 'Congratulations',
+				'message' => 'Application status has been changed',
+				'success' => true
+			]);
+		} else {
+			return response()->json([
+				'code' => 'error',
+				'title' => 'error',
+				'message' => 'Application status has been changed',
+				'success' => false
+			]);
+		}
+	}
+
+	public function test()
+	{
+		return $userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
+			->join('campus_programs', 'users_applications.campus_program_id', '=', 'campus_programs.id')
+			->join('intakes', 'users_applications.intake_id', '=', 'intakes.id')
+			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
+			->join('universities', 'campus.university_id', '=', 'universities.id')
+			->select('intakes.name as intake', 'status', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', DB::raw("(SELECT count(*) FROM application_message WHERE user_id != " . Auth::id() . " && message_status = 'unread' && application_id = users_applications.id ) as count"))->toSql();
+	}
+
+	function setFavorite(Request $request)
+	{
+		$application = UserApplication::find($request->id);
+		$application->is_favorite = $request->favorite;
+		if ($application->save()) {
+
+			//  if($application->is_favorite == 0){
+			//     return response()->json([
+			//       'code' => 'success',
+			//       'title' => 'Congratulations',
+			//       'message' => 'Application is set unfavorite',
+			//       'success' => true
+			//   ]);
+			//  }else{
+			//     return response()->json([
+			//       'code' => 'success',
+			//       'title' => 'Congratulations',
+			//       'message' => 'Application Application is set favorite',
+			//       'success' => true
+			//   ]);
+			//  }
+
+		}
+	}
+
+	function favoriteApplicatons(Request $request)
+	{
+		$breadcrumbs = [
+			['link' => "admin.applications-all", 'name' => "Applications"], ['name' => 'Favorite Applications']
+		];
+
+		$pageConfigs = [
+			//'pageHeader' => false,
+			//'contentLayout' => "content-left-sidebar",
+			'bodyClass' => 'chat-application',
+		];
+
+		$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
+			->join('campus_programs', 'users_applications.campus_program_id', '=', 'campus_programs.id')
+			->join('intakes', 'users_applications.intake_id', '=', 'intakes.id')
+			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
+			->join('universities', 'campus.university_id', '=', 'universities.id')
+			->select('intakes.name as intake', 'status', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))->where('is_favorite', 1)
+			->groupBy('users_applications.id');
+
+		if (isset($request->program)) {
+			$userApplications->where('programs.id', '=', $request->program);
+		}
+
+		if (isset($request->university)) {
+			$userApplications->where('universities.id', '=', $request->university);
+		}
+
+		if (isset($request->campus)) {
+			$userApplications->where('campus.id', '=', $request->campus);
+		}
+
+		//  $result =  $userApplications->get();
+		if (request()->ajax()) {
+			return Datatables::of($userApplications)
+
+				->editColumn('university', function ($row) {
+					return tooltip(Str::limit($row->university, 25, '...'), $row->university);
+				})
+				->editColumn('program', function ($row) {
+					return tooltip(Str::limit($row->program, 25, '...'), $row->program);
+				})
+				->editColumn('campus', function ($row) {
+					return tooltip(Str::limit($row->campus, 25, '...'), $row->campus);
+				})
+				->editColumn('apply_date', function ($row) {
+					return date('d M Y h:i A', strtotime($row->apply_date));
+				})
+				->editColumn('favorite', function ($row) {
+
+					if ($row->favorite == 0) {
+						$html = "<button class='btn favorite' data-id='" . $row->application_id . "'>";
+						$html .= "<i class='feather icon-heart pink text-danger'></i>";
+						$html .= "</button>";
+					} else {
+						$html = "<button class='btn favorite' data-id='" . $row->application_id . "'>";
+						$html .= "<i class='fa fa-heart  text-danger'></i>";
+						$html .= "</button>";
+					}
+
+					return $html;
+				})
+				->addColumn('name', function ($row) {
+					return "<a href='javascript:void(0)' class='profile' data-id='" . $row->user_id . "' data-application='" . $row->application_id . "'>" . $row->first . " " . $row->last_name . "</a>";
+				})
+				->editColumn('count', function ($row) {
+
+					$html = "<button class='btn admin-message' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#dynamic-modal' >";
+					// $html .= "<i class='ficon feather icon-bell'></i><span
+					// class='badge badge-pill badge-primary badge-up'>5</span>";
+	
+					$html .= "<i class='ficon feather icon-message-circle'></i>";
+					if ($row->count > 0) {
+						$html .= "<span class=
+            badge badge-pill badge-default badge-up'>$row->count</span>";
+					}
+					$html .= "</button>";
+					return $html;
+				})
+				//  ->editColumn('count',function($row){
+				//     return $row->count;
+
+				//  })
+				->editColumn('status', function ($row) {
+
+					if ($row->status == 'pending') {
+						$class = 'badge-warning';
+					} elseif ($row->status == 'open') {
+						$class = 'badge-info';
+					} else {
+						$class = 'badge-success';
+					}
+
+					return "<span class='badge $class status' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#apply-model'>" . ucfirst($row->status) . "</span>";
+				})
+				->rawColumns(['favorite', 'apply_date', 'name', 'message', 'status', 'campus', 'university', 'program', 'count'])
+				->make(true);
+		} else {
+			return view('dashboard.applications.favorite', compact('breadcrumbs', 'pageConfigs'));
+		}
+	}
+
+	function setPriority(Request $request)
+	{
+		//  echo $request->id."-".$request->priority;
+		$application = UserApplication::find($request->id);
+		$application->priority = $request->priority;
+		if ($application->save()) {
+			return response()->json([
+				'code' => 'success',
+				'title' => 'Congratulations',
+				'message' => 'Application priority is set',
+				'success' => true
+			]);
+		}
+	}
+
+	function destroy($id)
+	{
+		$application = UserApplication::find($id);
+		$application->delete();
+		if ($application->save()):
+			return response()->json([
+				'success' => true,
+				'code' => 'success',
+				'title' => 'Congratulations',
+				'message' => 'Application deleted successfully'
+			]);
+		endif;
+	}
+
+	public function toggleAdminStatus($id)
+	{
+		$application = UserApplication::findOrFail($id);
+
+		if ($application->admin_status == UserApplication::ACTIVE) {
+			$application->admin_status = UserApplication::INACTIVE;
+		} else {
+			$application->admin_status = UserApplication::ACTIVE;
+		}
+
+
+		if ($application->save()) {
+			return response()->json([
+				'success' => true,
+				'code' => 'success',
+				'title' => 'Success!',
+				'message' => 'Operation performed successfully.'
+			]);
+		} else {
+			return response()->json([
+				'success' => false,
+				'code' => 'danger',
+				'title' => 'Oops!',
+				'message' => 'Something went wrong.'
+			]);
+		}
+
+	}
+}

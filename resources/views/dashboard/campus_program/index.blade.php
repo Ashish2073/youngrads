@@ -65,19 +65,21 @@
                     data: function(d) {}
                 },
                 columns: [{
-                        name: 'universities.name',
-                        data: 'univ_name'
+                        name: 'university',
+                        data: 'university'
+                       
                     },
                     {
-                        data: 'campus',
-                        name: 'campus'
+                        name: 'campus',  
+                        data: 'campus'
                     },
                     {
-                        data: 'program',
-                        name: 'program'
+                        name: 'program',
+                        data: 'program'
                     },
                     {
                         data: 'action'
+                        
                     }
 
                 ],

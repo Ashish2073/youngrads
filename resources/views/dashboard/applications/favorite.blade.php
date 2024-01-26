@@ -327,7 +327,7 @@
                 $('.dynamic-title').text('');
                 id = $(this).data('id');
                 $.ajax({
-                    url: route('admin.applicaton-message-admin', $(this).data('id')),
+                    url: "{{url('admin/applicaton')}}"+"/"+id+"/"+"message",
                     success: function(data) {
                         $('.dynamic-body').html(data);
                         runScript(id);

@@ -213,7 +213,7 @@
                 $('.dynamic-title').text('Chat with us');
                 id = $(this).data('id');
                 $.ajax({
-                    url: "{{url('applicaton-message-user')}}"+"/"+id,
+                    url: "{{url('application')}}"+"/"+id+"/"+"message",
                     success: function(data) {
                         $('.dynamic-body').html(data);
                         initMessageScript(id);

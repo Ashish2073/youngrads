@@ -89,7 +89,7 @@
 
             $('body').on('click', '#add', function(e) {
 
-                $('.dynamic-title').text('Add Country');
+                $('.dynamic-title').text('Add State');
                 getContent({
                     url: $(this).data('url'),
                     success: function(data) {
@@ -102,7 +102,7 @@
 
             $('body').on('click', '.action-row', function(e) {
 
-                $('.dynamic-title').text('Update Country');
+                $('.dynamic-title').text('Update State');
                 getContent({
                     url: $(this).data('url'),
                     success: function(data) {

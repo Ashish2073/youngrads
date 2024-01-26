@@ -2,6 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AddressController;
+use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\UniversityController;
+use App\Http\Controllers\Admin\CampusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,12 +32,12 @@ Route::get('all-clear', function () {
 });
 
 //select2 option ajax
-Route::post('/get-program', 'Admin\ProgramController@getPrograms')->name('select-programs');
-Route::post('/get-university', 'Admin\UniversityController@selectUniverstiy')->name('select-university');
-Route::post('/get-campus', 'Admin\CampusController@selectCampus')->name('select-campus');
+Route::post('/get-program', [ProgramController::class,'getPrograms'])->name('select-programs');
+Route::post('/get-university',[UniversityController::class,'selectUniverstiy'])->name('select-university');
+Route::post('/get-campus', [CampusController::class,'selectCampus'])->name('select-campus');
 
-Route::post('/countries', 'Admin\AddressController@getCountries')->name('get-countries');
-Route::post('/get-state', 'Admin\AddressController@getState')->name('get-state');
+Route::post('/countries', [AddressController::class,'getCountries'])->name('get-countries');
+Route::post('/get-state', [AddressController::class,'getState'])->name('get-state');
 //Route::get('/countries','CourseFinderController@countryAutoComplete');
 
 

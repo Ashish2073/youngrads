@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Rules\UserApplicationAuthentication;
 use Illuminate\Support\Facades\DB;
+use App\Models\AddDataLimit;
 
 // Notifications
 use App\Notifications\Application;
@@ -67,6 +69,29 @@ class UserApplicationController extends Controller
 
 	public function store(Request $request)
 	{
+         $dataCount=AddDataLimit::where('model_name','App/Model/AddDataLimit')->where('action','create')->select('count')->get();
+		$countData=json_decode($dataCount,true)[0]['count'];
+		
+		$validator = Validator::make($request->all(), [
+            'year' => ['required', new UserApplicationAuthentication($countData)],
+            'intake' => ['required',new UserApplicationAuthentication($countData)],
+            
+        ]);
+
+		if ($validator->fails()) { 
+            $errors = $validator->errors();
+
+         
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $errors,
+            ], 422);
+        }
+
+
+
+
+
 
 		$intakes = CampusProgram::join('campus_program_intakes', 'campus_programs.id', '=', 'campus_program_intakes.campus_program_id')
 			->join('intakes', 'campus_program_intakes.intake_id', '=', 'intakes.id')
@@ -74,6 +99,10 @@ class UserApplicationController extends Controller
 			->where('campus_programs.id', $request->session()->get('id'))->get();
 
 		$id = $request->session()->get('id');
+
+
+
+		
 
 		$intakeIds = UserApplication::where('user_id', '=', Auth::id())->select('intake_id')->get();
 		$intake = $request->intake;

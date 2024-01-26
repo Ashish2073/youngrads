@@ -68,7 +68,13 @@
                 }
             },
             error: function(data) {
-                toast("error", "Something went wrong.", "Error");
+                if(data.responseJSON.errors.intake[0]){
+                     toast("error", `${data.responseJSON.errors.intake[0]}`, "Error");
+                    $('#apply-model').modal('hide');
+                }else{
+                    toast("error", "Something went wrong.", "Error");
+                }
+               
             },
             complete: function() {
 

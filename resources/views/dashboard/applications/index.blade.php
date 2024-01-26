@@ -4,6 +4,10 @@
 
 @section('page-style')
     <link rel="stylesheet" href="{{ asset(mix('css/pages/app-chat.css')) }}">
+    <!-- Add these links to your HTML file -->
+{{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
+
     <style>
         .modal-dialog-aside {
             width: 44% !important;
@@ -80,8 +84,43 @@
                                 </div>
                                 <div class="col-md-4 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
+                                    <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit Of Aplication</button>
+
                                 </div>
-                            </div>
+
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <!-- Modal content goes here -->
+                                          <form id="myForm">
+                                            <div class="form-group">
+                                              {{-- <label for="inputName">Name</label> --}}
+                                          
+                                              <input type="text" class="form-control" hidden id="modelname" name="name" required value="{{request()->segment(2)}}">
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="positiveNumber">Number of Application Apply</label>
+                                              <input type="number" min="0" class="form-control" id="positiveNumber" name="number_of_application" required>
+                                            </div>
+                                            <!-- Add other form fields as needed -->
+                                  
+                                            <button type="button" class="btn btn-primary" id="submitFormApplicationForm">Submit</button>
+                                          </form>
+                                        </div>
+                                       
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+
+                              
                             <div>
                                 <input type="hidden" name="view" value="" />
                                 <ul class="nav nav-tabs " role="tablist">
@@ -113,10 +152,12 @@
                                             <th>Student</th>
                                             <th>Application ID</th>
                                             <th>University</th>
+                                            <th>Campus</th>
                                             <th>Program</th>
                                             <th>Intake</th>
                                             <th>Status</th>
                                             <th>Applied Date</th>
+                                            {{-- <th>Count</th> --}}
                                             {{-- <th>Count</th>
                                             --}}
                                             <th>Message</th>
@@ -253,8 +294,10 @@
                         name: 'is_favorite'
                     },
                     {
-                        name: 'name',
-                        data: 'name'
+                        name: 'users.name',
+                        data: 'name',
+                        orderable: true, searchable: true
+                       
                     },
                     {
                         name: 'users_applications.application_number',
@@ -263,6 +306,10 @@
                     {
                         name: 'universities.name',
                         data: 'university'
+                    },
+                    {
+                        name: 'campus.name',
+                        data: 'campus'
                     },
 
                     {
@@ -479,7 +526,7 @@
 
 
 
-            //reset filter
+            //reset filter application/{id}/message
             $('#reset-filter').on('click', function() {
                 $(".select").selectpicker('deselectAll');
                 $(".select").val("");
@@ -491,7 +538,7 @@
                 $('.dynamic-title').text('');
                 id = $(this).data('id');
                 $.ajax({
-                    url: route('admin.applicaton-message-admin', $(this).data('id')),
+                    url: "{{url('admin/application')}}"+"/"+id+"/"+"message",
                     beforeSend: function() {
                         $(".dynamic-apply").html("");
                         $(".dynamic-body").html("");
@@ -516,5 +563,91 @@
 
 
         });
+
+        
+
+
+
+
+
     </script>
+
+<script>
+    $(document).ready(function() {
+      // Open the modal on button click positiveNumber  modelname
+      $('#openModalButton').on('click', function() {
+        
+        $('#myModal').modal('show');
+        $('#exampleModalLabel').html('Add Number');
+
+        $('#submitFormApplicationForm').on('click',function(){
+
+         
+
+        let count= $('#positiveNumber').val();
+        let modelName=$('#modelname').val();
+
+        $.ajax({
+                    url: "{{ route('admin.number-application-allow') }}", 
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        count: count,
+                        modelName: modelName,
+                    },
+                              
+                    success: (data) => { 
+                     
+                        $('#myModal').modal("hide");
+                        let html=$('.toast-success');
+                       
+
+                        html.each(function(index) {
+                           
+                            $(this).hide();              
+                       });
+
+                    
+                        toast("success", data, "Success");
+                        
+
+                        $('#positiveNumber').val('');
+                        dataTable.draw('page');
+                        
+                        
+                        
+                    },
+                    error: function(data) {
+
+                                let html=$('.toast-error');
+                       
+
+                                          html.each(function(index) {
+                  
+                                          $(this).hide();              
+                                       });
+
+
+                            if(data.responseJSON.errors.count[0]){
+                             toast("error", "count value required!!!.", "Error");
+                             $('#myModal').modal('hide');
+                             }else{
+                             toast("error", "Something went wrong.", "Error");
+                             $('#myModal').modal('hide');
+                             }
+
+                            
+
+               
+                          }
+                });
+
+
+
+
+
+      });
+    });
+    });
+  </script>
 @endsection

@@ -18,7 +18,7 @@ use App\Models\University;
 use App\Models\Test;
 use App\Models\CampusProgramTest;
 use Illuminate\Validation\Rule;
-use App\Models\CampusProgramFees;
+use CampusProgramFees;
 
 class CampusProgramController extends Controller
 {
@@ -60,14 +60,33 @@ class CampusProgramController extends Controller
         $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
             ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
             ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
-            ->select('campus_programs.id', 'universities.name as univ_name', 'campus.name as campus', 'programs.name as program')
+            ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
             ->get();
         if (request()->ajax()) {
-            return Datatables::of($campusPrograms)
+              return Datatables::of($campusPrograms)
                 ->addColumn('action', function ($row) {
                     return "<a href=" . route('admin.campus-program.edit', $row->id) . " class='btn btn-primary'>Update</a>";
                 })
-                ->rawColumns(['action'])
+
+                ->addColumn('university', function ($row) {
+                    return $row->university;
+                })
+                ->addColumn('campus', function ($row) {
+                    return $row->campus;
+                })
+                
+                ->addColumn('program', function ($row) {
+                    return $row->program;
+                })
+
+
+
+
+
+
+
+
+                ->rawColumns(['action','university','campus','program'])
                 ->make(true);
         } else {
             $breadcrumbs = [

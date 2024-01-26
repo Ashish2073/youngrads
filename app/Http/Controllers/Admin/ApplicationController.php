@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 // Third Party Packages
 use Yajra\Datatables\Datatables;
@@ -22,6 +23,7 @@ use App\Models\Campus;
 use App\Models\Program;
 use App\Models\University;
 use App\Models\User;
+use App\Models\AddDataLimit;
 
 class ApplicationController extends Controller
 {
@@ -431,4 +433,46 @@ class ApplicationController extends Controller
 		}
 
 	}
+	
+	
+	public function applicationallow(Request $request){
+		// AddDataLimit
+
+		$validator = Validator::make($request->all(), [
+           
+            'count' => ['required','numeric','min:0']
+            
+        ]);
+
+		if ($validator->fails()) { 
+            $errors = $validator->errors(); 
+
+         
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $errors,
+            ], 422);
+        }
+
+		$DataLimit=AddDataLimit::updateOrCreate(['model_name'=>'App/Model/AddDataLimit'],[
+			'action'=>'create','count'=>$request->count
+		]);
+
+
+		if ($DataLimit->wasRecentlyCreated) {
+			// The record was just created
+			return "Number of Application  was created.";
+		} else {
+			// The record was updated
+			return "Record was updated.";
+		}
+
+
+
+
+	}
+	
+	
+	
+	
 }

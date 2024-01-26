@@ -685,54 +685,15 @@
 
         });
 
-
-
-
-
-
-
-
-
-
-
-
         function workExperienceScript() {
 
-            // working_from_root
-            // $('.work-date').pickadate({
-            //     format: 'dd-mmmm-yyyy',
-            //     max: 'Today',
-            //     min: [1990, 3, 20],
-            //     selectYears: 20,
-            //     selectMonths: true,
-            // });
-
-            $('#working_from').pickadate({
-                format: 'dd-mmmm-yyyy',
-
-                max: 'Today',
-                min: [1970, 3, 20],
-                selectYears: 60,
-                selectMonths: true,
-                onSet: function(context) {
-                    if (context.select) {
-                        // If a date is selected in the start date picker, update the min date of the end date picker
-                        var selectedDate = new Date(context.select);
-                        selectedDate.setDate(selectedDate.getDate() + 1); // Add 1 day to the selected date
-                        $('#working_upto').pickadate('picker').set('min', selectedDate);
-                    }
-                }
-            });
-
-            $('#working_upto').pickadate({
+            $('.work-date').pickadate({
                 format: 'dd-mmmm-yyyy',
                 max: 'Today',
-                // min: window.min,
-                // disable: window.min,
-                selectYears: 60,
+                min: [1990, 3, 20],
+                selectYears: 20,
                 selectMonths: true,
             });
-
 
             $(document).on('change', '.current_working', function() {
                 if (this.checked) {
@@ -836,14 +797,6 @@
 
 
         }
-
-
-
-
-
-
-
-
 
         function updateState(id) {
             getContent({

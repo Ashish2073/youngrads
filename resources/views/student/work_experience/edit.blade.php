@@ -92,7 +92,6 @@
     <button type="submit" class="btn btn-primary" id="edit-btn">Update</button>
 
 </form>
-
 <script>
     $('#working_from').pickadate({
         format: 'dd-mmmm-yyyy',

@@ -481,7 +481,21 @@
     <!-- vendor files -->
     <script src="{{ asset(mix('vendors/js/extensions/wNumb.js')) }}"></script>
     <script src="{{ asset(mix('vendors/js/extensions/nouislider.min.js')) }}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
     {{-- <script src="{{ asset("js/scripts/select2.multi-checkboxes.js")}}"></script> --}}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <script>
         // Chat Application
         (function($) {
@@ -939,4 +953,128 @@
             $(".univ-box").html(html);
         }
     </script>
+    
+    
+    <script>
+        $(document).ready(function() {
+
+            // $('.select-2').select2();
+
+            dataTable = $("#result-search").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "pageLength": 100,
+                ajax: {
+                    url: `{{ route('getprogram') }}`,
+                    type: "GET",
+                    data: function(d) {
+                        // d.program = $('#program').val();
+                        // d.country_id = $("#country").val();
+                        console.log(d);
+                        d.what = $('#what').val();
+                        d.where = $('#where').val();
+                    }
+                },
+                columns: [{
+                        data: 'logo',
+                        "visible": false
+                    },
+                    {
+                        data: 'row',
+                    },
+                ],
+                responsive: false,
+                // columnDefs: [
+                //     {
+                //         orderable: true,
+                //         targets: 0,
+                //         checkboxes: { selectRow: true }
+                //     }
+                // ],
+                drawCallback: function(setting, data) {
+                    $(".table-img").each(function() {
+                        $(this).parent().addClass('product-img');
+                        $(this).parent().addClass('text-center');
+                    });
+
+                    $('body,html').animate({
+                        scrollTop: 290
+                    }, 1000);
+                },
+                dom: '<<"actions action-btns"><"action-filters">><"clear">rt<"bottom"<"actions">p>',
+                oLanguage: {
+                    sLengthMenu: "_MENU_",
+                    sSearch: "",
+                    sEmptyTable: "No results found"
+                },
+                aLengthMenu: [
+                    [10, 15, 20],
+                    [10, 15, 20]
+                ],
+                // select: {
+                //     style: "multi"
+                // },
+                // order: [[1, "asc"]],
+                bInfo: false,
+                pageLength: 10,
+                buttons: [{
+                    text: "<i class='feather icon-plus'></i> Add New",
+                    action: function() {
+                        $(this).removeClass("btn-secondary")
+                        $(".add-new-data").addClass("show")
+                        $(".overlay-bg").addClass("show")
+                        $("#data-name, #data-price").val("")
+                        $("#data-category, #data-status").prop("selectedIndex", 0)
+                    },
+                    className: "btn-outline-primary"
+                }],
+                initComplete: function(settings, json) {
+                    $(".dt-buttons .btn").removeClass("btn-secondary");
+                    $(".table-img").each(function() {
+                        $(this).parent().addClass('product-img');
+                    });
+                }
+            });
+
+            $('#guest-search').click(function() {
+                dataTable.draw("page");
+            });
+
+            $('#guest-reset').click(function() {
+                $('#what').val("");
+                $('#where').val("");
+                dataTable.draw("page");
+            });
+        });
+
+        var path = "{{ route('autocompletecourse') }}";
+        $('#what').typeahead({
+            autoSelect: false,
+            source: function(query, process) {
+                return $.get(path, {
+                    query: query
+                }, function(data) {
+                    return process(data);
+                });
+            }
+        });
+
+        var path1 = "{{ route('autocompletecountry') }}";
+        $('#where').typeahead({
+            autoSelect: false,
+            source: function(query, process) {
+                return $.get(path1, {
+                    query: query
+                }, function(data) {
+                    return process(data);
+                });
+            }
+        });
+    </script>
+    
+    
+    
+    
+    
+    
 @endsection

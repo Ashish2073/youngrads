@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserAcademic;
 use Illuminate\Support\Facades\DB;
-use App\Models\TEST;
+use App\Models\Test;
 use App\Models\SpecialTest;
 use App\Models\DocumentType;
 use App\Models\Files;

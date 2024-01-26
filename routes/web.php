@@ -57,7 +57,6 @@ use App\Http\Controllers\Admin\UniversityController;
 
 
 
-
 Route::group(['middleware' => 'prevent-back-history'], function () {
     Auth::routes(['verify' => true]);
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -104,7 +103,6 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         Route::post('/email/update', [App\Http\Controllers\Admin\Auth\ChangeEmailController::class, 'changeEmail'])->name('changeemail')->middleware('auth:admin');
     });
     Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
-
     Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
 
     // Activities
@@ -391,6 +389,11 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
 
     //application route
     Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all');
+    
+     Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
+    
+    
+    
     Route::get('applications-all/favourite', [ApplicationController::class, 'index'])->name('favorite-applicatons');
     Route::get('applications-all/inactive-application', [ApplicationController::class, 'index'])->name('inactive-applicatons');
     Route::get('application/{id}/message', [ApplicationController::class, 'applicationMessage'])->name('applicaton-message-admin');
@@ -447,7 +450,7 @@ Route::get('/campus-search/{id}', [CourseFinderController::class, 'campusePage']
 Route::get('autocompletecourse', [CourseFinderController::class, 'autocompleteCourse'])->name('autocompletecourse');
 Route::get('autocompletecountry', [CourseFinderController::class, 'autocompleteCountries'])->name('autocompletecountry');
 /**
- * Students Route  
+ * Students Route 
  */
 Route::get('edit-profile', [App\Http\Controllers\StudentController::class, 'editProfile'])->name('student.edit-profile');
 Route::get('edit-profile/{step}', [App\Http\Controllers\StudentController::class, 'stepView'])->name('student.stepView');
