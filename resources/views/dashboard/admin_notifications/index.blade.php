@@ -97,7 +97,7 @@
 
                 that = $(this);
                 $.ajax({
-                    url: route('admin.mark-read'),
+                    url: "{{ route('admin.mark-read') }}",
                     type: 'post',
                     beforeSend: function() {
                         that.attr('disabled', true).html(

@@ -811,31 +811,36 @@ class StudentController extends Controller
 	public function educationListing()
 	{
 		$education = UserAcademic::join('study_levels', 'user_academics.study_levels_id', '=', 'study_levels.id')
-			->where('user_id', '=', Auth::id())->select('study_levels.name as study_level', 'user_academics.*');
+		    ->join('countries','user_academics.country','=','countries.id')
+			->where('user_id', '=', Auth::id())->select('study_levels.name as study_level', 'user_academics.*','countries.name as country_name')
+			->get();
 
 		return Datatables::of($education)
-			->editColumn('marks', function ($row) {
+			->addColumn('marks', function ($row) {
 				if ($row->marks_unit == 'percentage') {
 					return $row->marks . "  %";
 				} else {
 					return $row->marks . " " . $row->marks_unit;
 				}
 			})
-			->editColumn('study_level', function ($row) {
+			->addColumn('study_level', function ($row) {
 				if ($row->study_level == 'Other') {
 					return $row->study_level . " ( " . $row->sub_other . " )";
 				} else {
 					return $row->study_level;
 				}
 			})
-			->editColumn('start_date', function ($row) {
+			->addColumn('start_date', function ($row) {
 				return date('d-F-Y', strtotime($row->start_date));
 			})
-			->editColumn('end_date', function ($row) {
+			->addColumn('language', function ($row) {
+				return $row->language;
+			})
+			->addColumn('end_date', function ($row) {
 				return date('d-F-Y', strtotime($row->end_date));
 			})
-			->editColumn('country', function ($row) {
-				return $row->getCountry->name ?? "";
+			->addColumn('country', function ($row) {
+				return $row->country_name ?? "";
 			})
 			->addColumn('action', function ($row) {
 				$html = "<div>";
@@ -844,7 +849,7 @@ class StudentController extends Controller
 				$html .= "</div>";
 				return $html;
 			})
-			->rawColumns(['action'])
+			->rawColumns(['action','language','country','marks','study_level','start_date','end_date'])
 			->make(true);
 	}
 
@@ -1031,7 +1036,7 @@ class StudentController extends Controller
 
 	function userDocumentStore(Request $request)
 	{
-
+		
 		$tableName = $request->table_name;
 		$tableId = $request->table_id;
 
@@ -1067,6 +1072,7 @@ class StudentController extends Controller
 			]);
 
 			$document->move(public_path('user_documents'), $fileName);
+			chmod(public_path('user_documents'.'/'.$fileName), 0755);
 
 			$i++;
 		}
@@ -1129,6 +1135,8 @@ class StudentController extends Controller
 
 	function documentUpdate($id, Request $request)
 	{
+
+		
 		$files = UserDocumentFiles::where('table_id', '=', $request->id)
 			->join('user_documents', 'user_document_files.user_document_id', '=', 'user_documents.id')
 			->select('user_documents.document_type_id as doc_id', 'user_document_files.*')
@@ -1200,6 +1208,7 @@ class StudentController extends Controller
 
 	public function uploadDocument(Request $request)
 	{
+		
 		// NOTES
 		// Steps to upload
 		// 1. Upload file and get file_id - file_id
@@ -1513,7 +1522,7 @@ class StudentController extends Controller
 				else
 					return "N/A";
 			})
-			->rawColumns(['action'])
+			->rawColumns(['action']) 
 			->make(true);
 	}
 

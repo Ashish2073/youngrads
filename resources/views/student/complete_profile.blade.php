@@ -1021,7 +1021,17 @@
                 disable: window.min,
                 selectYears: 60,
                 selectMonths: true,
+                onSet: function(context) {
+                    if (context.select) {
+                        // If a date is selected in the start date picker, update the min date of the end date picker
+                        var selectedDate = new Date(context.select);
+                        selectedDate.setDate(selectedDate.getDate() - 1); // Add 1 day to the selected date
+                        $('#start-date').pickadate('picker').set('max', selectedDate);
+                    }
+                }
             });
+
+
 
             $('#add-education').click(function() {
                 educationForm();

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Files;
 use App\Models\ApplicationMessage;
-use App\MessageAttachment;
+use App\Models\MessageAttachment;
 use Yajra\DataTables\Contracts\DataTable;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;

@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="education-country">Country Of Education<span class="text-danger">*</span></label>
+                    <label for="education-country">Country Of Educationss<span class="text-danger">*</span></label>
                     <select name="country" data-style="border-light bg-white" id="education-country"
                         class="select form-control" data-live-search="true">
                         <option value="">--Select Country--</option>
@@ -103,31 +103,31 @@
                     }
                 },
                 columns: [{
-                        name: 'study_levels.name',
+                        name: 'study_level',
                         data: 'study_level'
                     },
                     {
-                        name: 'user_academics.board_name',
+                        name: 'board_name',
                         data: 'board_name'
                     },
                     {
-                        name: 'user_academics.marks',
+                        name: 'marks',
                         data: 'marks'
                     },
                     {
-                        name: 'user_academics.country',
+                        name: 'country',
                         data: 'country'
                     },
                     {
-                        name: 'user_academics.language',
+                        name: 'language',
                         data: 'language',
                     },
                     {
-                        name: 'user_academics.start_date',
+                        name: 'start_date',
                         data: 'start_date'
                     },
                     {
-                        name: 'user_academics.end_date',
+                        name: 'end_date',
                         data: 'end_date'
                     },
                     {
@@ -216,13 +216,58 @@
         }
     }
 
+
+    function adjustDate(inputDateString, daysToAddOrSubtract) {
+        // Parse the input date string
+        var inputDateParts = inputDateString.split('-');
+        var day = parseInt(inputDateParts[0], 10);
+        var month = inputDateParts[1];
+        var year = parseInt(inputDateParts[2], 10);
+
+        // Create an array of month names
+        var monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        // Find the index of the month in the array
+        var monthIndex = monthNames.indexOf(month);
+
+        // Create a new date with the adjusted days
+        var outputDate = new Date(year, monthIndex, day + daysToAddOrSubtract);
+
+        // Format the output date as "DD-Month-YYYY"
+        var outputDateString = outputDate.getDate() + "-" + monthNames[outputDate.getMonth()] + "-" + outputDate
+            .getFullYear();
+
+        return outputDateString;
+    }
+
+
+
+
+
+
+
     function manageEducationScript() {
         // Selectpicker
         // Datepicker
+
+        // Input date string
+
+        // Output: "31-December-2019"
+
+
+
+
+
+
+
         $('#start-date').pickadate({
             format: 'dd-mmmm-yyyy',
 
-            max: 'Today',
+            max: (typeof($('#end-date').val()) !== 'undefined' && $('#end-date').val() !== null) ?
+                adjustDate($('#end-date').val(), -1) : 'Today',
             min: [1970, 3, 20],
             selectYears: 60,
             selectMonths: true,
@@ -230,19 +275,32 @@
                 if (context.select) {
                     // If a date is selected in the start date picker, update the min date of the end date picker
                     var selectedDate = new Date(context.select);
+                    console.log(selectedDate.getDate());
                     selectedDate.setDate(selectedDate.getDate() + 1); // Add 1 day to the selected date
                     $('#end-date').pickadate('picker').set('min', selectedDate);
                 }
             }
         });
 
+
+
+
         $('#end-date').pickadate({
             format: 'dd-mmmm-yyyy',
             max: 'Today',
-            // min: window.min,
+            min: (typeof($('#start-date').val()) !== 'undefined' && $('#start-date').val() !== null) ?
+                adjustDate($('#start-date').val(), +1) : [1970, 3, 20],
             // disable: window.min,
             selectYears: 60,
             selectMonths: true,
+            onSet: function(context) {
+                if (context.select) {
+                    // If a date is selected in the start date picker, update the min date of the end date picker
+                    var selectedDate = new Date(context.select);
+                    selectedDate.setDate(selectedDate.getDate() - 1); // Add 1 day to the selected date
+                    $('#start-date').pickadate('picker').set('max', selectedDate);
+                }
+            }
         });
 
         $("#marks-unit").selectpicker();

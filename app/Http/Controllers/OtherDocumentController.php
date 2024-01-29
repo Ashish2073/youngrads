@@ -38,6 +38,8 @@ class OtherDocumentController extends Controller
      */
     public function store(Request $request)
     {
+
+        
         // $validator = Validator::make($request->all(), [
         // 	'document_type' => 'required',
         // 	'document_type_id' => 'required',
