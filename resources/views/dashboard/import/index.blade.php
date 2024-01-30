@@ -65,7 +65,7 @@
                             </form>
                         </div>
                         <div class="card-footer">
-                            <a download href="{{ url('import_samples/campus_program.xlsx') }}">Click Here</a> to download
+                            <a download href="{{ asset('import_samples/campus_program.xlsx') }}">Click Here</a> to download
                             sample.
                         </div>
                     </div>

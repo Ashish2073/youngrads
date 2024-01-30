@@ -20,6 +20,7 @@
                     <div class="card-content">
                         <div class="card-body card-dashboard">
                             <p class="text-muted">Note: Click/Tap row for viewing profile</p>
+                            <a href="{{route('admin.students-data-export')}}" class="btn btn-primary mt-3">Export Students Application Data In Excel Form</a>
 
                             <div class="table-responsive">
                                 <table id="user-table" class="table table-hover w-100 zero-configuration">

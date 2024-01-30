@@ -21,6 +21,8 @@ use App\Models\UserAcademic;
 use App\Models\UserApplication;
 use App\Models\UserDocument;
 use App\Models\UserShortlistProgram;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentData;
 
 class StudentController extends Controller
 {
@@ -165,5 +167,10 @@ class StudentController extends Controller
 				'message' => 'User deleted successfully'
 			]);
 		endif;
+	}
+
+
+	public function get_student_data(){
+		return Excel::download(new StudentData, 'studentsdata.xlsx');
 	}
 }

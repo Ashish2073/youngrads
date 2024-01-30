@@ -85,7 +85,7 @@
                                 <div class="col-md-4 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
                                     <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit Of Aplication</button>
-
+                                    <a href="{{route('admin.students-application-export')}}" class="btn btn-primary mt-3">Export Students Application Data In Excel Form</a>
                                 </div>
 
                                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -101,7 +101,8 @@
                                           <!-- Modal content goes here -->
                                           <form id="myForm">
                                             <div class="form-group">
-                                              {{-- <label for="inputName">Name</label> --}}
+                                                  
+                                               <label for="inputName"><h3 id="allow_permission">{{json_decode($limitApplyApplication,true)[0]['count']}} Application Allow Permission To Submit </h3></label> 
                                           
                                               <input type="text" class="form-control" hidden id="modelname" name="name" required value="{{request()->segment(2)}}">
                                             </div>
@@ -597,6 +598,10 @@
                     },
                               
                     success: (data) => { 
+
+               
+
+                        $('#allow_permission').html(`${data.Data.count} Application Allow Permission To Submit`);
                      
                         $('#myModal').modal("hide");
                         let html=$('.toast-success');
@@ -608,7 +613,7 @@
                        });
 
                     
-                        toast("success", data, "Success");
+                        toast("success", "Data Submited Successfully", "Success");
                         
 
                         $('#positiveNumber').val('');

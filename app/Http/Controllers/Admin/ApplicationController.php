@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentApplication;
 
 // Third Party Packages
 use Yajra\Datatables\Datatables;
@@ -194,7 +196,8 @@ class ApplicationController extends Controller
 			$univs = University::all();
 			$programs = Program::all();
 			$campuses = Campus::all();
-			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses'));
+			$limitApplyApplication=AddDataLimit::where('model_name','App/Model/AddDataLimit')->where('action','create')->select('count')->get();
+			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses','limitApplyApplication'));
 		}
 	}
 
@@ -459,18 +462,28 @@ class ApplicationController extends Controller
 		]);
 
 
-		if ($DataLimit->wasRecentlyCreated) {
-			// The record was just created
-			return "Number of Application  was created.";
-		} else {
-			// The record was updated
-			return "Record was updated.";
-		}
+	   return response()->json([
+			'Data'=>json_decode($DataLimit,true)
+		]);
 
 
+		// if ($DataLimit->wasRecentlyCreated) {
+		// 	// The record was just created
+		// 	return "Number of Application  was created.";
+		// } else {
+		// 	// The record was updated
+		// 	return "Record was updated.";
+		// }
 
+
+ 
 
 	}
+
+	public function get_student_application_data()
+    {
+        return Excel::download(new StudentApplication, 'studentsapplication.xlsx');
+    }
 	
 	
 	

@@ -167,6 +167,8 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         ]
     ]);
 
+    Route::get('students-data-export', [App\Http\Controllers\Admin\StudentController::class, 'get_student_data'])->name('students-data-export');
+
     //shortlist
     Route::get('/shortlist-courses/{id}', [StudentController::class, 'shortlistApplication'])->name('shortlist-courses');
 
@@ -226,6 +228,8 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     ]);
 
     //Study Area
+
+
 
     Route::resource('study', '\App\Http\Controllers\Admin\StudyController', [
         'names' => [
@@ -392,6 +396,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     
      Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
     
+     Route::get('students-application-export', [ApplicationController::class, 'get_student_application_data'])->name('students-application-export');
     
     
     Route::get('applications-all/favourite', [ApplicationController::class, 'index'])->name('favorite-applicatons');
