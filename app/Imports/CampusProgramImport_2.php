@@ -223,83 +223,30 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
            
 
-            $TestAll=Test::whereIn('test_name',$entrenceExamAllName)->pluck('id')->toArray();
+            $TestAll=Test::whereIn('test_name',$entrenceExamAllName)->pluck('id');
 
-          
+            dd($TestInput,$TestAll);
 
+           
+
+            $TestIDJSON=json_decode( $TestAll,true);
+           
+
+            $TestID= $TestIDJSON[0]['id'];
 
 
             $TestSocre=(isset($record['required_score_for_enterence']) && !empty($record['required_score_for_enterence'])) ? $record['required_score_for_enterence']:null;
 
             $TestSocreNlt=(isset($record['required_nlt_score_for_enterence']) && !empty($record['required_nlt_score_for_enterence'])) ? $record['required_nlt_score_for_enterence']:null;
-             
-            $entrenceExamAllTestScore=explode(',', $TestSocre);
-
-            
-
-
-
-
-            $records = [];
-
-            foreach ($TestAll as $k=>$testId) {
-                $records[] = [
-                    'campus_program_id' => $campusProgramId,
-                    'test_id' => (isset($testId) && !empty($testId)?$testId:null),
-                    'score' =>  (isset($entrenceExamAllTestScore[$k]) && !empty($entrenceExamAllTestScore[$k])?$entrenceExamAllTestScore[$k]:null),
-                    'nlt_score' => $TestSocreNlt,
-                    'show_in_front' => 1,
-                ];
-            }
-
-
-                    //  $campusProgramId = 1; // replace with the actual value
-                    //  $testScores = [18, 30, 31];
-                    // $TestSocre = 0; // replace with the actual value
-                    // $TestSocreNlt = 0; // replace with the actual value
-
-                    // $records1 = [];
-
-                    //  foreach ($testScores as $testId) {
-                    //               $records1[] = [
-                    //                'campus_program_id' => $campusProgramId,
-                    //                 'test_id' => $testId,
-                    //                    'score' => $TestSocre,
-                    //                    'nlt_score' => $TestSocreNlt,
-                    //                   'show_in_front' => 1,
-                    //                 ];
-                    //             } 
-
-
-
-
-
-            //    dd($records,$records1);
-
-
-
-
-
-
-       
-            CampusProgramTest::insert($records);
-
-            // dd($records);
-
-
-
-
-
-
 
           
-            // CampusProgramTest::create([
-            //     'campus_program_id' => $campusProgramId,
-            //     'test_id' => $TestID,
-            //     'score' =>  $TestSocre,
-            //     'nlt_score' =>  $TestSocreNlt,
-            //     'show_in_front' => 1,
-            // ]);
+            CampusProgramTest::create([
+                'campus_program_id' => $campusProgramId,
+                'test_id' => $TestID,
+                'score' =>  $TestSocre,
+                'nlt_score' =>  $TestSocreNlt,
+                'show_in_front' => 1,
+            ]);
 
 
 
@@ -386,20 +333,22 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     'show_in_front' => 1,
                 ]);
             }
-            
+
             // Campus Program Fees
             CampusProgramFee::where('campus_program_id', $campusProgramId)->delete();
 
-            if (!empty(($record['annual_tuition_fee'])) && isset($record['annual_tuition_fee'])) {
-                $price =$record['annual_tuition_fee'];
-                $currencyType=$record['currency_type'];
+            if (!empty(trim($record['annual_tuition_fee']))) {
+                $priceArr = explode(" ", $record['annual_tuition_fee']);
+                $price = $priceArr[0];
+                $price = str_replace(",", "", $price);
+                $price = floatval($price);
 
-                
-               
+                $currency = str_replace(",", "", $priceArr[1]);
+                $currency = str_replace(".", "", $currency);
+                $currency = trim($currency);
 
-                if (isset($currenciesArr[strtolower($currencyType)])) {
-                    $currencyId = $currenciesArr[strtolower($currencyType)];
-                   
+                if (isset($currenciesArr[strtolower($currency)])) {
+                    $currencyId = $currenciesArr[strtolower($currency)];
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
                         'fee_type_id' => $feeType['tuition_fee'],
@@ -409,21 +358,25 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 } else {
                     Log::debug("Invalid Currency 1: " . json_encode($record));
                     $sheetError[] = [
-                        'message' => "Invalid Currency 1: " . $currencyType . " " . $record['annual_tuition_fee'],
+                        'message' => "Invalid Currency 1: " . $currency . " " . $record['annual_tuition_fee'],
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
                 }
             }
 
-            if (!empty(($record['program_fee'])) && isset($record['program_fee'])) {
+            if (!empty(trim($record['program_fees']))) {
 
-                $price= $record['program_fee'];
-                $currencyType=$record['currency_type'];
-             
-;
+                $priceArr = explode(" ", $record['program_fees']);
+                $price = $priceArr[0];
+                $price = str_replace(",", "", $price);
+                $price = floatval($price);
 
-                if (isset($currenciesArr[strtolower($currencyType)])) {
+                $currency = str_replace(",", "", $priceArr[1]);
+                $currency = str_replace(".", "", $currency);
+                $currency = trim($currency);
+
+                if (isset($currenciesArr[strtolower($currency)])) {
                     $currencyId = $currenciesArr[strtolower($currency)];
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
@@ -434,21 +387,25 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 } else {
                     Log::debug("Invalid Currency 2: " . json_encode($record));
                     $sheetError[] = [
-                        'message' => "Invalid Currency 2: " . $currencyType . " " . $record['program_fee'],
+                        'message' => "Invalid Currency 2: " . $currency . " " . $record['program_fees'],
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
                 }
             }
 
-            if (!empty(($record['app_fee'])) && isset(($record['app_fee']))) {
-                $price = $record['app_fee'];
-                $currencyType=$record['currency_type'];
+            if (!empty(trim($record['app_fee']))) {
+                $priceArr = explode(" ", $record['app_fee']);
+                $price = $priceArr[0];
+                $price = str_replace(",", "", $price);
+                $price = floatval($price);
 
-            
+                $currency = str_replace(",", "", $priceArr[1]);
+                $currency = str_replace(".", "", $currency);
+                $currency = trim($currency);
 
-                if (isset($currenciesArr[strtolower($currencyType)])) {
-                    $currencyId = $currenciesArr[strtolower($currencyType)];
+                if (isset($currenciesArr[strtolower($currency)])) {
+                    $currencyId = $currenciesArr[strtolower($currency)];
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
                         'fee_type_id' => $feeType['application_fee'],
@@ -458,7 +415,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 } else {
                     Log::debug("Invalid Currency 3: " . json_encode($record));
                     $sheetError[] = [
-                        'message' => "Invalid Currency 3: " . $currencyType . " " . $record['app_fee'],
+                        'message' => "Invalid Currency 3: " . $currency . " " . $record['program_fees'],
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
