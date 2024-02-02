@@ -191,19 +191,21 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
         if(isset($record['entrance_exam_name']) && !empty($record['entrance_exam_name'])){
 
             $entrenceExamAllName=explode(',',$record['entrance_exam_name']);
+            $entranceExamMinNumber=explode(',',$record['entrance_score_min']);
+            $entranceExamMaxNumber=explode(',',$record['entrance_score_max']);
 
-           
+          
               
             $testValues=[];
-            foreach ($entrenceExamAllName as $testName) {
+            foreach ($entrenceExamAllName as $k=>$testName) {
                 $testValues[] = [
                     'test_name' => $testName,
-                    'min' => (isset($record['entrance_score_min']) && !empty($record['entrance_score_min'])?$record['entrance_score_min']:null),
-                    'max' =>  (isset($record['entrance_score_max']) && !empty($record['entrance_score_max'])?$record['entrance_score_max']:null),     
+                    'min' => (isset($entranceExamMinNumber[$k]) && !empty($entranceExamMinNumber[$k])? (int)$entranceExamMinNumber[$k]:null),
+                    'max' =>  (isset($entranceExamMaxNumber[$k]) && !empty($entranceExamMaxNumber[$k])? (int)$entranceExamMaxNumber[$k]:null),     
                 ];
             }
  
-       
+        
 
             // if(isset($record['entrance_score_max']) && !empty($record['entrance_score_max'])){
             //     $maxScore=$record['entrance_score_max'];
@@ -219,7 +221,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             //     $minScore=null; 
             // }
           
-            $TestInput=Test::upsert($testValues,['test_name'], ['min', 'max']);
+            $TestInput=Test::upsert($testValues,'id', ['min', 'max']);
 
            
 
@@ -424,7 +426,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 ;
 
                 if (isset($currenciesArr[strtolower($currencyType)])) {
-                    $currencyId = $currenciesArr[strtolower($currency)];
+                    $currencyId = $currenciesArr[strtolower($currencyType)];
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
                         'fee_type_id' => $feeType['admission_fee'],
@@ -441,7 +443,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 }
             }
 
-            if (!empty(($record['app_fee'])) && isset(($record['app_fee']))) {
+            if (!empty(($record['app_fee'])) && isset($record['app_fee'])) {
                 $price = $record['app_fee'];
                 $currencyType=$record['currency_type'];
 
