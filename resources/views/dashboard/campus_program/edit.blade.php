@@ -152,7 +152,7 @@
                                     @foreach ($tests as $test)
                                         <div class="form-group col-6">
                                             <label>{{ $test->test_name }}</label>
-                                            <input min="0" max="10" type="text" class="form-control"
+                                            <input min="{{$test->min}}" max="{{$test->max}}" type="text" class="form-control"
                                                 name="test[{{ $j }}][score]"
                                                 value="{{ old("test.$j.score", $campusProgramTest[$test->id]['score']) }}" />
                                             <input type="hidden" name="test[{{ $j }}][type]"

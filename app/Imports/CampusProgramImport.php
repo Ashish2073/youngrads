@@ -63,6 +63,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
         $sheetError = [];
         $rowNumber = 1;
+        
 
        
 
@@ -188,40 +189,57 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             // Campus Program Tests
             CampusProgramTest::where('campus_program_id', $campusProgramId)->delete();
 
-        if(isset($record['entrance_exam_name']) && !empty($record['entrance_exam_name'])){
+           if(isset($record['entrance_exam_name']) && !empty($record['entrance_exam_name'])){
 
             $entrenceExamAllName=explode(',',$record['entrance_exam_name']);
             $entranceExamMinNumber=explode(',',$record['entrance_score_min']);
             $entranceExamMaxNumber=explode(',',$record['entrance_score_max']);
-
-          
-              
+            $entrenceExamAllTestScore=explode(',',  $record['required_score_for_enterence']);
             $testValues=[];
-            foreach ($entrenceExamAllName as $k=>$testName) {
-                $testValues[] = [
-                    'test_name' => $testName,
-                    'min' => (isset($entranceExamMinNumber[$k]) && !empty($entranceExamMinNumber[$k])? (int)$entranceExamMinNumber[$k]:null),
-                    'max' =>  (isset($entranceExamMaxNumber[$k]) && !empty($entranceExamMaxNumber[$k])? (int)$entranceExamMaxNumber[$k]:null),     
+              $testBoolean=true;
+              foreach($entrenceExamAllName as $k=>$testName){
+                  $testValues[$k]['test_name']=$testName;  
+
+                  if(!is_numeric($entranceExamMinNumber[$k])){
+                   Log::debug(json_encode($testName).'Test Score Minimum Validation!' . json_encode($testName));
+                   $sheetError[] = [
+                    'message' => json_encode($testName).'Test  Minimum Score Not Numeric ! !' . json_encode($entranceExamMinNumber[$k]),
+                    'record' => $record,
+                    'rowNumber' => $rowNumber,
+                 ];
+                 $testBoolean=false;
+                   continue;
+                  
+                }else{
+                    $testValues[$k]['min'] =(isset($entranceExamMinNumber[$k]) && !empty($entranceExamMinNumber[$k])? (int)$entranceExamMinNumber[$k]:null);   
+                   
+                }
+
+              if(!is_numeric($entranceExamMaxNumber[$k])){
+                Log::debug(json_encode($testName).'!Test Score Maxmium Validation!' . json_encode($testName));
+                $sheetError[] = [
+                    'message' => json_encode($testName).'Test  Maximum Score Not Numeric !' . json_encode($entranceExamMaxNumber[$k]),
+                    'record' => $record,
+                    'rowNumber' => $rowNumber,
                 ];
+                $testBoolean=false;
+                continue;
+            }else{
+                $testValues[$k]['max'] =(isset($entranceExamMaxNumber[$k]) && !empty($entranceExamMaxNumber[$k])? (int)$entranceExamMaxNumber[$k]:null);   
+               
+           
             }
- 
+
+            }
+           
+         
+           
+           
         
 
-            // if(isset($record['entrance_score_max']) && !empty($record['entrance_score_max'])){
-            //     $maxScore=$record['entrance_score_max'];
-
-            // }else{
-            //     $maxScore=null; 
-            // }
-
-            // if(isset($record['entrance_score_min']) && !empty($record['entrance_score_min'])){
-            //     $minScore=$record['entrance_score_min'];
-
-            // }else{
-            //     $minScore=null; 
-            // }
-          
-            $TestInput=Test::upsert($testValues,'id', ['min', 'max']);
+            if($testBoolean){
+            $TestInput=Test::upsert($testValues,'test_name', ['min', 'max']);
+            }
 
            
 
@@ -231,114 +249,70 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
 
 
-            $TestSocre=(isset($record['required_score_for_enterence']) && !empty($record['required_score_for_enterence'])) ? $record['required_score_for_enterence']:null;
+          
 
             $TestSocreNlt=(isset($record['required_nlt_score_for_enterence']) && !empty($record['required_nlt_score_for_enterence'])) ? $record['required_nlt_score_for_enterence']:null;
              
-            $entrenceExamAllTestScore=explode(',', $TestSocre);
+            if(isset($record['required_score_for_enterence']) && !empty($record['required_score_for_enterence'])){
+                $entrenceExamAllTestScore=explode(',', $record['required_score_for_enterence']);
+                
+            }else{
+                $entrenceExamAllTestScore=null;
+            }
+
+              
+            
+
+          
+
+
 
             
 
 
 
 
-            $records = [];
+            $Campusrecords = [];
+            $testScoreBoolean=true;
+
 
             foreach ($TestAll as $k=>$testId) {
-                $records[] = [
-                    'campus_program_id' => $campusProgramId,
-                    'test_id' => (isset($testId) && !empty($testId)?$testId:null),
-                    'score' =>  (isset($entrenceExamAllTestScore[$k]) && !empty($entrenceExamAllTestScore[$k])?$entrenceExamAllTestScore[$k]:null),
-                    'nlt_score' => $TestSocreNlt,
-                    'show_in_front' => 1,
-                ];
+
+
+                if(!is_numeric($entrenceExamAllTestScore[$k])){
+              
+                    Log::debug(json_encode($testName).'Test Score Validation!' . json_encode($testName));
+                    $sheetError[] = [
+                        'message' => json_encode($testName).'Test Score Not Numeric!' . json_encode($entrenceExamAllTestScore[$k]),
+                        'record' => $record,
+                        'rowNumber' => $rowNumber,
+                    ];
+                    $testScoreBoolean=false;
+                    continue;
+                  
+
+                }else{
+                    $Campusrecords[] = [
+                        'campus_program_id' => $campusProgramId,
+                        'test_id' => (isset($testId) && !empty($testId)?$testId:null),
+                        'score' =>  (isset($entrenceExamAllTestScore[$k]) && !empty($entrenceExamAllTestScore[$k])?$entrenceExamAllTestScore[$k]:null),
+                        'nlt_score' => $TestSocreNlt,
+                        'show_in_front' => 1,
+                    ];
+
+                }
+
+
+              
             }
+      
+            if($testScoreBoolean){
+                CampusProgramTest::insert($Campusrecords);
+            }
+           
 
 
-                    //  $campusProgramId = 1; // replace with the actual value
-                    //  $testScores = [18, 30, 31];
-                    // $TestSocre = 0; // replace with the actual value
-                    // $TestSocreNlt = 0; // replace with the actual value
-
-                    // $records1 = [];
-
-                    //  foreach ($testScores as $testId) {
-                    //               $records1[] = [
-                    //                'campus_program_id' => $campusProgramId,
-                    //                 'test_id' => $testId,
-                    //                    'score' => $TestSocre,
-                    //                    'nlt_score' => $TestSocreNlt,
-                    //                   'show_in_front' => 1,
-                    //                 ];
-                    //             } 
-
-
-
-
-
-            //    dd($records,$records1);
-
-
-
-
-
-
-       
-            CampusProgramTest::insert($records);
-
-            // dd($records);
-
-
-
-
-
-
-
-          
-            // CampusProgramTest::create([
-            //     'campus_program_id' => $campusProgramId,
-            //     'test_id' => $TestID,
-            //     'score' =>  $TestSocre,
-            //     'nlt_score' =>  $TestSocreNlt,
-            //     'show_in_front' => 1,
-            // ]);
-
-
-
-
-
-
-         }
-
-
-
-
-
-
-
-
-
-        //  else{
-
-        //     Log::debug('!Entrance Exam name' . json_encode($record));
-        //     $sheetError[] = [
-        //         'message' => 'Entraance Exam does not exists!',
-        //         'record' => $record,
-        //         'rowNumber' => $rowNumber,
-        //     ];
-        //     continue;
-
-        // }
-
-
-
-
-
-
-
-
-          
-
+        
 
 
             if (isset($record['ielts_os']) && !empty($record['ielts_os'])) {
@@ -415,6 +389,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
+                    continue;
                 }
             }
 
@@ -440,6 +415,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
+                    continue;
                 }
             }
 
@@ -464,6 +440,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
+                    continue;
                 }
             }
 
@@ -485,20 +462,50 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                             'message' => "Invalid Intake. Please provide either of these values: " . implode(", ", array_keys($intakeIdNameArr)),
                             'rowNumber' => $rowNumber
                         ];
+                        continue;
                     }
                 }
             }
         }
-
-        $this->response = [
-            'success' => true,
-            'title' => 'Sheet Imported',
-            'code' => 'success',
-            'message' => 'Sheet imported successfully',
-            'sheetError' => $sheetError,
-        ];
+    
+        
     }
 
+    
+   
+        if(empty($sheetError)){
+           
+            $this->response = [
+                'success' => true,
+                'title' => 'Sheet Imported',
+                'code' => 'success',
+                'message' => 'Sheet imported successfully',
+                
+            ];
+
+            return $this->response;
+
+        }else{ 
+           
+          
+            $this->response = [
+                'success' => false,
+                'title' => 'Sheet Not Imported',
+                'code' => 'fail',
+                'message' => 'Sheet Not Imported',
+                'sheetError' => $sheetError,
+            ];
+           
+          
+            return $this->response;
+           
+            
+        }
+        
+      
+ 
+}   
+   
 
     public function chunkSize(): int
     {

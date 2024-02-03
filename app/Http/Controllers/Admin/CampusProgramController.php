@@ -279,6 +279,7 @@ class CampusProgramController extends Controller
             'program' => ['required', Rule::unique('campus_programs', 'program_id')->where(function ($query) use ($campus) {
                 return $query->where('campus_id', '=', $campus);
             })->ignore($id)],
+
             'intakes' => 'required|array|min:1',
             'campus_program_duration' => 'required|numeric',
         ], ['program.unique' => "Program already exists in the Campus"]);
@@ -328,7 +329,7 @@ class CampusProgramController extends Controller
         } else {
             return back()->with('error', 'Something Went Wrong');
         }
-    }
+    } 
 
     /**
      * Remove the specified resource from storage.

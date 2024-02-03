@@ -155,7 +155,7 @@
                                     @foreach ($tests as $test)
                                         <div class="form-group col-6">
                                             <label>{{ $test->test_name }}</label>
-                                            <input min="0" max="10" type="text" class="form-control"
+                                            <input min="{{$test->min}}" max="{{$test->max}}" type="text" class="form-control"
                                                 value="{{ old("test.$j.score") }}"
                                                 name="test[{{ $j }}][score]">
                                             <div class="vs-checkbox-con vs-checkbox-primary mt-1">

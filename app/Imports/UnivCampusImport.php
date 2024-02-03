@@ -26,7 +26,7 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
     {
         $univsNameIdArr = University::getNameIdIndexedArray();
        
-        $univIdCampusNameArr = Campus::getUnivIdCampusNameArr();
+        $univIdCampusNameArr = Campus::getUnivIdCampusNameArr(); 
         $countryNameIdArr = Country::getCountryIdNameArr();
         $stateNameIdArr = State::getStateNameIdArr();  
         $cityNameIdArr = City::getCityNameIdArr();

@@ -164,7 +164,7 @@
             });
 
             submitForm($('#import-programs-form'), {
-                beforeSubmit: function() {
+                 beforeSubmit: function() {
                     submitLoader("#import-programs-btn");
                 },
                 success: function(data) {

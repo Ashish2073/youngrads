@@ -41,7 +41,10 @@ class ImportController extends Controller
     public function importPrograms()
     {
         $import = new CampusProgramImport();
-        Excel::import($import, request()->file('programs_file'));
+        
+       $data= Excel::import($import, request()->file('programs_file'));
+
+        
         return response()->json($import->response);
     }
 }
