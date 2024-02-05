@@ -164,7 +164,7 @@
             });
 
             submitForm($('#import-programs-form'), {
-                 beforeSubmit: function() {
+                beforeSubmit: function() {
                     submitLoader("#import-programs-btn");
                 },
                 success: function(data) {
@@ -172,7 +172,18 @@
                         toast("success", data.message, "Congratulations");
                         displaySheetError(data.sheetError);
                     } else {
-                        toast("error", "Something went wrong.", "Error");
+                        let sheetError = data.sheetError;
+
+                        let sheetErrorCount = sheetError.length;
+                        let errrorMessage = "";
+                        for (let i = 0; i < sheetErrorCount; i++) {
+                            errrorMessage = errrorMessage + " " + (i + 1) + "-" + sheetError[i].message + "\n";
+
+                        }
+
+
+
+                        toast("error", errrorMessage, "Error");
                     }
                 },
                 complete: function() {

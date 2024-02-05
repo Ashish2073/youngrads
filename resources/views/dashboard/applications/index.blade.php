@@ -5,7 +5,7 @@
 @section('page-style')
     <link rel="stylesheet" href="{{ asset(mix('css/pages/app-chat.css')) }}">
     <!-- Add these links to your HTML file -->
-{{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
     <style>
@@ -15,6 +15,18 @@
 
         .status {
             cursor: pointer;
+        }
+
+        @media only screen and (min-width:941px) {
+            .export-app-mob {
+                display: none;
+            }
+        }
+
+        @media only screen and (max-width:941px) {
+            .export-app-web {
+                display: none;
+            }
         }
     </style>
 @endsection
@@ -84,94 +96,112 @@
                                 </div>
                                 <div class="col-md-4 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
-                                    <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit Of Aplication</button>
-                                    <a href="{{route('admin.students-application-export')}}" class="btn btn-primary mt-3">Export Students Application Data In Excel Form</a>
+                                    <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit Of
+                                        Aplication</button>
+                                    <a href="{{ route('admin.students-application-export') }}"
+                                        class="btn btn-primary mt-3 export-app-mob">Export Students Application Data In
+                                        Excel Form</a>
                                 </div>
 
-                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
-                                      <div class="modal-content">
-                                        <div class="modal-header">
-                                          <h5 class="modal-title" id="exampleModalLabel"></h5>
-                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                          </button>
-                                        </div>
-                                        <div class="modal-body">
-                                          <!-- Modal content goes here -->
-                                          <form id="myForm">
-                                            <div class="form-group">
-                                                  
-                                               <label for="inputName"><h3 id="allow_permission">{{json_decode($limitApplyApplication,true)[0]['count']}} Application Allow Permission To Submit </h3></label> 
-                                          
-                                              <input type="text" class="form-control" hidden id="modelname" name="name" required value="{{request()->segment(2)}}">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
                                             </div>
-                                            <div class="form-group">
-                                              <label for="positiveNumber">Number of Application Apply</label>
-                                              <input type="number" min="0" class="form-control" id="positiveNumber" name="number_of_application" required>
+                                            <div class="modal-body">
+                                                <!-- Modal content goes here -->
+                                                <form id="myForm">
+                                                    <div class="form-group">
+
+                                                        <label for="inputName">
+                                                            <h3 id="allow_permission">
+                                                                {{ json_decode($limitApplyApplication, true)[0]['count'] }}
+                                                                Application Allow Permission To Submit </h3>
+                                                        </label>
+
+                                                        <input type="text" class="form-control" hidden id="modelname"
+                                                            name="name" required value="{{ request()->segment(2) }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="positiveNumber">Number of Application Apply</label>
+                                                        <input type="number" min="0" class="form-control"
+                                                            id="positiveNumber" name="number_of_application" required>
+                                                    </div>
+                                                    <!-- Add other form fields as needed -->
+
+                                                    <button type="button" class="btn btn-primary"
+                                                        id="submitFormApplicationForm">Submit</button>
+                                                </form>
                                             </div>
-                                            <!-- Add other form fields as needed -->
-                                  
-                                            <button type="button" class="btn btn-primary" id="submitFormApplicationForm">Submit</button>
-                                          </form>
+
                                         </div>
-                                       
-                                      </div>
                                     </div>
-                                  </div>
-                                  
+                                </div>
 
-                              
-                            <div>
-                                <input type="hidden" name="view" value="" />
-                                <ul class="nav nav-tabs " role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active work-nav"
-                                            data-value="{{ App\Models\UserApplication::ACTIVE }}" aria-controls="home"
-                                            role="tab">
-                                            Active
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link work-nav"
-                                            data-value="{{ App\Models\UserApplication::INACTIVE }}" aria-controls="profile"
-                                            role="tab">Inactive</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link work-nav" data-value="favourite" aria-controls="profile"
-                                            role="tab">
-                                            <i class="fa fa-heart"></i> Favourite(s) </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="table-responsive">
 
-                                <table id="admin-application-table" class="table table-hover w-100 zero-configuration">
-                                    <thead>
-                                        <tr>
-                                            <th>Favourite</th>
-                                            <th>Student</th>
-                                            <th>Application ID</th>
-                                            <th>University</th>
-                                            <th>Campus</th>
-                                            <th>Program</th>
-                                            <th>Intake</th>
-                                            <th>Status</th>
-                                            <th>Applied Date</th>
-                                            {{-- <th>Count</th> --}}
-                                            {{-- <th>Count</th>
+
+                                <div>
+                                    <input type="hidden" name="view" value="" />
+                                    <ul class="nav nav-tabs " role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active work-nav"
+                                                data-value="{{ App\Models\UserApplication::ACTIVE }}"
+                                                aria-controls="home" role="tab">
+                                                Active
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link work-nav"
+                                                data-value="{{ App\Models\UserApplication::INACTIVE }}"
+                                                aria-controls="profile" role="tab">Inactive</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link work-nav" data-value="favourite" aria-controls="profile"
+                                                role="tab">
+                                                <i class="fa fa-heart"></i> Favourite(s) </a>
+                                        </li>
+                                        <li class="nav-item ml-2">
+                                            <a href="{{ route('admin.students-application-export') }}"
+                                                class="btn btn-primary export-app-web">Export Students Application Data In
+                                                Excel Form</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="table-responsive">
+
+                                    <table id="admin-application-table"
+                                        class="table table-hover w-100 zero-configuration">
+                                        <thead>
+                                            <tr>
+                                                <th>Favourite</th>
+                                                <th>Student</th>
+                                                <th>Application ID</th>
+                                                <th>University</th>
+                                                <th>Campus</th>
+                                                <th>Program</th>
+                                                <th>Intake</th>
+                                                <th>Status</th>
+                                                <th>Applied Date</th>
+                                                {{-- <th>Count</th> --}}
+                                                {{-- <th>Count</th>
                                             --}}
-                                            <th>Message</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                                                <th>Message</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 @endsection
 
@@ -297,8 +327,9 @@
                     {
                         name: 'users.name',
                         data: 'name',
-                        orderable: true, searchable: true
-                       
+                        orderable: true,
+                        searchable: true
+
                     },
                     {
                         name: 'users_applications.application_number',
@@ -539,7 +570,7 @@
                 $('.dynamic-title').text('');
                 id = $(this).data('id');
                 $.ajax({
-                    url: "{{url('admin/application')}}"+"/"+id+"/"+"message",
+                    url: "{{ url('admin/application') }}" + "/" + id + "/" + "message",
                     beforeSend: function() {
                         $(".dynamic-apply").html("");
                         $(".dynamic-body").html("");
@@ -564,95 +595,90 @@
 
 
         });
-
-        
-
-
-
-
-
     </script>
 
-<script>
-    $(document).ready(function() {
-      // Open the modal on button click positiveNumber  modelname
-      $('#openModalButton').on('click', function() {
-        
-        $('#myModal').modal('show');
-        $('#exampleModalLabel').html('Add Number');
+    <script>
+        $(document).ready(function() {
+            // Open the modal on button click positiveNumber  modelname
+            $('#openModalButton').on('click', function() {
 
-        $('#submitFormApplicationForm').on('click',function(){
+                $('#myModal').modal('show');
+                $('#exampleModalLabel').html('Add Number');
 
-         
-
-        let count= $('#positiveNumber').val();
-        let modelName=$('#modelname').val();
-
-        $.ajax({
-                    url: "{{ route('admin.number-application-allow') }}", 
-                    type: 'POST',
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        count: count,
-                        modelName: modelName,
-                    },
-                              
-                    success: (data) => { 
-
-               
-
-                        $('#allow_permission').html(`${data.Data.count} Application Allow Permission To Submit`);
-                     
-                        $('#myModal').modal("hide");
-                        let html=$('.toast-success');
-                       
-
-                        html.each(function(index) {
-                           
-                            $(this).hide();              
-                       });
-
-                    
-                        toast("success", "Data Submited Successfully", "Success");
-                        
-
-                        $('#positiveNumber').val('');
-                        dataTable.draw('page');
-                        
-                        
-                        
-                    },
-                    error: function(data) {
-
-                                let html=$('.toast-error');
-                       
-
-                                          html.each(function(index) {
-                  
-                                          $(this).hide();              
-                                       });
+                $('#submitFormApplicationForm').on('click', function() {
 
 
-                            if(data.responseJSON.errors.count[0]){
-                             toast("error", "count value required!!!.", "Error");
-                             $('#myModal').modal('hide');
-                             }else{
-                             toast("error", "Something went wrong.", "Error");
-                             $('#myModal').modal('hide');
-                             }
 
-                            
+                    let count = $('#positiveNumber').val();
+                    let modelName = $('#modelname').val();
 
-               
-                          }
+                    $.ajax({
+                        url: "{{ route('admin.number-application-allow') }}",
+                        type: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            count: count,
+                            modelName: modelName,
+                        },
+
+                        success: (data) => {
+
+
+
+                            $('#allow_permission').html(
+                                `${data.Data.count} Application Allow Permission To Submit`
+                            );
+
+                            $('#myModal').modal("hide");
+                            let html = $('.toast-success');
+
+
+                            html.each(function(index) {
+
+                                $(this).hide();
+                            });
+
+
+                            toast("success", "Data Submited Successfully", "Success");
+
+
+                            $('#positiveNumber').val('');
+                            dataTable.draw('page');
+
+
+
+                        },
+                        error: function(data) {
+
+                            let html = $('.toast-error');
+
+
+                            html.each(function(index) {
+
+                                $(this).hide();
+                            });
+
+
+                            if (data.responseJSON.errors.count[0]) {
+                                toast("error", "count value required!!!.", "Error");
+                                $('#myModal').modal('hide');
+                            } else {
+                                toast("error", "Something went wrong.", "Error");
+                                $('#myModal').modal('hide');
+                            }
+
+
+
+
+                        }
+                    });
+
+
+
+
+
                 });
-
-
-
-
-
-      });
-    });
-    });
-  </script>
+            });
+        });
+    </script>
 @endsection

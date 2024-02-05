@@ -39,6 +39,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $records)
     {
+
+      
         $univsNameIdArr = University::getNameIdIndexedArray();
         $univIdCampusNameArr = Campus::getUnivIdCampusNameArr();
         $programNameIdArr = Program::getNameIdArr();
@@ -64,14 +66,18 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
         $sheetError = [];
         $rowNumber = 1;
         
-
-       
-
+        
+     
+           
         foreach ($records as $record) {
+            
             $rowNumber++;
-            if (empty($record['university'])) {
-                continue;
-            }
+
+           
+            // if (empty($record['university'])) {
+            //     dd($record);
+            //     continue;
+            // }
             // University ID
             if (!isset($univsNameIdArr[strtolower($record['university'])])) {
                 Log::debug('University does not exists!' . json_encode($record));
@@ -203,7 +209,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                   if(!is_numeric($entranceExamMinNumber[$k])){
                    Log::debug(json_encode($testName).'Test Score Minimum Validation!' . json_encode($testName));
                    $sheetError[] = [
-                    'message' => json_encode($testName).'Test  Minimum Score Not Numeric ! !' . json_encode($entranceExamMinNumber[$k]),
+                    'message' => $testName." ".'Test  Minimum Score Not Numeric ! !'."Given Value Is" .$entranceExamMinNumber[$k],
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                  ];
@@ -218,7 +224,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
               if(!is_numeric($entranceExamMaxNumber[$k])){
                 Log::debug(json_encode($testName).'!Test Score Maxmium Validation!' . json_encode($testName));
                 $sheetError[] = [
-                    'message' => json_encode($testName).'Test  Maximum Score Not Numeric !' . json_encode($entranceExamMaxNumber[$k]),
+                    'message' => $testName." ".'Test  Maximum Score Not Numeric !' ."Given Value Is". $entranceExamMaxNumber[$k],
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                 ];
@@ -283,7 +289,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
               
                     Log::debug(json_encode($testName).'Test Score Validation!' . json_encode($testName));
                     $sheetError[] = [
-                        'message' => json_encode($testName).'Test Score Not Numeric!' . json_encode($entrenceExamAllTestScore[$k]),
+                        'message' => $testName." ".'Test Score Not Numeric!'."Given Value Is" .$entrenceExamAllTestScore[$k],
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
@@ -472,21 +478,21 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
     }
 
     
-   
+  
         if(empty($sheetError)){
            
             $this->response = [
                 'success' => true,
                 'title' => 'Sheet Imported',
                 'code' => 'success',
-                'message' => 'Sheet imported successfully',
+                 'message' => 'Sheet imported successfully',
                 
             ];
 
             return $this->response;
 
         }else{ 
-           
+            
           
             $this->response = [
                 'success' => false,
