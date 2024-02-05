@@ -25,6 +25,7 @@
                                 name="university" id="university" data-live-search="true">
                                 <option value="">--Select University --</option>
                                 @foreach (config('universties') as $unversity)
+                                   
                                     <option
                                         {{ $unversity->id == old('university', $campusProgram->university_id) ? 'selected' : '' }}
                                         value={{ $unversity->id }}>{{ $unversity->name }}</option>
@@ -40,7 +41,11 @@
                                 name="campus" id="campus" data-live-search="true"
                                 data-value="{{ old('campus', $campusProgram->campus_id) }}">
                                 @foreach (config('campuses') as $campus)
-                                    <option {{ $campus->id == old('campus', $campusProgram->campus_id) }}
+
+                              
+                      
+
+                                    <option {{ $campus->id == old('campus', $campusProgram->campus_id)? 'selected' : ''  }}
                                         value={{ $campus->id }}>{{ $campus->name }}</option>
                                 @endforeach
                             </select>
@@ -189,6 +194,8 @@
             @if ($campusProgram->userApplication->count() > 0)
                 <div class="col-md-12">
                     <p>{{ config('setting.delete_notice') }}</p>
+                    @php session()->put('used_campus_program',[$campusProgram->university_id,$campusProgram->campus_id, $campusProgram->program_id]); @endphp
+                    <a href="{{url('admin/applications-all')}}"><p> click Here to Show Uses</p><a>
                 </div>
             @else
                 <div class="form-group delete" style="margin-top:1%">

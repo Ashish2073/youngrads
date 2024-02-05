@@ -19,7 +19,58 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body card-dashboard">
+
                             <p class="text-muted">Note: Click/Tap row for viewing profile</p>
+  <div class="row application-filter align-items-center">
+                            <div class="col-md-2 col-12">
+                                <div class="form-group">
+                                    <label for="univ">Universities</label>
+                                    <select id="univs" name="univs[]" data-live-search="true" multiple
+                                        class=" select form-control">
+                                      
+                                            <option
+                                      
+                                            value=""></option>
+                                       
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-12">
+                                <div class="form-group">
+                                    <label for="campus">Campus</label>
+                                    <select id="campus" name="campus[]" data-live-search="true" multiple
+                                        class=" select form-control">
+                                       
+
+                                      
+                                            <option
+                                           
+                                             value=""></option>
+                                     
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-12">
+                                <div class="form-group">
+                                    <label for="program">Program</label>
+                                    <select id="program" name="program[]" data-live-search="true" multiple
+                                        class=" select form-control">
+                                     
+
+                                            <option
+                                            
+                                            
+                                            value=""></option>
+                                       
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div> 
+
+
+
+
                             <a href="{{route('admin.students-data-export')}}" class="btn btn-primary mt-3">Export Students Application Data In Excel Form</a>
 
                             <div class="table-responsive">

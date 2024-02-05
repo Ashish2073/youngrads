@@ -35,7 +35,10 @@ class ApplicationController extends Controller
 	}
 
 	public function index(Request $request)
+
 	{
+
+	
 		$breadcrumbs = [
 			['link' => "admin.home", 'name' => "Dashboard"], ['name' => 'Application']
 		];
@@ -47,14 +50,54 @@ class ApplicationController extends Controller
 			'sidebarCollapsed' => true
 		];
 
-		$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
+
+		
+
+
+			if((session()->has('used_campus_program'))){
+		     $usedCampusProgram=session()->get('used_campus_program'); 
+			
+			
+			$usedCampusProgramUniversityId=$usedCampusProgram[0];
+			$usedCampusProgramCampusId=$usedCampusProgram[1];
+			$usedCampusProgramId=$usedCampusProgram[2];
+
+
+			$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
 			->join('campus_programs', 'users_applications.campus_program_id', '=', 'campus_programs.id')
 			->join('intakes', 'users_applications.intake_id', '=', 'intakes.id')
 			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
 			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 			->join('universities', 'campus.university_id', '=', 'universities.id')
 			->select('intakes.name as intake', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))
+			->where('campus.university_id','=',$usedCampusProgramUniversityId)
+			->where('campus_programs.campus_id','=',$usedCampusProgramCampusId)
+			->where('campus_programs.program_id','=',$usedCampusProgramId)
 			->groupBy('users_applications.id');
+			
+		
+
+			}else{
+				$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
+				->join('campus_programs', 'users_applications.campus_program_id', '=', 'campus_programs.id')
+				->join('intakes', 'users_applications.intake_id', '=', 'intakes.id')
+				->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+				->join('programs', 'campus_programs.program_id', "=", 'programs.id')
+				->join('universities', 'campus.university_id', '=', 'universities.id')
+				->select('intakes.name as intake', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))
+				->groupBy('users_applications.id');
+
+			}
+			
+		
+			
+	
+			
+
+
+
+
+			
 
 		if ($request->has('program')) {
 			$userApplications->whereIn('programs.id', $request->program);
@@ -92,9 +135,12 @@ class ApplicationController extends Controller
 
 		//  $result =  $userApplications->get();
 		if (request()->ajax()) {
+             
+			
 			return Datatables::of($userApplications)
 
 				->editColumn('university', function ($row) {
+				
 					return tooltip(Str::limit($row->university, 25, '...'), $row->university);
 				})
 				->editColumn('program', function ($row) {
@@ -121,6 +167,7 @@ class ApplicationController extends Controller
 						$color = "success";
 						$text = ucfirst(UserApplication::ACTIVE);
 					}
+					session()->forget('used_campus_program');
 
 					return "<button class='btn btn-$color application-toggle-status btn-icon btn-round' data-id={$row->application_id}>
 						Make {$text}

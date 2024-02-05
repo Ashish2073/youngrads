@@ -32,6 +32,27 @@
 @endsection
 
 @section('content')
+
+
+@if((session()->has('used_campus_program')))
+@php $usedCampusProgram=session()->get('used_campus_program'); @endphp
+
+@php 
+$usedCampusProgramUniversityId=$usedCampusProgram[0];
+$usedCampusProgramCampusId=$usedCampusProgram[1];
+$usedCampusProgramId=$usedCampusProgram[2];
+
+
+@endphp
+
+@endif
+
+<input type="hidden" value={{($usedCampusProgramUniversityId)??""}} id="useduniversityid"/>
+<input type="hidden" value={{($usedCampusProgramCampusId)??""}} id="usedcampusid"/>
+<input type="hidden" value={{($usedCampusProgramId)??""}} id="usedprogramid"/>
+
+
+
     <section id="basic-datatable">
         <input type="hidden" name="favourite" value="{{ request()->segment(3) }}">
         <div class="row">
@@ -55,7 +76,10 @@
                                         <select id="univs" name="univs[]" data-live-search="true" multiple
                                             class=" select form-control">
                                             @foreach ($univs ?? [] as $univ)
-                                                <option value="{{ $univ->id }}">{{ $univ->name }}</option>
+                                                <option
+                                            {{ $univ->id == ($usedCampusProgramUniversityId??"") ? 'selected' : '' }}
+                                                
+                                                value="{{ $univ->id }}">{{ $univ->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -66,7 +90,11 @@
                                         <select id="campus" name="campus[]" data-live-search="true" multiple
                                             class=" select form-control">
                                             @foreach ($campuses ?? [] as $campus)
-                                                <option value="{{ $campus->id }}">{{ $campus->name }}</option>
+
+                                          
+                                                <option
+                                                {{ $campus->id == ($usedCampusProgramCampusId??"") ? 'selected' : '' }}
+                                                 value="{{ $campus->id }}">{{ $campus->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -77,7 +105,11 @@
                                         <select id="program" name="program[]" data-live-search="true" multiple
                                             class=" select form-control">
                                             @foreach ($programs ?? [] as $program)
-                                                <option value="{{ $program->id }}">{{ $program->name }}</option>
+
+                                                <option
+                                                {{ $program->id  == ($usedCampusProgramId??"") ? 'selected' : '' }}
+                                                
+                                                value="{{ $program->id }}">{{ $program->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -211,6 +243,8 @@
         var messgeTable;
         var dataTable;
 
+        
+
         $(document).ready(function() {
 
             try {
@@ -222,6 +256,137 @@
                     }, 500);
                 }
             } catch (e) {}
+
+
+            // var usedUniversityId=$('#useduniversityid').val();
+           
+            // var usedCampusId=$('#usedcampusid').val();
+            // var usedProgramId=$('#usedprogramid').val();
+            
+
+            // if((usedUniversityId !== "" && usedUniversityId !== null && usedUniversityId !== undefined)&&
+            // (usedCampusId !== "" && usedCampusId !== null && usedCampusId !== undefined)&&
+            // (usedProgramId !== "" && usedProgramId !== null && usedProgramId !== undefined)){
+
+
+
+            //    console.log(usedUniversityId);
+            //    console.log(usedCampusId);
+            //    console.log(usedProgramId); 
+
+            //     console.log('hello');
+
+                
+
+            //     dataTable = $("#admin-application-table").DataTable({
+            //     "processing": true,
+            //     "serverSide": true,
+            //     //"pageLength": 100,
+            //     ajax: {
+            //         url: "{{ route('admin.applications-all') }}",
+            //         data: function(d) {
+                        
+            //             d.university = $('#useduniversityid').val();
+            //             d.campus = $('#usedcampusid').val();
+            //             d.program = $('#usedprogramid').val();
+            //             d.status = $("#status_filter").val();
+            //             d.favourite = $("input[name='favourite']").val();
+            //             d.view = $("input[name='view']").val();
+                      
+            //         }
+            //     },
+            //     // dom: "tps",
+            //     "order": [
+            //         [7, "desc"]
+            //     ],
+            //     columns: [{
+            //             data: 'favorite',
+            //             name: 'is_favorite'
+            //         },
+            //         {
+            //             name: 'users.name',
+            //             data: 'name',
+            //             orderable: true,
+            //             searchable: true
+
+            //         },
+            //         {
+            //             name: 'users_applications.application_number',
+            //             data: 'application_number'
+            //         },
+            //         {
+            //             name: 'universities.name',
+            //             data: 'university'
+            //         },
+            //         {
+            //             name: 'campus.name',
+            //             data: 'campus'
+            //         },
+
+            //         {
+            //             name: 'programs.name',
+            //             data: 'program'
+            //         },
+            //         {
+            //             name: 'users_applications.year ',
+            //             data: 'year'
+            //         },
+            //         {
+            //             name: 'status',
+            //             data: 'status'
+            //         },
+            //         {
+            //             name: 'users_applications.created_at',
+            //             data: 'apply_date'
+            //         },
+            //         {
+            //             name: 'count',
+            //             data: 'count',
+            //             searchable: false
+            //             // "visible":false,
+            //         },
+            //         {
+            //             //   name: 'toggle-admin-status',
+            //             data: 'toggle_status'
+            //         }
+
+            //         // {
+            //         //   name: 'message',
+            //         //   data: 'message',
+            //         // }
+            //     ],
+            //     responsive: false,
+
+            //     drawCallback: function(setting, data) {
+            //         // let setTime;
+            //         // clearTimeout(setTime);
+            //         // setTime = setTimeout(()=>{
+            //         //     dataTable.draw('page');
+            //         //   },10000);
+
+            //     },
+            //     bInfo: false,
+            //     pageLength: 100,
+            //     initComplete: function(settings, json) {
+            //         $(".dt-buttons .btn").removeClass("btn-secondary");
+            //         $(".table-img").each(function() {
+            //             $(this).parent().addClass('product-img');
+            //         });
+
+            //         // setTimeout(()=>{
+            //         //   dataTable.ajax.reload(null,false);
+            //         // },5000);
+
+            //     }
+            // });
+
+            // dataTable.draw();
+
+
+            // }
+        
+
+
 
             // Navigation
             $('.work-nav').click(function() {
@@ -239,8 +404,10 @@
 
             $(".select").selectpicker();
             $(".application-filter").find("select").on("change", function() {
+                console.log('gf');
                 dataTable.draw();
             });
+
             //ajax for select
             // $('.university').select2({
             //     placeholder: 'Filter by University',
