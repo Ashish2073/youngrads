@@ -167,6 +167,8 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         ]
     ]);
 
+    Route::post('students-data-filter',[\App\Http\Controllers\Admin\StudentController::class,'filterstudentdata'])->name('students-data-filter');
+
     Route::get('students-data-export', [App\Http\Controllers\Admin\StudentController::class, 'get_student_data'])->name('students-data-export');
 
     //shortlist

@@ -33,32 +33,60 @@ class StudentController extends Controller
 		$this->middleware('auth:admin')->except('profileResume');
 	}
 
-	public function index()
+	public function index(Request $request)
 	{
+	
 		if (request()->ajax()) {
-			$users = User::all();
+			
+			
+		  
+				if((($request->get('id')!=null) && $request->get('email')==null && $request->get('personal_number')==null)){
+					$users=User::whereIn('id',$request->get('id'))->get();
+
+				}elseif((($request->get('email')!=null) && $request->get('id')==null && $request->get('personal_number')==null)){
+					$users=User::whereIn('email',$request->get('email'))->get();
+				}elseif((($request->get('personal_number')!=null) && $request->get('id')==null && $request->get('email')==null)){
+					$users=User::whereIn('personal_number',$request->get('personal_number'))->get();
+					
+				}elseif((($request->get('personal_number')!=null) && $request->get('id')!=null && $request->get('email')==null)){
+					$users=User::whereIn('personal_number',$request->get('personal_number'))->whereIn('id',$request->get('id'))->get();
+				}elseif((($request->get('personal_number')==null) && $request->get('id')!=null && $request->get('email')!=null)){
+					$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get();
+				}elseif((($request->get('personal_number')!=null) && $request->get('id')==null && $request->get('email')!=null)){
+					$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get();
+				}
+				
+				else{
+					$users=User::all();
+				}
+			
+			
+			
+			
 			return Datatables::of($users)
 				// ->addColumn('action', function($row){
 				//   return "<button class='btn btn-primary'>View Profile</button>";
 				//  })
-				->editColumn('student_id', function ($row) {
+				->addColumn('student_id', function ($row) {
+					
 					return  "young_stu_" . $row->id;
 				})
 				 
-				->editColumn('name', function ($row) {
+				->addColumn('name', function ($row) {
 					return $row->name . " " . $row->last_name;
 				})
 
-				->editColumn('email', function ($row) {
+				->addColumn('email', function ($row) {
 					return "<a href='mailto:" . $row->email . "' class='a-link'>" . $row->email . "</a>";
 				})
-				->editColumn('personal_number', function ($row) {
+				->addColumn('personal_number', function ($row) {
 					return $row->personal_number ?? "N/A";
 				})
-				->editColumn('passport', function ($row) {
+				->addColumn('passport', function ($row) {
 					return $row->passport ?? "N/A";
 				})
-				->editColumn('dob', function ($row) {
+				->addColumn('dob', function ($row) {
+					
 					return $row->dob ? date("d M Y", strtotime($row->dob)) : "N/A";
 				})
 				->addColumn('delete', function ($row) {
@@ -70,11 +98,15 @@ class StudentController extends Controller
 				->rawColumns(['email', 'delete', 'shortlist'])
 				->make(true);
 		} else {
+			$userId=User::select('id')->get();
+			$userEmail=User::select('email')->get();
+			$userPhone=User::select('personal_number')->get();
+			
 			$breadcrumbs = [
 				['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Students"]
 			];
 			return view('dashboard.students.index', [
-				'breadcrumbs' => $breadcrumbs
+				'breadcrumbs' => $breadcrumbs,'userId'=>$userId,'userEmail'=>$userEmail,'userPhone'=>$userPhone
 			]);
 		}
 	}
@@ -172,5 +204,10 @@ class StudentController extends Controller
 
 	public function get_student_data(){
 		return Excel::download(new StudentData, 'studentsdata.xlsx');
+	}
+
+	public function filterstudentdata(Request $request){
+		
+
 	}
 }

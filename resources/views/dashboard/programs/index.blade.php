@@ -119,7 +119,7 @@
                 getContent({
                     url: $(this).data('url'),
                     success: function(data) {
-
+ 
                         $('.dynamic-body').html(data);
                         runScript();
                     }
@@ -128,7 +128,7 @@
 
             $('body').on('change', 'select[name="study_area_id"]', function(e) {
                 $.ajax({
-                    url: route('sub_study_areas', $(this).find('option:selected').val()),
+                    url:"{{url('sub-study-areas')}}"+"/"+ $(this).find('option:selected').val(),
                     success: function(data) {
                         let html = "";
                         data.forEach(function(value, index) {

@@ -405,68 +405,10 @@ $usedCampusProgramId=$usedCampusProgram[2];
             $(".select").selectpicker();
             $(".application-filter").find("select").on("change", function() {
                 console.log('gf');
+                console.log($('#program').val());
                 dataTable.draw();
             });
 
-            //ajax for select
-            // $('.university').select2({
-            //     placeholder: 'Filter by University',
-            //     ajax: {
-            //         url: route('select-university'),
-            //         dataType: 'json',
-            //         type: 'POST',
-            //         data: function(params) {
-            //             return {
-            //                 name: params.term
-            //             }
-            //         },
-            //         processResults: function(data) {
-            //             return {
-            //                 results: data
-            //             }
-            //         }
-            //     }
-            // });
-
-            // $('.campus').select2({
-            //     placeholder: 'Filter by Campus',
-            //     multiple: false,
-            //     ajax: {
-            //         url: route('select-campus'),
-            //         dataType: 'json',
-            //         type: 'POST',
-            //         data: function(params) {
-            //             return {
-            //                 name: params.term
-            //             }
-            //         },
-            //         processResults: function(data) {
-            //             return {
-            //                 results: data
-            //             }
-            //         }
-            //     }
-            // });
-
-            // $('.program').select2({
-            //     placeholder: 'Filter by Program',
-            //     multiple: false,
-            //     ajax: {
-            //         url: route('select-programs'),
-            //         dataType: 'json',
-            //         type: 'POST',
-            //         data: function(params) {
-            //             return {
-            //                 name: params.term
-            //             }
-            //         },
-            //         processResults: function(data) {
-            //             return {
-            //                 results: data
-            //             }
-            //         }
-            //     }
-            // });
 
             dataTable = $("#admin-application-table").DataTable({
                 "processing": true,

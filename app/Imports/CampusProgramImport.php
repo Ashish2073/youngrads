@@ -39,12 +39,14 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $records)
     {
-
-      
+        
+        
         $univsNameIdArr = University::getNameIdIndexedArray();
         $univIdCampusNameArr = Campus::getUnivIdCampusNameArr();
         $programNameIdArr = Program::getNameIdArr();
         $programLevelIdArr = ProgramLevel::getNameIdArr();
+
+        
         $studyAreaNameIdArr = Study::getNameIdArr();
         $subStudyNameIdArr = Study::getsubStudyNameIdArr();
         $campusProgramsArr = CampusProgram::getCampusProgramNameIdArr();
@@ -106,7 +108,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             if (!isset($programLevelIdArr[strtolower($record['level'])])) {
                 Log::debug('Program Level does not exists!' . json_encode($record));
                 $sheetError[] = [
-                    'message' => 'Program Level does not exists!',
+                    'message' => 'Program Level does not exists!'.$record['level'],
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                 ];

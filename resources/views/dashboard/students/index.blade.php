@@ -21,50 +21,66 @@
                         <div class="card-body card-dashboard">
 
                             <p class="text-muted">Note: Click/Tap row for viewing profile</p>
-  <div class="row application-filter align-items-center">
+                               <div class="row application-filter align-items-center">
                             <div class="col-md-2 col-12">
                                 <div class="form-group">
-                                    <label for="univ">Universities</label>
-                                    <select id="univs" name="univs[]" data-live-search="true" multiple
+                                    <label for="userid">Student Id</label>
+                                    <select data-colum="0" id="userid" name="id[]" data-live-search="true" multiple
                                         class=" select form-control">
-                                      
+                                      @foreach($userId as $user)
+                                      @if(isset($user->id))
                                             <option
                                       
-                                            value=""></option>
-                                       
+                                         
+                                            value="{{$user->id}}">{{"young_stu_".$user->id}}</option>
+                                      @endif
+                                            @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-2 col-12">
                                 <div class="form-group">
-                                    <label for="campus">Campus</label>
-                                    <select id="campus" name="campus[]" data-live-search="true" multiple
+                                    <label for="useremail">Email</label>
+                                    <select id="useremail" name="email[]" data-live-search="true" multiple
                                         class=" select form-control">
                                        
 
-                                      
+                                      @foreach($userEmail as $user)
+
+                                      @if(isset($user->email))
                                             <option
                                            
-                                             value=""></option>
-                                     
+                                              value="{{$user->email}}">{{$user->email}}</option>
+                                              @endif
+                                     @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-2 col-12">
                                 <div class="form-group">
-                                    <label for="program">Program</label>
-                                    <select id="program" name="program[]" data-live-search="true" multiple
+                                    <label for="userphone">Phone Number</label>
+                                    <select id="userphone" name="phone[]" data-live-search="true" multiple
                                         class=" select form-control">
                                      
-
+                                           @foreach ( $userPhone as $user )
+                                               
+                                            @if(isset($user->personal_number))
                                             <option
                                             
-                                            
-                                            value=""></option>
-                                       
+                                          
+                                            value="{{$user->personal_number}}">{{$user->personal_number}}</option>
+                                            @endif
+                                            @endforeach
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="col-md-4 col-12 text-right">
+                                <button class="btn btn-primary" id="reset-filter">Reset</button>
+                              
+                            </div>
+
+
 
                         </div> 
 
@@ -116,6 +132,19 @@
     <script>
         var dataTable;
         jQuery(document).ready(function() {
+  
+
+            $(".select").selectpicker();
+            $(".application-filter").find("select").on("change", function() {
+                console.log('gf');
+                console.log($("#userid").val());
+
+                 dataTable.draw();
+            });
+
+
+
+
             // Datatable
             dataTable = $("#user-table").DataTable({
                 "processing": true,
@@ -123,41 +152,30 @@
                 "bInfo": true,
                 "pageLength": 50,
                 "fixedHeader": true,
-                // dom: "<'row custom-row'<'col-sm-3'l><'col-sm-3 first-place'><'col-sm-6 second-place'f>>tr<'row'<'col-sm-6'i><'col-sm-6'p>>",
-                // dom: "<'panel panel-default'" +
-                //        "<'panel-heading'" +
-                //             "<'row'" +
-                //                 "<'col-sm-12 custom-heading'>" +
-                //             ">" +
-                //             "<'row custom-row'" +
-                //                 "<'col-sm-3'l>" +
-                //                 "<'col-sm-9 second-place'f>" +
-                //             ">" +
-                //         ">" +
-                //         "<'panel-body'" +
-                //             "tr" +
-                //         ">" +
-                //         "<'panel-footer'" +
-                //             "<'row'" +
-                //                 "<'col-sm-6'i>" +
-                //                 "<'col-sm-6'p>" +
-                //             ">" +
-                //         ">" +
-                //     ">",
+             
                 ajax: {
                     url: "{{ route('admin.students') }}",
-                    data: function(d) {
-                        // d.quiz_id = $('select[name="quiz_id"]').val();
+                   
+                    data: function (d) {
+                       
+                        d.id=$("#userid").val();
+                        d.email=$('#useremail').val();
+                        d.personal_number=$('#userphone').val();
                     }
                 },
+                "order": [
+                    [7, "desc"]
+                ],
                 columns: [{
                         data: 'student_id',
-                        name: 'student_id'
+                        name: 'student_id',
+                      
                     },
 
                     {
                         data: 'name',
-                        name: 'name'
+                        name: 'name',
+                      
                     },
                     {
                         data: 'email',
@@ -208,6 +226,20 @@
                     // initDatatable();
                 }
             });
+
+
+           
+
+            
+
+
+
+
+
+
+
+
+
 
 
 
@@ -360,5 +392,19 @@
                 }
             });
         }
+
+        $('#reset-filter').on('click', function() {
+                $(".select").selectpicker('deselectAll');
+                $(".select").val("");
+                $(".select").selectpicker('refresh');
+
+            });
+
+
+       
+
+
+
+
     </script>
 @endsection
