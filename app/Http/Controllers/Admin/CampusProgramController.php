@@ -89,11 +89,12 @@ class CampusProgramController extends Controller
                 ->rawColumns(['action','university','campus','program'])
                 ->make(true);
         } else {
+            $university=University::select('id','name')->get();
             $breadcrumbs = [
                 ['link' => "admin.home", 'name' => "Dashboard"], ['name' => 'Campus Program']
             ];
             return view('dashboard.campus_program.index', [
-                'breadcrumbs' => $breadcrumbs
+                'breadcrumbs' => $breadcrumbs,'university'=>$university
             ]);
         }
     }
