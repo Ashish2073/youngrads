@@ -9,6 +9,16 @@
     </button>
 @endsection
 
+@if((session()->has('used_university')))
+@php $usedUniversity=session()->get('used_university'); @endphp
+
+@php 
+$usedUniversityId=$usedUniversity[0];
+
+@endphp
+
+@endif
+
 @section('content')
 
 
@@ -19,9 +29,74 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        {{-- <h4 class="card-title">Students</h4>
-                        --}}
                     </div>
+                    <div class="card-content">
+                        <div class="card-body card-dashboard">
+
+                        <div class="row application-filter align-items-center">
+                            <div class="col-md-2 col-12">
+                                   <div class="form-group">
+                                      <label for="universityid">University</label>
+                                          <select id="universityid" name="universityid[]" data-live-search="true" multiple
+                                               class=" select form-control">
+                                            @foreach( $university as $unvdata)
+                                            @if(isset($unvdata->id))
+                                                      <option
+                       
+                                            {{ $unvdata->id == ($usedUniversityId??"") ? 'selected' : '' }}   
+                                              value="{{$unvdata->id}}">{{$unvdata->name}}</option>
+                                              @endif
+                                           @endforeach     
+                                           </select>
+                                    </div>
+                            </div>
+                 <div class="col-md-2 col-12">
+                      <div class="form-group">
+                     <label for="campusid">Campus</label>
+                     <select id="campusid" name="campusid[]" data-live-search="true" multiple
+                         class=" select form-control">
+                        
+                  @foreach($campus as $camdata)
+                     @if(isset($camdata->id))
+                             <option
+                            
+                               value="{{$camdata->id}}">{{$camdata->name}}</option>
+                          @endif
+                               @endforeach
+                       
+                     </select>
+                 </div>
+             </div>
+             {{-- <div class="col-md-2 col-12">
+                 <div class="form-group">
+                     <label for="websitename">Website</label>
+                     <select id="websitename" name="websitename[]" data-live-search="true" multiple
+                         class=" select form-control">
+                      
+                      
+                         @foreach($campus as $camdata)
+                         @if(isset($camdata->website))
+                                 <option
+                                
+                                   value="{{$camdata->website}}">{{$camdata->website}}</option>
+                              @endif
+                                   @endforeach
+
+                           
+                            
+                     </select>
+                 </div>
+             </div> --}}
+
+             <div class="col-md-4 col-12 text-right">
+                 <button class="btn btn-primary" id="reset-filter">Reset</button>
+               
+             </div>
+
+
+
+         </div> 
+                    
                     <div class="card-content">
                         <div class="card-body card-dashboard">
 
@@ -47,13 +122,32 @@
     </section>
 
 @endsection
-
+@section('vendor-script')
+    {{-- vendor files --}}
+    <script src="{{ asset(mix('vendors/js/tables/datatable/pdfmake.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/vfs_fonts.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.html5.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.print.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
+@endsection
 @section('page-script')
     <script>
         var dataTable;
         $(document).ready(function() {
-
+            $(".select").selectpicker();
             //datatabls
+            
+            $(".application-filter").find("select").on("change", function() {
+               
+                console.log($('#websitename').val());
+                 dataTable.draw();
+            });
+
+
+
             dataTable = $("#course-table").DataTable({
                 "processing": true,
                 "serverSide": true,
@@ -63,7 +157,9 @@
                 ajax: {
                     url: "{{ route('admin.campuses') }}",
                     data: function(d) {
-                        // d.quiz_id = $('select[name="quiz_id"]').val();
+                        d.campusid=$("#campusid").val();
+                        d.universityid=$('#universityid').val();
+                        d.websitename=$('#websitename').val();
                     }
                 },
                 columns: [{
@@ -129,7 +225,7 @@
             });
 
             $('body').on('click', '.action-row', function(e) {
-
+                $(".select").selectpicker();
                 $('.dynamic-title').text('Update Campus');
                 getContent({
                     url: $(this).data('url'),
@@ -215,8 +311,8 @@
 
 
         function runScript() {
-
-            $(".select").select2();
+            $(".select").selectpicker();
+            // $(".select").select2();
 
             validateForm($('#course-create-form'), {
                 rules: {
@@ -390,5 +486,15 @@
             preview.onload = (e) => fileName.attr('src', e.target.result);
             preview.readAsDataURL(e.target.files[0]);
         }
+
+        $('#reset-filter').on('click', function() {
+                $(".select").selectpicker('deselectAll');
+                $(".select").val("");
+                $(".select").selectpicker('refresh');
+
+            });
+
+
+
     </script>
 @endsection

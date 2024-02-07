@@ -22,6 +22,83 @@
                     <div class="card-content">
                         <div class="card-body card-dashboard">
 
+                        <div class="row application-filter align-items-center">
+                            <div class="col-md-2 col-12">
+                                   <div class="form-group">
+                                      <label for="programeid">Program Name</label>
+                                          <select id="programeid" name="programeid[]" data-live-search="true" multiple
+                                               class=" select form-control">
+                                          @foreach($program as $prodata)
+                                                      <option
+                       
+                          
+                                              value="{{$prodata->id}}">{{$prodata->name}}</option>
+                                               @endforeach 
+                                           </select>
+                                    </div>
+                            </div>
+                 <div class="col-md-2 col-12">
+                      <div class="form-group">
+                     <label for="programelevelid">Program Level</label>
+                     <select id="programelevelid" name="programelevelid[]" data-live-search="true" multiple
+                         class=" select form-control">
+                        
+                         @foreach($programlevel as $leveldata)
+                             <option
+                            
+                               value="{{$leveldata->id}}">{{$leveldata->name}}</option>
+                         @endforeach
+                       
+                     </select>
+                 </div>
+             </div>
+             <div class="col-md-2 col-12">
+                 <div class="form-group">
+                     <label for="studyareaid">Study Area</label>
+                     <select id="studyareaid" name="studyareaid[]" data-live-search="true" multiple
+                         class=" select form-control">
+                      @foreach($studyareas as $std)
+                  
+                                 <option
+                                
+                                   value="{{$std->id}}">{{$std->name}}</option>
+                              
+
+                           @endforeach
+                            
+                     </select>
+                 </div>
+             </div>
+
+             <div class="col-md-2 col-12">
+                <div class="form-group">
+                    <label for="duration">Duration</label>
+                    <select id="duration" name="duration[]" data-live-search="true" multiple
+                        class=" select form-control">
+                     
+                        @foreach($programduration as $pro)
+                                <option
+                               
+                                  value="{{$pro->duration}}">{{$pro->duration}}</option>
+                             
+                               @endforeach
+                          
+                           
+                    </select>
+                </div>
+            </div>
+
+             <div class="col-md-4 col-12 text-right">
+                 <button class="btn btn-primary" id="reset-filter">Reset</button>
+               
+             </div>
+
+
+
+         </div> 
+                    <div class="card-content">
+                        <div class="card-body card-dashboard">
+
                             <div class="table-responsive">
                                 <table id="program-table" class="table table-hover w-100 zero-configuration">
                                     <thead>
@@ -51,6 +128,16 @@
     <script>
         var dataTable;
         $(document).ready(function() {
+            $(".select").selectpicker();
+
+
+            $(".application-filter").find("select").on("change", function() {
+              
+                 dataTable.draw(); 
+            });
+
+
+
 
             //datatabls
             dataTable = $("#program-table").DataTable({
@@ -61,7 +148,10 @@
                 ajax: {
                     url: "{{ route('admin.programs') }}",
                     data: function(d) {
-                        // d.quiz_id = $('select[name="quiz_id"]').val();
+                    d.programeid = $('#programeid').val();
+                    d.programelevelid = $('#programelevelid').val();
+                    d.studyareaid = $('#studyareaid').val();
+                    d.duration=$('#duration').val();
                     }
                 },
                 columns: [{
@@ -143,8 +233,8 @@
         });
 
         function runScript() {
-
-            $(".select").select2();
+            $(".select").selectpicker(); 
+            // $(".select").select2();
             validateForm($('#program-create-form'), {
                 rules: {
                     name: {
@@ -263,5 +353,12 @@
 
 
         }
+
+        $('#reset-filter').on('click', function() {
+                $(".select").selectpicker('deselectAll');
+                $(".select").val("");
+                $(".select").selectpicker('refresh');
+
+            });
     </script>
 @endsection

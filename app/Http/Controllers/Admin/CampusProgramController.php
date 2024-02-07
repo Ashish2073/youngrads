@@ -19,6 +19,7 @@ use App\Models\Test;
 use App\Models\CampusProgramTest;
 use Illuminate\Validation\Rule;
 use CampusProgramFees;
+use Illuminate\Support\Facades\DB; 
 
 class CampusProgramController extends Controller
 {
@@ -53,18 +54,41 @@ class CampusProgramController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response \DB::raw("CONCAT(COALESCE(users.name,''), 
      */
-    public function index()
+    public function index(Request $request)
     {
-        $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+
+        if(($request->get('campusid')!=null) ||($request->get('universityid')!=null)||($request->get('programid')!=null)) {
+
+          
+            $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+            ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
+             ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
+            ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
+            ->whereIn('campus.id', $request->get('campusid') ? $request->get('campusid') : [DB::raw('campus.id')])
+            ->whereIn('programs.id', $request->get('programid') ? $request->get('programid') : [DB::raw('programs.id')])
+            ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
+            ->get();
+
+        }else{
+            $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
             ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
             ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
             ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
             ->get();
+        }
+ 
+
+
+
+
+       
         if (request()->ajax()) {
               return Datatables::of($campusPrograms)
                 ->addColumn('action', function ($row) {
+                    session()->forget('used_program');
+                    session()->forget('used_campus');
                     return "<a href=" . route('admin.campus-program.edit', $row->id) . " class='btn btn-primary'>Update</a>";
                 })
 
@@ -72,7 +96,7 @@ class CampusProgramController extends Controller
                     return $row->university;
                 })
                 ->addColumn('campus', function ($row) {
-                    return $row->campus;
+                    return $row->campus; 
                 })
                 
                 ->addColumn('program', function ($row) {
@@ -92,8 +116,14 @@ class CampusProgramController extends Controller
             $breadcrumbs = [
                 ['link' => "admin.home", 'name' => "Dashboard"], ['name' => 'Campus Program']
             ];
+
+            $university=University::select('id','name')->get(); 
+            $campus=Campus::select('id','name')->get();
+            
+            $program=Program::select('id','name')->get();
+
             return view('dashboard.campus_program.index', [
-                'breadcrumbs' => $breadcrumbs
+                'breadcrumbs' => $breadcrumbs,'university'=>$university,'campus'=>$campus,'program'=>$program
             ]);
         }
     }

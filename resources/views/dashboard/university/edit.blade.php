@@ -22,7 +22,9 @@
         </form>
         <div class="form-group delete " style="margin-top:1%">
           @if($university->campus->count() > 0)
-           <p>{{ $university->name }} is related to antother record(s).</p>
+           <p>{{ $university->name }} is related to another record(s).</p>
+           @php session()->put('used_university',[$university->id]); @endphp
+           <a href="{{url('admin/campus')}}"><p> click Here to Show Uses</p><a>
           @else
           <form  id="delete-form" method="POST" action="{{ route('admin.university.destroy', $university->id) }}" >
            @csrf

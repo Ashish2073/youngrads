@@ -22,24 +22,24 @@
 
                             <p class="text-muted">Note: Click/Tap row for viewing profile</p>
                                <div class="row application-filter align-items-center">
-                            <div class="col-md-2 col-12">
-                                <div class="form-group">
-                                    <label for="userid">Student Id</label>
-                                    <select data-colum="0" id="userid" name="id[]" data-live-search="true" multiple
-                                        class=" select form-control">
-                                      @foreach($userId as $user)
-                                      @if(isset($user->id))
-                                            <option
+                                           <div class="col-md-2 col-12">
+                                                  <div class="form-group">
+                                                     <label for="userid">Student Id</label>
+                                                         <select data-colum="0" id="userid" name="id[]" data-live-search="true" multiple
+                                                              class=" select form-control">
+                                                            @foreach($userId as $user)
+                                                            @if(isset($user->id))
+                                                                     <option
                                       
                                          
-                                            value="{{$user->id}}">{{"young_stu_".$user->id}}</option>
-                                      @endif
-                                            @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-12">
-                                <div class="form-group">
+                                                             value="{{$user->id}}">{{"young_stu_".$user->id}}</option>
+                                                               @endif
+                                                                    @endforeach
+                                                          </select>
+                                                   </div>
+                                           </div>
+                                <div class="col-md-2 col-12">
+                                     <div class="form-group">
                                     <label for="useremail">Email</label>
                                     <select id="useremail" name="email[]" data-live-search="true" multiple
                                         class=" select form-control">
