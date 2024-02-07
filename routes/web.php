@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\LanguageController;
-//use Illuminate\Routing\Route;
+//use Illuminate\Routing\Route; 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\ActivityController;
@@ -321,6 +321,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         ]
     ]);
 
+    Route::post('university-campus-relation',[\App\Http\Controllers\Admin\CampusProgramController::class,'universitycampus'])->name('university-to-campus');
     //document type
     Route::resource('document-type', '\App\Http\Controllers\Admin\DocumentTypeController', [
         'names' => [

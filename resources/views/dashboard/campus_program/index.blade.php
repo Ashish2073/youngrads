@@ -84,7 +84,7 @@
                                             @foreach ($program as $prodata)
                                                 <option
                                                     @if (isset($prodata->id)) {{ $prodata->id == ($usedCampusProgramId ?? '') ? 'selected' : '' }}
-                                 value="{{ $prodata->id }}">{{ $prodata->name }}</option> @endif
+                                                     value="{{ $prodata->id }}">{{ $prodata->name }}</option> @endif
                                                     @endforeach
 
                                         </select>
@@ -140,8 +140,40 @@
         $(document).ready(function() {
             $(".select").selectpicker();
 
-            $(".application-filter").find("select").on("change", function() {
+            $(".application-filter").find("select").on("change", function(e) {
+                if (e.target.id == "universityid") {
 
+                    $.ajax({
+                        url: "{{ route('admin.university-to-campus') }}",
+                        type: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            universityid: $('#universityid').val(),
+
+                        },
+                        success: (data) => {
+                            let univLength = data.length;
+                            var univHTML =
+                                `<option value="${data[0].id}">${data[0].name}</option>`;
+                            for (let i = 1; i < univLength; i++) {
+                                console.log(data[i].id);
+                                var uninHTML =
+                                    `<option value="${data[i].id}">${data[i].name}</option>`
+                                console.log(univHTML);
+
+                            }
+
+                            console.log(univHTML);
+
+                            $('#campusid').html(univHTML);
+                            $("#campusid").selectpicker('refresh');
+
+                        }
+                    })
+
+
+
+                }
 
                 dataTable.draw();
             });

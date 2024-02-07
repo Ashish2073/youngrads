@@ -56,6 +56,12 @@ class CampusProgramController extends Controller
      *
      * @return \Illuminate\Http\Response \DB::raw("CONCAT(COALESCE(users.name,''), 
      */
+
+     public function universitycampus(Request $request){
+        $camupusdata=Campus::whereIn('university_id',$request->universityid)->select('id','name')->get();
+        return $camupusdata;
+
+     }
     public function index(Request $request)
     {
 
