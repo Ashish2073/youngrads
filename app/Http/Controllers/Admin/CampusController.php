@@ -19,6 +19,7 @@ use App\Models\City;
 use App\Models\State;
 use App\Models\Country;
 
+
 class CampusController extends Controller
 {
     public function __construct()
@@ -31,16 +32,42 @@ class CampusController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+
+
+        if(($request->get('universityid')!=null)|| ($request->get('campusid')!=null) || ($request->get('websitename')!=null)){
+           
+        
+           
+            $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
+            ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
+            ->whereIn('campus.id', $request->get('campusid') ? $request->get('campusid') : [DB::raw('campus.id')])
+            ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
+             ->get();
+
+            // if(count(json_decode($Campus,true))==0){
+            //     $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
+            //     ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
+            //     ->whereIn('campus.id', $request->get('campusid') ? $request->get('campusid') : [DB::raw('campus.id')])
+            //     ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')]) 
+            //     ->get();
+
+            // }
+
+           
+
+          
+        }else{ 
         $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
             ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
             ->get();
-
+        }
 
         if (request()->ajax()) {
             return Datatables::of($Campus)
                 ->editColumn('logo', function ($row) {
+                    session()->forget('used_university');
                     if ($row->logo == '') {
                         return "N/A";
                     } else {
@@ -73,8 +100,10 @@ class CampusController extends Controller
             $breadcrumbs = [
                 ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Campuses"]
             ];
+            $university=University::select('id','name')->get(); 
+            $campus=Campus::select('id','name','website')->get();
             return view('dashboard.campus.index', [
-                'breadcrumbs' => $breadcrumbs
+                'breadcrumbs' => $breadcrumbs,'university'=>$university,'campus'=>$campus,
             ]);
         }
     }

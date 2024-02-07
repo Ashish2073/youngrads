@@ -200,7 +200,7 @@
             @else
                 <div class="form-group delete" style="margin-top:1%">
                     <form id="delete-form" method="POST"
-                        action="{{ route('admin.campus-program.destroy', $campusProgram->id) }}">
+                         action="{{ route('admin.campus-program.destroy', $campusProgram->id) }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>

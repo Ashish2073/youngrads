@@ -11,6 +11,24 @@
         <i class="feather icon-plus"></i>
     </a>
 @endsection
+@if (session()->has('used_program'))
+    @php $usedCampusProgram=session()->get('used_program'); @endphp
+
+    @php
+        $usedCampusProgramId = $usedCampusProgram[0];
+
+    @endphp
+@endif
+
+@if (session()->has('used_campus'))
+    @php $usedCampus=session()->get('used_campus'); @endphp
+
+    @php
+        $usedCampusUniversityId = $usedCampus[0];
+        $usedCampusId = $usedCampus[1];
+
+    @endphp
+@endif
 
 @section('content')
 
@@ -23,45 +41,51 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body card-dashboard">
+
                             <div class="row application-filter align-items-center">
                                 <div class="col-md-2 col-12">
                                     <div class="form-group">
                                         <label for="universityid">University</label>
-                                        <select data-colum="0" id="universityid" name="university[]" data-live-search="true"
-                                            multiple class=" select form-control">
-
-                                            @foreach ($university as $data)
-                                                @if (isset($data->id))
-                                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                                    </option>
+                                        <select id="universityid" name="universityid[]" data-live-search="true" multiple
+                                            class=" select form-control">
+                                            @foreach ($university as $unvdata)
+                                                @if (isset($unvdata->id))
+                                                    <option {{-- $usedCampusUniversityId=$usedCampus[0];
+                                                          $usedCampusId=$usedCampus[1]; --}}
+                                                        {{ $unvdata->id == ($usedCampusUniversityId ?? '') ? 'selected' : '' }}
+                                                        value="{{ $unvdata->id }}">{{ $unvdata->name }}</option>
                                                 @endif
                                             @endforeach
                                         </select>
-
                                     </div>
                                 </div>
                                 <div class="col-md-2 col-12">
                                     <div class="form-group">
                                         <label for="campusid">Campus</label>
-                                        <select id="campusid" name="campus[]" data-live-search="true" multiple
+                                        <select id="campusid" name="campusid[]" data-live-search="true" multiple
                                             class=" select form-control">
 
-
-
-                                            <option value=""></option>
+                                            @foreach ($campus as $camdata)
+                                                @if (isset($camdata->id))
+                                                    <option {{ $camdata->id == ($usedCampusId ?? '') ? 'selected' : '' }}
+                                                        value="{{ $camdata->id }}">{{ $camdata->name }}</option>
+                                                @endif
+                                            @endforeach
 
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-2 col-12">
                                     <div class="form-group">
-                                        <label for="programeid">Programe</label>
-                                        <select id="programeid" name="program[]" data-live-search="true" multiple
+                                        <label for="programid">Program</label>
+                                        <select id="programid" name="programid[]" data-live-search="true" multiple
                                             class=" select form-control">
 
-
-                                            <option value="">
-                                            </option>
+                                            @foreach ($program as $prodata)
+                                                <option
+                                                    @if (isset($prodata->id)) {{ $prodata->id == ($usedCampusProgramId ?? '') ? 'selected' : '' }}
+                                 value="{{ $prodata->id }}">{{ $prodata->name }}</option> @endif
+                                                    @endforeach
 
                                         </select>
                                     </div>
@@ -74,7 +98,9 @@
 
 
 
+
                             </div>
+
 
                             <div class="table-responsive">
                                 <table id="table" class="table table-hover w-100 zero-configuration">
@@ -112,6 +138,18 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
+            $(".select").selectpicker();
+
+            $(".application-filter").find("select").on("change", function() {
+
+
+                dataTable.draw();
+            });
+
+
+
+
+
             @if (session('success'))
                 toast('success', "{{ session('success') }}")
             @endif
@@ -128,7 +166,11 @@
                 "fixedHeader": true,
                 ajax: {
                     url: "{{ route('admin.campus-programs') }}",
-                    data: function(d) {}
+                    data: function(d) {
+                        d.campusid = $("#campusid").val();
+                        d.universityid = $('#universityid').val();
+                        d.programid = $('#programid').val();
+                    }
                 },
                 columns: [{
                         name: 'university',
@@ -165,6 +207,14 @@
 
 
 
+
+        });
+
+
+        $('#reset-filter').on('click', function() {
+            $(".select").selectpicker('deselectAll');
+            $(".select").val("");
+            $(".select").selectpicker('refresh');
 
         });
     </script>
