@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProgramArea;
+use Illuminate\Support\Facades\DB;
 use Str;
 
 class StudyController extends Controller
@@ -26,11 +27,29 @@ class StudyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         if (request()->ajax()) {
-            $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
+
+              if(($request->get('studyid')!=null) || ($request->get('substudyid'))){
+
+                $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
+                ->select('study_areas.*', "parent_study.name as parent_name")
+                ->whereIn('parent_study.id',($request->get('studyid'))?$request->get('studyid'):[DB::raw('parent_study.id')])
+                ->whereIn('study_areas.id',($request->get('substudyid'))?$request->get('substudyid'):[DB::raw('study_areas.id')])
+                ->get();
+
+
+              }else{
+
+                $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
                 ->select('study_areas.*', "parent_study.name as parent_name");
+
+              }
+
+
+
+           
             return DataTables::of($records)
                 ->editColumn('parent_name', function ($row) {
                     if ($row->parent_id == 0) {
@@ -39,8 +58,13 @@ class StudyController extends Controller
                     return \Str::limit($row->parent_name, 40, "...");
                 })
                 ->editColumn('name', function ($row) {
-
-                    return \Str::limit($row->name, 40, "...");
+                    if($row->parent_id==0){
+                        return \Str::limit($row->name." "."(Study-Area)", 50, "...");
+                    }else{
+                        return \Str::limit($row->name." "."(Sub-Study-Area)", 50, "...");
+                    }
+ 
+                    
                 })
                 ->make(true);
 
@@ -48,8 +72,11 @@ class StudyController extends Controller
             $breadcrumbs = [
                 ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Study Areas"]
             ];
+
+            $study=Study::select('id','name')->where('parent_id',0)->get();
+            $substudy=Study::select('id','name')->where('parent_id','!=',0)->get();
             return view('dashboard.study_area.index', [
-                'breadcrumbs' => $breadcrumbs
+                'breadcrumbs' => $breadcrumbs,'study'=>$study,'substudy'=>$substudy
             ]);
         }
 
@@ -215,5 +242,9 @@ class StudyController extends Controller
         return Study::where('parent_id', $id)->get();
     }
 
+
+    public function studytosubstudy(Request $request){
+        return Study::where('parent_id', $request->studyid)->get();
+    }
 
 }

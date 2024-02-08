@@ -244,6 +244,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         ]
     ]);
 
+    Route::post('study-to-substudy',[\App\Http\Controllers\Admin\StudyController::class,'studytosubstudy'])->name('study-to-substudy');
     //Fee_type
 
     Route::resource('feetype', '\App\Http\Controllers\Admin\FeeTypeController', [

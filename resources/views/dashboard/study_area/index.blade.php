@@ -25,6 +25,47 @@
                                 data-url="{{ route('admin.study.create') }}" class="btn btn-primary float-right">
                                 <span class="fa fa-plus"></span> Add Study Area
                             </button> --}}
+                            <div class="row application-filter align-items-center">
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="studyid">Study Area</label>
+                                        <select data-colum="0" id="studyid" name="studyid[]" data-live-search="true"
+                                            multiple class=" select form-control">
+                                            @foreach ($study as $stddata)
+                                                @if (isset($stddata->id))
+                                                    <option value="{{ $stddata->id }}">{{ $stddata->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="substudyid">Sub Study Area</label>
+                                        <select id="substudyid" name="substudyid[]" data-live-search="true" multiple
+                                            class=" select form-control">
+
+
+
+                                            @foreach ($substudy as $data)
+                                                @if (isset($data->id))
+                                                    <option value="{{ $data->id }}">{{ $data->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-4 col-12 text-right">
+                                    <button class="btn btn-primary" id="reset-filter">Reset</button>
+
+                                </div>
+
+
+
+                            </div>
                             <div class="table-responsive">
                                 <table id="study-table" class="table table-hover w-100 zero-configuration">
                                     <thead>
@@ -49,6 +90,56 @@
 @section('page-script')
     <script>
         $(document).ready(function() {
+            $(".select").selectpicker();
+
+
+            function studytosubstudy(id) {
+
+                if (id == "studyid") {
+
+                    $.ajax({
+                        url: "{{ route('admin.study-to-substudy') }}",
+                        type: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            studyid: $('#studyid').val(),
+
+                        },
+                        success: (data) => {
+                            let studyLength = data.length;
+
+                            if (studyLength > 0) {
+                                var studyHTML =
+                                    `<option value="${data[0].id}">${data[0].name}</option>`;
+                                for (let i = 1; i < studyLength; i++) {
+
+                                    var studyHTML = studyHTML +
+                                        `<option value="${data[i].id}">${data[i].name}</option>`
+
+
+                                }
+                            } else {
+                                var studyHTML = `<option value=""  disabled>No Data Found</option>`;
+
+                            }
+
+
+                            $('#substudyid').html(studyHTML);
+                            $("#substudyid").selectpicker('refresh');
+
+
+                        }
+                    })
+
+                }
+
+            }
+
+            $(".application-filter").find("select").on("change", function(e) {
+                studytosubstudy(e.target.id);
+
+                dataTable.draw();
+            });
             // Datatable
             dataTable = $("#study-table").DataTable({
                 "processing": true,
@@ -59,7 +150,8 @@
                 ajax: {
                     url: "{{ route('admin.studies') }}",
                     data: function(d) {
-                        // d.quiz_id = $('select[name="quiz_id"]').val();
+                        d.studyid = $('#studyid').val();
+                        d.substudyid = $('#substudyid').val();
                     }
                 },
                 columns: [{
@@ -208,5 +300,12 @@
 
 
         }
+
+        $('#reset-filter').on('click', function() {
+            $(".select").selectpicker('deselectAll');
+            $(".select").val("");
+            $(".select").selectpicker('refresh');
+            dataTable.draw();
+        });
     </script>
 @endsection
