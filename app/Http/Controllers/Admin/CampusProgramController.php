@@ -58,7 +58,10 @@ class CampusProgramController extends Controller
      */
 
      public function universitycampus(Request $request){
-        $camupusdata=Campus::whereIn('university_id',$request->universityid)->select('id','name')->get();
+    
+       
+        $camupusdata=Campus::select('id','name','university_id')->whereIn('university_id',($request->universityid)?($request->universityid):[DB::raw('university_id')])->get();
+       
         return $camupusdata;
 
      }
@@ -422,5 +425,17 @@ class CampusProgramController extends Controller
     public function getCampus($id)
     {
         return Campus::select('name', 'id')->where('university_id', '=', $id)->get();
+    }
+
+    public function resetData(){
+        $university=University::select('id','name')->get(); 
+        $campus=Campus::select('id','name')->get();
+        
+        $program=Program::select('id','name')->get();
+
+        return [
+            'university'=> $university,'campus'=>$campus,'program'=>$program
+        ];
+
     }
 }

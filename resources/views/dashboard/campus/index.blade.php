@@ -138,11 +138,51 @@ $usedUniversityId=$usedUniversity[0];
         var dataTable;
         $(document).ready(function() {
             $(".select").selectpicker();
+
+            function campusDataByUniversity(id){
+             
+             if (id == "universityid") {
+
+                        $.ajax({
+                       url: "{{ route('admin.university-to-campus') }}",
+                       type: 'POST',
+                       data: {
+                       _token: "{{ csrf_token() }}",
+                        universityid: $('#universityid').val(),
+
+                       },
+                      success: (data) => {
+                      let univLength = data.length;
+                     
+                      if(univLength>0){
+                       var univHTML =`<option value="${data[0].id}">${data[0].name}</option>`;
+                       for (let i = 1; i < univLength; i++) {
+                    
+                       var univHTML = univHTML+`<option value="${data[i].id}">${data[i].name}</option>`
+                    
+
+                       }
+                     }else{
+                         var univHTML=`<option value=""  disabled>No Data Found</option>`;
+                       
+                     }
+                     
+
+                      $('#campusid').html(univHTML);
+                      $("#campusid").selectpicker('refresh');
+                      
+
+                   }
+                 })
+
+             }
+
+          }
             //datatabls
             
-            $(".application-filter").find("select").on("change", function() {
+            $(".application-filter").find("select").on("change", function(e) {
                
-                console.log($('#websitename').val());
+                campusDataByUniversity(e.target.id);
                  dataTable.draw();
             });
 
@@ -491,6 +531,67 @@ $usedUniversityId=$usedUniversity[0];
                 $(".select").selectpicker('deselectAll');
                 $(".select").val("");
                 $(".select").selectpicker('refresh');
+                dataTable.draw();
+
+$.ajax({
+          url: "{{ route('admin.reset-filter') }}",
+          type: 'POST',
+          data: {
+          _token: "{{ csrf_token() }}",
+           
+
+          },
+         success: (data) => {
+
+            
+            let univData = (data.university);
+            let univLength = univData.length;
+        
+         if(univLength>0){
+          var univHTML =`<option value="${univData[0].id}">${ univData[0].name}</option>`;
+          for (let i = 1; i < univLength; i++) {
+       
+          var univHTML = univHTML+`<option value="${univData[i].id}">${univData[i].name}</option>`
+        
+
+          }  
+          
+    
+
+         $('#universityid').html(univHTML);
+         $("#universityid").selectpicker('refresh');
+         
+        }
+
+        let campusData = (data.campus);
+            let campusLength = campusData.length;
+        
+         if(campusLength>0){
+          var campusDataHTML =`<option value="${campusData[0].id}">${ campusData[0].name}</option>`;
+          for (let m = 1; m < campusLength; m++) {
+       
+          var campusDataHTML = campusDataHTML+`<option value="${campusData[m].id}">${campusData[m].name}</option>`
+        
+
+          }  
+          
+        
+
+         $('#campusid').html(campusDataHTML);
+         $("#campusid").selectpicker('refresh');
+         
+        }
+
+
+       
+
+
+
+
+
+      }
+    })
+
 
             });
 

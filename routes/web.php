@@ -322,6 +322,8 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     ]);
 
     Route::post('university-campus-relation',[\App\Http\Controllers\Admin\CampusProgramController::class,'universitycampus'])->name('university-to-campus');
+
+    Route::post('reset-filter',[\App\Http\Controllers\Admin\CampusProgramController::class,'resetData'])->name('reset-filter');
     //document type
     Route::resource('document-type', '\App\Http\Controllers\Admin\DocumentTypeController', [
         'names' => [

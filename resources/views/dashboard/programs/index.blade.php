@@ -220,12 +220,18 @@
                 $.ajax({
                     url:"{{url('sub-study-areas')}}"+"/"+ $(this).find('option:selected').val(),
                     success: function(data) {
+                        console.log(data);
                         let html = "";
                         data.forEach(function(value, index) {
                             html += "<option value='" + value.id + "'>" + value.name +
                                 "</option>";
                         });
+                     
+                      
+                       
                         $("#sub_study_area_id").html(html);
+                      
+                        $("#sub_study_area_id").selectpicker('refresh'); 
                     }
                 })
             });

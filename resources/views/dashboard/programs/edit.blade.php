@@ -104,7 +104,7 @@
             <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
            </form>
          @endif
-       </div>
-    </div>
+       </div>  
+    </div> 
 </div>
 </div>
