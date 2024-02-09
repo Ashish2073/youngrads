@@ -332,6 +332,7 @@ $usedUniversityId=$usedUniversity[0];
                         $('#city').html('');
                         $('#city').append(html);
                         // $(".select").select2('refresh');
+                        $(".select").selectpicker('refresh');
                     }
                 });
 

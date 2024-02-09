@@ -42,7 +42,7 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
         foreach ($records as $record) {
              // University Record
 
-           
+            if(isset($record['university'])){
             if (!isset($univsNameIdArr[strtolower($record['university'])])) {
                 $university = new University;
             } else {
@@ -55,8 +55,10 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
             
             $univsNameIdArr[strtolower($university->name)] = $university->id;
             $universityId = $university->id;
-
+            }
+        
             // Campus Record
+            if(isset($universityId) && isset($record['campus'])){
             if (!isset($univIdCampusNameArr[$universityId . "__" . strtolower($record['campus'])])) {
                 $campus = new Campus;
             } else {
@@ -73,16 +75,17 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
             $distance = str_replace("km", "", $record['distance']);
             $distance = str_replace("Km", "", $distance);
             $campus->distance = trim($distance);
-            $campus->nearest_major_city = $record['nearest_major_city'];
-            $campus->latitude = $record['latitude'];
-            $campus->longitude = $record['longitude'];
+            $campus->nearest_major_city =(isset($record['nearest_major_city']) && (!empty($record['nearest_major_city'])))?$record['nearest_major_city']:null;
+            $campus->latitude = (isset($record['latitude']) && (!empty($record['latitude'])))?$record['latitude']:null;
+            $campus->longitude = (isset($record['longitude']) && (!empty($record['longitude'])))?$record['longitude']:null;;
             $campus->save();
 
             $campusId = $campus->id;
             $univIdCampusNameArr[$universityId . "__" . strtolower($record['campus'])] = $campusId;
-
+        }
             // Campus Address
             // Country
+            if(isset($record['country'])){
             if (isset($countryNameIdArr[strtolower($record['country'])])) {
                 $countryId = $countryNameIdArr[strtolower($record['country'])];
             } else {
@@ -92,8 +95,9 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 $countryId = $country->id;
                 $countryNameIdArr[strtolower($record['country'])] = $countryId;
             }
-
+             }
             // State
+            if(isset($countryId) && isset($record['state'])){
             if (isset($stateNameIdArr[$countryId . "__" . strtolower($record['state'])])) {
                 $stateId = $stateNameIdArr[$countryId . "__" . strtolower($record['state'])];
             } else {
@@ -105,8 +109,9 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 $stateNameIdArr[$countryId . "__" . strtolower($record['state'])] = $stateId;
             }
 
-               
-         
+        }   
+         ////city
+         if(isset($stateId) && isset($record['city'])){
             if (isset($cityNameIdArr[$countryId . "__" . $stateId . "__" . strtolower($record['city'])])) {
               
                 
@@ -122,23 +127,26 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 $cityId = $city->id;
                 $cityNameIdArr[$countryId . "__" . $stateId . "__" . strtolower($record['city'])] = $cityId;
             }
+        }
 
+        ////addressss///////
+        if(isset($campus) && isset($stateId) && isset($countryId) && isset($cityId)){
             if (is_null($campus->address_id)) {
                 $address = new Address;
             } else {
                 $address = Address::find($campus->address_id);
             }
 
-            $address->address = $record['address'];
+            $address->address = (isset($record['address']) && !empty($record['address']))?$record['address']:null;
             $address->country_id = $countryId;
             $address->state_id = $stateId;
             $address->city_id = $cityId;
-            $address->post_code=$record['postcode'];
+            $address->post_code=(isset($record['postcode']) && !empty($record['postcode']))?$record['postcode']:null;
             $address->save();
 
             $campus->address_id = $address->id;
             $campus->save();
-
+        }
             $rowNumber++;
         }
 

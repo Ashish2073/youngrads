@@ -36,10 +36,17 @@
 
             <div class="form-group">
                 <button type="submit" id="submit-btn" class="btn btn-primary">Update</button>
+                
             </div>
         </form>
         @if($study->hasChild())
             <p>{{ config('setting.delete_notice') }}</p>
+{{-- 
+            @php Study::@endphp --}}
+           
+            @php session()->put('used_study_area',[$study->id]); @endphp
+            <a href="{{url('admin/study')}}"><p> click Here to Show Uses</p><a>
+
        @else
            <div class="form-group delete" style="margin-top:1%">
             <form id="delete-form" method="POST" action="{{ route('admin.study.destroy', $study->id) }}">

@@ -171,6 +171,8 @@
 
                          $('#campusid').html(univHTML);
                          $("#campusid").selectpicker('refresh');
+
+                         dataTable.draw();
                          
 
                       }
@@ -313,6 +315,7 @@
                         }
 
 
+                        dataTable.draw();
                        
 
 

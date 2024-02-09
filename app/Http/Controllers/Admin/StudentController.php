@@ -59,13 +59,33 @@ class StudentController extends Controller
 				// else{
 				// 	$users=User::all();
 				// }
-			      if(($request->get('email')!=null)||($request->get('email')!=null)||($request->get('personal_number')!=null)){
-			       $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
-				   ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
-				   ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):(([DB::raw('personal_number')])?([DB::raw('personal_number')]):NULL))
-				   ->get();
+				     
+			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)){
+				
+			    //    $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
+				//    ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
+				// ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):[(DB::raw('personal_number'))])
+				//    ->get();
+
+				   $users = User::select('id', 'name', 'last_name', 'email', 'personal_number', 'passport', 'dob')
+                            ->whereIn('id', ($request->get('id') != null) ? $request->get('id') : [DB::raw('id')])
+                             ->whereIn('email', ($request->get('email') != null) ? $request->get('email') : [DB::raw('email')])
+                              ->where(function ($query) use ($request) {
+								if(($request->has('personal_number'))){
+									$query->whereIn('personal_number', $request->get('personal_number'));
+								}else{
+									$query->whereIn('personal_number', ($request->get('personal_number') != null) ? $request->personal_number : [DB::raw('personal_number')])
+									->orWhereNull('personal_number');
+								}
+
+                              })
+                            ->get();
+
+
 				  }else{
+					
 					$users=User::all();
+					
 				  }
 			
 			return Datatables::of($users)
@@ -116,8 +136,9 @@ class StudentController extends Controller
 		}
 	}
 
-	public function profileResume($id, Request $request)
-	{
+	       public function profileResume($id, Request $request)
+
+	     {
 
 		$applicationId = ($request->application) ? $request->application : '';
 		$refusalCountry = '';

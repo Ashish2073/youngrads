@@ -69,7 +69,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
         $rowNumber = 1;
         
         
-     
+         
            
         foreach ($records as $record) {
             
@@ -81,6 +81,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             //     continue;
             // }
             // University ID
+
+            if(isset($record['university'])){
             if (!isset($univsNameIdArr[strtolower($record['university'])])) {
                 Log::debug('University does not exists!' . json_encode($record));
                 $sheetError[] = [
@@ -91,21 +93,28 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 continue;
             }
             $univId = $univsNameIdArr[strtolower($record['university'])];
+            }
+
 
             // Campus ID
+             if(isset($record['campus'])){
             if (!isset($univIdCampusNameArr[$univId . "__" . strtolower($record['campus'])])) {
-                Log::debug('Campus does not exists!' . json_encode($record));
+                Log::debug('Campus does not exists!'.$record['campus'] . json_encode($record));
                 $sheetError[] = [
-                    'message' => 'Campus does not exists!',
+                    'message' => 'Campus does not exists!'.$record['campus'],
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                 ];
                 continue;
             }
             $campusId = $univIdCampusNameArr[$univId . "__" . strtolower($record['campus'])];
-
+           }
             // Program Level ID
-            if (!isset($programLevelIdArr[strtolower($record['level'])])) {
+
+            if(isset($record['level'])){
+            if (!isset($programLevelIdArr[str_replace(' ','',strtolower($record['level']))])) {
+
+              
                 Log::debug('Program Level does not exists!' . json_encode($record));
                 $sheetError[] = [
                     'message' => 'Program Level does not exists!'.$record['level'],
@@ -114,10 +123,12 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 ];
                 continue;
             } else {
-                $programLevelId = $programLevelIdArr[strtolower($record['level'])];
+                $programLevelId = $programLevelIdArr[str_replace(' ','',strtolower($record['level']))];
             }
-
+          }
             // Study Area ID
+            if(isset($record['study_area'])){
+             
             if (!isset($studyAreaNameIdArr[strtolower($record['study_area'])])) {
                 $studyArea = new Study;
                 $studyArea->name = $record['study_area'];
@@ -127,8 +138,9 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             } else {
                 $studyAreaId = $studyAreaNameIdArr[strtolower($record['study_area'])];
             }
-
+             }
             // Program
+            if(isset($record['program'])){
             if (!isset($programNameIdArr[strtolower($record['program'])])) {
                 $program = new Program;
             } else {
@@ -150,7 +162,10 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
             // Program Study Areas
             $programStudyAreaIdArr = ProgramArea::getIdNameArr($programId);
+        }
 
+
+            if(isset($record['sub_study_area']) && isset($programStudyAreaIdArr)){
             if (!empty($record['sub_study_area'])) {
                 $subStudyArea = explode(",", $record['sub_study_area']);
                 foreach ($subStudyArea as $area) {
@@ -175,9 +190,10 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             }
 
 
-
+        }
 
             // Campus Program
+            if(isset($campusId) && isset($programId)){
             if (!isset($campusProgramsArr[$campusId . "__" . $programId])) {
                 $campusProgram = new CampusProgram;
             } else {
@@ -187,14 +203,17 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
             $campusProgram->campus_id = $campusId;
             $campusProgram->program_id = $programId;
-            $campusProgram->entry_requirment = $record['entry_requirements'];
+            $campusProgram->entry_requirment = ($record['entry_requirements'])??null;
             $campusProgram->campus_program_duration = $duration;
-            $campusProgram->website = !empty($record['website']) ? $record['website'] : null;
+            $campusProgram->website = ($record['website']) ?? null;
             $campusProgram->save();
 
             $campusProgramId = $campusProgram->id;
 
+        }
+
             // Campus Program Tests
+            if(isset( $campusProgramId)){
             CampusProgramTest::where('campus_program_id', $campusProgramId)->delete();
 
            if(isset($record['entrance_exam_name']) && !empty($record['entrance_exam_name'])){
@@ -475,7 +494,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 }
             }
         }
-    
+        }
         
     }
 
