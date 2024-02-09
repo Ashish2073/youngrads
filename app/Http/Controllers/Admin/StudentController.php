@@ -62,7 +62,7 @@ class StudentController extends Controller
 			      if(($request->get('email')!=null)||($request->get('email')!=null)||($request->get('personal_number')!=null)){
 			       $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
 				   ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
-				   ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):[DB::raw('personal_number')])
+				   ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):(([DB::raw('personal_number')])?([DB::raw('personal_number')]):NULL))
 				   ->get();
 				  }else{
 					$users=User::all();
