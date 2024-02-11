@@ -1,6 +1,10 @@
 @extends('layouts/contentLayoutMaster')
 
 @section('title', 'Campus Program')
+@section('vendor-style')
+    {{-- vendor css files --}}
+    <link rel="stylesheet" href="{{ asset(mix('vendors/css/tables/datatable/datatables.min.css')) }}">
+@endsection
 
 @section('breadcumb-right')
     <a href="{{ route('admin.campus-program.create') }}" class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">
@@ -19,6 +23,55 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body card-dashboard">
+                            <div class="row application-filter align-items-center">
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="universityid">University</label>
+                                        <select data-colum="0" id="universityid" name="university[]" data-live-search="true"
+                                            multiple class=" select form-control">
+
+
+                                            <option value="bvv">
+                                            </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="campusid">Campus</label>
+                                        <select id="campusid" name="campus[]" data-live-search="true" multiple
+                                            class=" select form-control">
+
+
+
+                                            <option value=""></option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="programeid">Programe</label>
+                                        <select id="programeid" name="program[]" data-live-search="true" multiple
+                                            class=" select form-control">
+
+
+                                            <option value="">
+                                            </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-12 text-right">
+                                    <button class="btn btn-primary" id="reset-filter">Reset</button>
+
+                                </div>
+
+
+
+                            </div>
 
                             <div class="table-responsive">
                                 <table id="table" class="table table-hover w-100 zero-configuration">
@@ -42,7 +95,17 @@
     </section>
 
 @endsection
-
+@section('vendor-script')
+    {{-- vendor files --}}
+    <script src="{{ asset(mix('vendors/js/tables/datatable/pdfmake.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/vfs_fonts.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.html5.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.print.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
+@endsection
 @section('page-script')
     <script>
         $(document).ready(function() {
@@ -67,10 +130,10 @@
                 columns: [{
                         name: 'university',
                         data: 'university'
-                       
+
                     },
                     {
-                        name: 'campus',  
+                        name: 'campus',
                         data: 'campus'
                     },
                     {
@@ -79,7 +142,7 @@
                     },
                     {
                         data: 'action'
-                        
+
                     }
 
                 ],
