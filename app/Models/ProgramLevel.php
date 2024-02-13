@@ -42,7 +42,7 @@ class ProgramLevel extends Model
         $records = self::all();
         $nameIdArr = [];
         foreach ($records as $record) {
-            $nameIdArr[strtolower($record->name)] = $record->id;
+            $nameIdArr[str_replace(' ','',strtolower($record->name))] = $record->id;
         }
         return $nameIdArr;
     }

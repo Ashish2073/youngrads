@@ -92,6 +92,11 @@
         <div class="form-group delete " style="margin-top:1%">
          @if($program->campusProgram->count() > 0)
                <p>{{ config('setting.delete_notice') }}</p>
+
+               @php session()->put('used_program',[$program->id, $program->subAreaIds(),$program->study_area_id,$program->program_level_id,$program->duration]); @endphp
+
+
+               <a href="{{url('admin/campus-program')}}"><p> click Here to Show Uses</p><a>
          @else
          <form  id="delete-form" method="POST" action="{{ route('admin.program.destroy', $program->id) }}" >
           @csrf
@@ -99,7 +104,7 @@
             <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
            </form>
          @endif
-       </div>
-    </div>
+       </div>  
+    </div> 
 </div>
 </div>

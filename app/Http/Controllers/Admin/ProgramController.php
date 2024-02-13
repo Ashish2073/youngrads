@@ -35,12 +35,28 @@ class ProgramController extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function index()
+  public function index(Request $request)
   {
+
+    if(($request->get('programeid')!=null) || ($request->get('programelevelid')!=null) || ($request->get('studyareaid')!=null)||($request->get('duration')!=null) ){
+     
+      $programs = Program::leftJoin('program_levels', 'programs.program_level_id', '=', 'program_levels.id')
+      ->leftJoin('study_areas', 'programs.study_area_id', '=', 'study_areas.id')
+      ->select('programs.id', 'programs.name as name', 'program_levels.name as program_level', 'study_areas.name as study_area', 'programs.duration')
+      ->whereIn('programs.id', $request->get('programeid') ? $request->get('programeid') : [DB::raw('programs.id')])
+      ->whereIn('program_levels.id', $request->get('programelevelid') ? $request->get('programelevelid') : [DB::raw('program_levels.id')])
+      ->whereIn('study_areas.id', $request->get('studyareaid') ? $request->get('studyareaid') : [DB::raw('study_areas.id')]) 
+      ->whereIn('programs.duration', $request->get('duration') ? $request->get('duration') : [DB::raw('programs.duration')])
+      ->get();
+
+    }else{
+
     $programs = Program::leftJoin('program_levels', 'programs.program_level_id', '=', 'program_levels.id')
       ->leftJoin('study_areas', 'programs.study_area_id', '=', 'study_areas.id')
       ->select('programs.id', 'programs.name as name', 'program_levels.name as program_level', 'study_areas.name as study_area', 'programs.duration')
       ->get();
+    }
+
 
     if (request()->ajax()) {
       return DataTables::of($programs)
@@ -56,11 +72,20 @@ class ProgramController extends Controller
       $breadcrumbs = [
         ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Programs"]
       ];
+
+      $program=Program::select('id','name')->get();
+
+      $programduration=Program::select('duration')->distinct('duration')->get();
+
+      $programlevel=ProgramLevel::select('id','name')->get();
+      $studyareas = Study::select('id', 'name')->get();
+
+
       return view('dashboard.programs.index', [
-        'breadcrumbs' => $breadcrumbs
+        'breadcrumbs' => $breadcrumbs,'program'=>$program,'programlevel'=> $programlevel,'studyareas'=>$studyareas, 'programduration'=>$programduration
       ]);
     }
-  }
+  } 
 
   /**
    * Show the form for creating a new resource.

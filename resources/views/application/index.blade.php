@@ -131,7 +131,7 @@
                         data: 'application_number'
                     },
                     {
-                        name: 'universities.name',
+                         name: 'universities.name',
                         data: 'university'
                     },
                     {

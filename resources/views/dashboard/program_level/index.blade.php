@@ -64,7 +64,7 @@
                 "pageLength": 100,
                 "fixedHeader": true,
                 ajax: {
-                    url: route('admin.programlevels').url(),
+                    url: "{{route('admin.programlevels')}}",
                     data: function (d) {
                         // d.quiz_id = $('select[name="quiz_id"]').val();
                     }
@@ -79,11 +79,11 @@
                     },
 
                 ],
-
+                // programlevel
                 'createdRow': function (row, data, dataIndex) {
                     $(row).addClass('action-row');
                     let id = data['id'];
-                    let editUrl = route('admin.programlevel.edit', id).url();
+                    let editUrl = "{{url('admin/programlevel')}}"+"/"+id+"/"+"edit";
                     $(row).attr('data-url', editUrl);
                     $(row).attr('data-target', "#dynamic-modal");
                     $(row).attr('data-toggle', "modal");

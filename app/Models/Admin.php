@@ -15,7 +15,7 @@ use Spatie\Activitylog\LogOptions;
 class Admin extends Authenticatable
 {
 
-    use LogsActivity;
+    use LogsActivity; 
     protected static $logOnlyDirty = true;
     protected static $logFillable = true;
 
@@ -46,7 +46,7 @@ class Admin extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new Notification($token));
-    }
+    } 
 
     public function profileImage()
     {
@@ -55,7 +55,7 @@ class Admin extends Authenticatable
         } else {
             return asset('images/portrait/small/avatar-s-11.jpg');
         }
-    }
+    } 
 
     public function getInitials()
     {

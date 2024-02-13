@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\LanguageController;
-//use Illuminate\Routing\Route;
+//use Illuminate\Routing\Route; 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\ActivityController;
@@ -240,11 +240,13 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
             'edit' => 'study.edit',
             'update' => 'study.update',
             'store' => 'study.store',
-            'destroy' => 'study.destroy'
+            'destroy' => 'study.destroy' 
         ]
     ]);
 
+    Route::post('study-to-substudy',[\App\Http\Controllers\Admin\StudyController::class,'studytosubstudy'])->name('study-to-substudy');
     //Fee_type
+    Route::post('reset-study-area-filter',[\App\Http\Controllers\Admin\StudyController::class,'resetstudyarea'])->name('reset-study-area-filter');
 
     Route::resource('feetype', '\App\Http\Controllers\Admin\FeeTypeController', [
         'names' => [
@@ -321,6 +323,9 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         ]
     ]);
 
+    Route::post('university-campus-relation',[\App\Http\Controllers\Admin\CampusProgramController::class,'universitycampus'])->name('university-to-campus');
+
+    Route::post('reset-filter',[\App\Http\Controllers\Admin\CampusProgramController::class,'resetData'])->name('reset-filter');
     //document type
     Route::resource('document-type', '\App\Http\Controllers\Admin\DocumentTypeController', [
         'names' => [

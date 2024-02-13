@@ -162,7 +162,10 @@
 @if($campus->campusProgram->count() > 0)
     <div class="col-12">
         <p>{{ config('setting.delete_notice') }}</p>
+        @php session()->put('used_campus',[$campus->university->id,$campus->id,]); @endphp
+        <a href="{{url('admin/campus-program')}}"><p> click Here to Show Uses</p><a>
     </div>
+
 @else
     <div class="form-group delete" style="margin-top:1%">
        <form  id="delete-form" method="POST" action="{{ route('admin.campus.destroy', $campus->id) }}" >

@@ -34,22 +34,20 @@
 @section('content')
 
 
-@if((session()->has('used_campus_program')))
-@php $usedCampusProgram=session()->get('used_campus_program'); @endphp
+    @if (session()->has('used_campus_program'))
+        @php $usedCampusProgram=session()->get('used_campus_program'); @endphp
 
-@php 
-$usedCampusProgramUniversityId=$usedCampusProgram[0];
-$usedCampusProgramCampusId=$usedCampusProgram[1];
-$usedCampusProgramId=$usedCampusProgram[2];
+        @php
+            $usedCampusProgramUniversityId = $usedCampusProgram[0];
+            $usedCampusProgramCampusId = $usedCampusProgram[1];
+            $usedCampusProgramId = $usedCampusProgram[2];
 
+        @endphp
+    @endif
 
-@endphp
-
-@endif
-
-<input type="hidden" value={{($usedCampusProgramUniversityId)??""}} id="useduniversityid"/>
-<input type="hidden" value={{($usedCampusProgramCampusId)??""}} id="usedcampusid"/>
-<input type="hidden" value={{($usedCampusProgramId)??""}} id="usedprogramid"/>
+    <input type="hidden" value={{ $usedCampusProgramUniversityId ?? '' }} id="useduniversityid" />
+    <input type="hidden" value={{ $usedCampusProgramCampusId ?? '' }} id="usedcampusid" />
+    <input type="hidden" value={{ $usedCampusProgramId ?? '' }} id="usedprogramid" />
 
 
 
@@ -77,9 +75,8 @@ $usedCampusProgramId=$usedCampusProgram[2];
                                             class=" select form-control">
                                             @foreach ($univs ?? [] as $univ)
                                                 <option
-                                            {{ $univ->id == ($usedCampusProgramUniversityId??"") ? 'selected' : '' }}
-                                                
-                                                value="{{ $univ->id }}">{{ $univ->name }}</option>
+                                                    {{ $univ->id == ($usedCampusProgramUniversityId ?? '') ? 'selected' : '' }}
+                                                    value="{{ $univ->id }}">{{ $univ->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -90,11 +87,9 @@ $usedCampusProgramId=$usedCampusProgram[2];
                                         <select id="campus" name="campus[]" data-live-search="true" multiple
                                             class=" select form-control">
                                             @foreach ($campuses ?? [] as $campus)
-
-                                          
                                                 <option
-                                                {{ $campus->id == ($usedCampusProgramCampusId??"") ? 'selected' : '' }}
-                                                 value="{{ $campus->id }}">{{ $campus->name }}</option>
+                                                    {{ $campus->id == ($usedCampusProgramCampusId ?? '') ? 'selected' : '' }}
+                                                    value="{{ $campus->id }}">{{ $campus->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -105,11 +100,8 @@ $usedCampusProgramId=$usedCampusProgram[2];
                                         <select id="program" name="program[]" data-live-search="true" multiple
                                             class=" select form-control">
                                             @foreach ($programs ?? [] as $program)
-
-                                                <option
-                                                {{ $program->id  == ($usedCampusProgramId??"") ? 'selected' : '' }}
-                                                
-                                                value="{{ $program->id }}">{{ $program->name }}</option>
+                                                <option {{ $program->id == ($usedCampusProgramId ?? '') ? 'selected' : '' }}
+                                                    value="{{ $program->id }}">{{ $program->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -243,7 +235,7 @@ $usedCampusProgramId=$usedCampusProgram[2];
         var messgeTable;
         var dataTable;
 
-        
+
 
         $(document).ready(function() {
 
@@ -259,10 +251,10 @@ $usedCampusProgramId=$usedCampusProgram[2];
 
 
             // var usedUniversityId=$('#useduniversityid').val();
-           
+
             // var usedCampusId=$('#usedcampusid').val();
             // var usedProgramId=$('#usedprogramid').val();
-            
+
 
             // if((usedUniversityId !== "" && usedUniversityId !== null && usedUniversityId !== undefined)&&
             // (usedCampusId !== "" && usedCampusId !== null && usedCampusId !== undefined)&&
@@ -276,7 +268,7 @@ $usedCampusProgramId=$usedCampusProgram[2];
 
             //     console.log('hello');
 
-                
+
 
             //     dataTable = $("#admin-application-table").DataTable({
             //     "processing": true,
@@ -285,14 +277,14 @@ $usedCampusProgramId=$usedCampusProgram[2];
             //     ajax: {
             //         url: "{{ route('admin.applications-all') }}",
             //         data: function(d) {
-                        
+
             //             d.university = $('#useduniversityid').val();
             //             d.campus = $('#usedcampusid').val();
             //             d.program = $('#usedprogramid').val();
             //             d.status = $("#status_filter").val();
             //             d.favourite = $("input[name='favourite']").val();
             //             d.view = $("input[name='view']").val();
-                      
+
             //         }
             //     },
             //     // dom: "tps",
@@ -384,7 +376,7 @@ $usedCampusProgramId=$usedCampusProgram[2];
 
 
             // }
-        
+
 
 
 

@@ -9,10 +9,14 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Notifications\StudentEmailChange;
+use App\Models\ApplicationMessage;
 use Illuminate\Support\Facades\URL;
 use App\Models\UserMeta;
 use App\Models\City;
+use App\Models\UserApplication;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -183,6 +187,8 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
+   
+
     public function meta($key)
     {
         $meta = UserMeta::where([
@@ -263,6 +269,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ];
         }
 
+        
         $tests = Test::join('user_special_tests', 'user_special_tests.test_type_id', '=', 'tests.id')
             ->where('user_special_tests.user_id', $user->id)
             ->select('tests.*')->get();
@@ -271,22 +278,43 @@ class User extends Authenticatable implements MustVerifyEmail
 
         foreach ($tests as $test) {
             $main_docs = Test::where('parent_id', $test->id)->select('tests.*', 'test_name as name')->get();
-            foreach ($main_docs as $main_doc) {
+            $main_test= Test::select('tests.*', 'test_name as name')->where('id',$test->id)->get();
+
+        
+
+            foreach (($main_test) as $main_doc) {
                 $user_document = UserDocument::where([
                     'user_id' => $user->id,
                     'document_type_id' => $main_doc->id,
                     'document_type' => 'tests'
                 ])->get();
-                $main_doc->documents = $user_document;
+                ($main_doc)->documents = $user_document;
             }
 
             $document_lists['Test']['document_lists'][] = [
                 'name' => $test->test_name,
                 'id' => $test->id,
-                'document_list' => $main_docs
+                'document_list' => $main_test
             ];
-        }
 
+          
+
+            // foreach (($main_docs) as $main_doc) {
+            //     $user_document = UserDocument::where([
+            //         'user_id' => $user->id,
+            //         'document_type_id' => $main_doc->id,
+            //         'document_type' => 'tests'
+            //     ])->get();
+            //     ($main_doc)->documents = $user_document;
+            // }
+
+            // $document_lists['Test']['document_lists'][] = [
+            //     'name' => $test->test_name,
+            //     'id' => $test->id,
+            //     'document_list' => $main_docs
+            // ];
+        }
+        // dd($document_lists);
         $documents = DocumentType::select('document_types.*', 'title as name')->get();
         $document_lists['Document']['group_name'] = 'Mandatory Documents';
         $document_lists['Document']['document_type'] = 'document_types';
@@ -305,7 +333,8 @@ class User extends Authenticatable implements MustVerifyEmail
                 'document_list' => [$document]
             ];
         }
-
+        
+     
         return $document_lists;
     }
 
@@ -469,12 +498,30 @@ class User extends Authenticatable implements MustVerifyEmail
                     continue;
                 }
                 foreach ($list['document_list'] ?? [] as $list_doc) {
+                    if(isset($list_doc->documents)){
                     if ($list_doc->documents->count() == 0) {
                         $profile['upload_documents']['status'] = false;
                     }
+                   }
                 }
             }
         }
-        return $profile;
+        return $profile; 
     }
+
+    public static  function getunreadmessage()
+    {
+       
+       
+       $userunreadMessage=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+       ->select('users_applications.application_number as application_number','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"),
+       )->where('users_applications.user_id', '=', Auth::id())->where('message_status','unread')->get();
+       
+    
+        
+        return $userunreadMessage;
+    }
+
+
+
 }

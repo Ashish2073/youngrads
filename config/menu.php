@@ -106,12 +106,12 @@ return [
         'icon_class' => 'fa fa-book',
         // 'route' => 'admin.studies',
         'sub_menu' => [
-            // [
-            //     'menu_name' => 'Program Levels',
-            //     'route' => 'admin.programlevels',
-            //     'icon_class' => 'fa fa-tasks',
-            //     'permission' => 'program_view'
-            // ],
+            [
+                'menu_name' => 'Program Levels',
+                'route' => 'admin.programlevels',
+                'icon_class' => 'fa fa-tasks',
+                'permission' => 'program_view'
+            ],
             [
                 'menu_name' => 'Study Areas',
                 'route' => 'admin.studies',

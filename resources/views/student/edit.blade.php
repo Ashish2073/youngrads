@@ -13,13 +13,14 @@
             <div class="card-content">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4 col-12 d-none">
+                        <div class="col-md-4 col-12 ">
                             <div class="media mb-2">
                                 <a class="mr-2 my-25" href="javascript:void(0);">
                                     <img src="{{ auth()->user()->getprofileImg() }}" {{--
                                         src="{{ asset('uploads/profile_pic/student/' . $user->profile_img) }}"
-                                        --}} alt="users avatar"
-                                        class="users-avatar-shadow rounded pro-image" height="64" width="64">
+                                        --}}
+                                        alt="users avatar" class="users-avatar-shadow rounded pro-image" height="64"
+                                        width="64">
                                 </a>
                                 <div class="media-body mt-50">
                                     <h4 class="media-heading">{{ $user->name }}</h4>
@@ -44,7 +45,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-4 col-12">
-                          <h4>Update Profile</h4><hr>
+                            <h4>Update Profile</h4>
+                            <hr>
                             <form id="update-profile-form" action="{{ route('update-profile', $user->id) }}" method="post">
                                 @csrf
                                 @method('PUT')
@@ -53,54 +55,54 @@
 
 
                                 @include('dashboard.common.fields.text', [
-                                'label_name' => 'First Name',
-                                'id' => 'first_name',
-                                'name' => 'first_name',
-                                'placeholder' => 'Enter First Name',
-                                'input_attribute' => [
-                                'type' => 'text',
+                                    'label_name' => 'First Name',
+                                    'id' => 'first_name',
+                                    'name' => 'first_name',
+                                    'placeholder' => 'Enter First Name',
+                                    'input_attribute' => [
+                                        'type' => 'text',
                                 
-                                'value' => old('first_name', $user->name),
-                                ],
-                                'classes' => '',
+                                        'value' => old('first_name', $user->name),
+                                    ],
+                                    'classes' => '',
                                 ])
 
                                 @include('dashboard.common.fields.text', [
-                                'label_name' => 'Last Name',
-                                'id' => 'last_name',
-                                'name' => 'last_name',
-                                'placeholder' => 'Enter Last Name',
-                                'input_attribute' => [
-                                'type' => 'text',
-                                'value' => old('last_name', $user->last_name),
-                                ],
-                                'classes' => '',
+                                    'label_name' => 'Last Name',
+                                    'id' => 'last_name',
+                                    'name' => 'last_name',
+                                    'placeholder' => 'Enter Last Name',
+                                    'input_attribute' => [
+                                        'type' => 'text',
+                                        'value' => old('last_name', $user->last_name),
+                                    ],
+                                    'classes' => '',
                                 ])
 
 
                                 @include('dashboard.common.fields.text', [
-                                'label_name' => 'Password',
-                                'id' => 'password',
-                                'name' => 'password',
-                                'placeholder' => 'Enter Password',
-                                'input_attribute' => [
-                                'type' => 'password',
-                                'value' => '',
-                                ],
-                                'classes' => '',
-                                'help_text' => 'Leave blank to use existing password'
+                                    'label_name' => 'Password',
+                                    'id' => 'password',
+                                    'name' => 'password',
+                                    'placeholder' => 'Enter Password',
+                                    'input_attribute' => [
+                                        'type' => 'password',
+                                        'value' => '',
+                                    ],
+                                    'classes' => '',
+                                    'help_text' => 'Leave blank to use existing password',
                                 ])
 
                                 @include('dashboard.common.fields.text', [
-                                'label_name' => 'Confirm Password',
-                                'id' => 'confirm-password',
-                                'name' => 'password_confirmation',
-                                'placeholder' => 'Enter Confirm Password',
-                                'input_attribute' => [
-                                'type' => 'password',
-                                'value' => '',
-                                ],
-                                'classes' => '',
+                                    'label_name' => 'Confirm Password',
+                                    'id' => 'confirm-password',
+                                    'name' => 'password_confirmation',
+                                    'placeholder' => 'Enter Confirm Password',
+                                    'input_attribute' => [
+                                        'type' => 'password',
+                                        'value' => '',
+                                    ],
+                                    'classes' => '',
                                 ])
 
 
@@ -111,11 +113,12 @@
                             </form>
                         </div>
                         <div class="col-md-4 col-12 ">
-                          <h4>Change Email Address</h4><hr>
-                          <div class="change-email">
-                              @include('student.change_email')
+                            <h4>Change Email Address</h4>
+                            <hr>
+                            <div class="change-email">
+                                @include('student.change_email')
 
-                          </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,7 +178,7 @@
                 first_name: {
                     required: true
                 },
-               
+
                 "password_confirmation": {
                     equalTo: "#password"
                 },
@@ -247,6 +250,5 @@
 
             });
         }
-
     </script>
 @endsection

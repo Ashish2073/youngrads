@@ -885,6 +885,7 @@ class StudentController extends Controller
 
 	function testScoreStore(Request $request)
 	{
+		
 
 		$subTests = DB::table('special_test_sub')->where('test_id', '=', $request->test_type)->get();
 		$testName = Test::find($request->test_type)->test_name;
@@ -907,6 +908,7 @@ class StudentController extends Controller
 		$userTest->score = $request->score;
 
 		$i = 0;
+		if(isset($request->subscore)){
 		foreach ($request->subscore as $subTest) {
 			if ($subTest != "") {
 				SubTest::create([
@@ -918,7 +920,7 @@ class StudentController extends Controller
 			}
 			$i++;
 		}
-
+	}
 		if ($userTest->save()) {
 			return response()->json([
 				'code' => 'success',
@@ -1222,6 +1224,8 @@ class StudentController extends Controller
 		// 4. Delete Files
 
 		// Form validation
+
+		
 
 		$validation_arr = [
 			'document_type' => 'required',
