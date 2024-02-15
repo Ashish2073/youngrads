@@ -55,11 +55,20 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, ['name' => 'required|unique:roles']);
-        $role = Role::create([
-            'name' => $request->name,
-            'guard_name' => 'admin'
-        ]);
+        $this->validate($request, ['name' => 'required|unique:roles,name,NULL,id,deleted_at,NULL']);
+        $role = Role::withTrashed()->firstOrNew(['name' => $request->name]);
+
+        if ($role->trashed()) {
+            // If a soft-deleted record with the same name exists, restore it
+            $role->restore();
+        }else{
+            $role = Role::create([
+                'name' => $request->name,
+                'guard_name' => 'modifires'
+            ]);
+
+        }
+      
 
         if ($role) {
             $permissions = $request->get('permissions', []);

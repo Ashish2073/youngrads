@@ -6,11 +6,16 @@
     <link rel="stylesheet" href="{{ asset(mix('vendors/css/tables/datatable/datatables.min.css')) }}">
 @endsection
 
+<style>
+
+</style>
+
 @section('breadcumb-right')
     <a href="{{ route('admin.campus-program.create') }}" class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">
         <i class="feather icon-plus"></i>
     </a>
 @endsection
+
 @if (session()->has('used_program'))
     @php $usedCampusProgram=session()->get('used_program'); @endphp
 
@@ -45,7 +50,7 @@
 
 
                             <div class="row application-filter align-items-center">
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="universityid">University</label>
                                         <select id="universityid" name="universityid[]" data-live-search="true" multiple
@@ -61,7 +66,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="campusid">Campus</label>
                                         <select id="campusid" name="campusid[]" data-live-search="true" multiple
@@ -77,7 +82,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="programid">Program</label>
                                         <select id="programid" name="programid[]" data-live-search="true" multiple
@@ -93,7 +98,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4 col-12 text-right">
+                                <div class="col-md-2 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
 
                                 </div>
@@ -284,7 +289,7 @@
 
                     if (univLength > 0) {
                         var univHTML =
-                        `<option value="${univData[0].id}">${ univData[0].name}</option>`;
+                            `<option value="${univData[0].id}">${ univData[0].name}</option>`;
                         for (let i = 1; i < univLength; i++) {
 
                             var univHTML = univHTML +

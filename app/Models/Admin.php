@@ -16,7 +16,7 @@ class Admin extends Authenticatable
 {
 
     use LogsActivity; 
-    protected static $logOnlyDirty = true;
+     protected static $logOnlyDirty = true;
     protected static $logFillable = true;
 
     use HasRoles;

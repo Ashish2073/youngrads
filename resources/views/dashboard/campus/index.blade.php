@@ -9,14 +9,13 @@
     </button>
 @endsection
 
-@if((session()->has('used_university')))
-@php $usedUniversity=session()->get('used_university'); @endphp
+@if (session()->has('used_university'))
+    @php $usedUniversity=session()->get('used_university'); @endphp
 
-@php 
-$usedUniversityId=$usedUniversity[0];
+    @php
+        $usedUniversityId = $usedUniversity[0];
 
-@endphp
-
+    @endphp
 @endif
 
 @section('content')
@@ -33,49 +32,46 @@ $usedUniversityId=$usedUniversity[0];
                     <div class="card-content">
                         <div class="card-body card-dashboard">
 
-                        <div class="row application-filter align-items-center">
-                            <div class="col-md-2 col-12">
-                                   <div class="form-group">
-                                      <label for="universityid">University</label>
-                                          <select id="universityid" name="universityid[]" data-live-search="true" multiple
-                                               class=" select form-control">
-                                            @foreach( $university as $unvdata)
-                                            @if(isset($unvdata->id))
-                                                      <option
-                       
-                                            {{ $unvdata->id == ($usedUniversityId??"") ? 'selected' : '' }}   
-                                              value="{{$unvdata->id}}">{{$unvdata->name}}</option>
-                                              @endif
-                                           @endforeach     
-                                           </select>
+                            <div class="row application-filter align-items-center">
+                                <div class="col-md-5 col-12">
+                                    <div class="form-group">
+                                        <label for="universityid">University</label>
+                                        <select id="universityid" name="universityid[]" data-live-search="true" multiple
+                                            class=" select form-control">
+                                            @foreach ($university as $unvdata)
+                                                @if (isset($unvdata->id))
+                                                    <option
+                                                        {{ $unvdata->id == ($usedUniversityId ?? '') ? 'selected' : '' }}
+                                                        value="{{ $unvdata->id }}">{{ $unvdata->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
                                     </div>
-                            </div>
-                 <div class="col-md-2 col-12">
-                      <div class="form-group">
-                     <label for="campusid">Campus</label>
-                     <select id="campusid" name="campusid[]" data-live-search="true" multiple
-                         class=" select form-control">
-                        
-                  @foreach($campus as $camdata)
-                     @if(isset($camdata->id))
-                             <option
-                            
-                               value="{{$camdata->id}}">{{$camdata->name}}</option>
-                          @endif
-                               @endforeach
-                       
-                     </select>
-                 </div>
-             </div>
-             {{-- <div class="col-md-2 col-12">
+                                </div>
+                                <div class="col-md-5 col-12">
+                                    <div class="form-group">
+                                        <label for="campusid">Campus</label>
+                                        <select id="campusid" name="campusid[]" data-live-search="true" multiple
+                                            class=" select form-control">
+
+                                            @foreach ($campus as $camdata)
+                                                @if (isset($camdata->id))
+                                                    <option value="{{ $camdata->id }}">{{ $camdata->name }}</option>
+                                                @endif
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+                                </div>
+                                {{-- <div class="col-md-2 col-12">
                  <div class="form-group">
                      <label for="websitename">Website</label>
                      <select id="websitename" name="websitename[]" data-live-search="true" multiple
                          class=" select form-control">
                       
                       
-                         @foreach($campus as $camdata)
-                         @if(isset($camdata->website))
+                         @foreach ($campus as $camdata)
+                         @if (isset($camdata->website))
                                  <option
                                 
                                    value="{{$camdata->website}}">{{$camdata->website}}</option>
@@ -88,37 +84,38 @@ $usedUniversityId=$usedUniversity[0];
                  </div>
              </div> --}}
 
-             <div class="col-md-4 col-12 text-right">
-                 <button class="btn btn-primary" id="reset-filter">Reset</button>
-               
-             </div>
+                                <div class="col-md-2 col-12 text-right">
+                                    <button class="btn btn-primary" id="reset-filter">Reset</button>
+
+                                </div>
 
 
 
-         </div> 
-                    
-                    <div class="card-content">
-                        <div class="card-body card-dashboard">
+                            </div>
 
-                            <div class="table-responsive">
-                                <table id="course-table" class="table table-hover w-100 zero-configuration">
-                                    <thead>
-                                        <tr>
-                                            <th>Campus Name</th>
-                                            <th>University</th>
-                                            <th>Website</th>
-                                            {{-- <th>Logo</th> --}}
-                                            <th>Cover</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                            <div class="card-content">
+                                <div class="card-body card-dashboard">
+
+                                    <div class="table-responsive">
+                                        <table id="course-table" class="table table-hover w-100 zero-configuration">
+                                            <thead>
+                                                <tr>
+                                                    <th>University</th>
+                                                    <th>Campus Name</th>
+
+                                                    <th>Website</th>
+                                                    {{-- <th>Logo</th> --}}
+                                                    <th>Cover</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
     </section>
 
 @endsection
@@ -139,51 +136,52 @@ $usedUniversityId=$usedUniversity[0];
         $(document).ready(function() {
             $(".select").selectpicker();
 
-            function campusDataByUniversity(id){
-             
-             if (id == "universityid") {
+            function campusDataByUniversity(id) {
 
-                        $.ajax({
-                       url: "{{ route('admin.university-to-campus') }}",
-                       type: 'POST',
-                       data: {
-                       _token: "{{ csrf_token() }}",
-                        universityid: $('#universityid').val(),
+                if (id == "universityid") {
 
-                       },
-                      success: (data) => {
-                      let univLength = data.length;
-                     
-                      if(univLength>0){
-                       var univHTML =`<option value="${data[0].id}">${data[0].name}</option>`;
-                       for (let i = 1; i < univLength; i++) {
-                    
-                       var univHTML = univHTML+`<option value="${data[i].id}">${data[i].name}</option>`
-                    
+                    $.ajax({
+                        url: "{{ route('admin.university-to-campus') }}",
+                        type: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            universityid: $('#universityid').val(),
 
-                       }
-                     }else{
-                         var univHTML=`<option value=""  disabled>No Data Found</option>`;
-                       
-                     }
-                     
+                        },
+                        success: (data) => {
+                            let univLength = data.length;
 
-                      $('#campusid').html(univHTML);
-                      $("#campusid").selectpicker('refresh');
-                      
+                            if (univLength > 0) {
+                                var univHTML = `<option value="${data[0].id}">${data[0].name}</option>`;
+                                for (let i = 1; i < univLength; i++) {
 
-                   }
-                 })
+                                    var univHTML = univHTML +
+                                        `<option value="${data[i].id}">${data[i].name}</option>`
 
-             }
 
-          }
+                                }
+                            } else {
+                                var univHTML = `<option value=""  disabled>No Data Found</option>`;
+
+                            }
+
+
+                            $('#campusid').html(univHTML);
+                            $("#campusid").selectpicker('refresh');
+
+
+                        }
+                    })
+
+                }
+
+            }
             //datatabls
-            
+
             $(".application-filter").find("select").on("change", function(e) {
-               
+
                 campusDataByUniversity(e.target.id);
-                 dataTable.draw();
+                dataTable.draw();
             });
 
 
@@ -197,18 +195,18 @@ $usedUniversityId=$usedUniversity[0];
                 ajax: {
                     url: "{{ route('admin.campuses') }}",
                     data: function(d) {
-                        d.campusid=$("#campusid").val();
-                        d.universityid=$('#universityid').val();
-                        d.websitename=$('#websitename').val();
+                        d.campusid = $("#campusid").val();
+                        d.universityid = $('#universityid').val();
+                        d.websitename = $('#websitename').val();
                     }
                 },
                 columns: [{
-                        data: 'campus',
-                        name: 'campus'
-                    },
-                    {
                         data: 'university',
                         name: 'university'
+                    },
+                    {
+                        data: 'campus',
+                        name: 'campus'
                     },
                     {
                         data: 'website',
@@ -529,74 +527,75 @@ $usedUniversityId=$usedUniversity[0];
         }
 
         $('#reset-filter').on('click', function() {
-                $(".select").selectpicker('deselectAll');
-                $(".select").val("");
-                $(".select").selectpicker('refresh');
-                dataTable.draw();
+            $(".select").selectpicker('deselectAll');
+            $(".select").val("");
+            $(".select").selectpicker('refresh');
+            dataTable.draw();
 
-$.ajax({
-          url: "{{ route('admin.reset-filter') }}",
-          type: 'POST',
-          data: {
-          _token: "{{ csrf_token() }}",
-           
-
-          },
-         success: (data) => {
-
-            
-            let univData = (data.university);
-            let univLength = univData.length;
-        
-         if(univLength>0){
-          var univHTML =`<option value="${univData[0].id}">${ univData[0].name}</option>`;
-          for (let i = 1; i < univLength; i++) {
-       
-          var univHTML = univHTML+`<option value="${univData[i].id}">${univData[i].name}</option>`
-        
-
-          }  
-          
-    
-
-         $('#universityid').html(univHTML);
-         $("#universityid").selectpicker('refresh');
-         
-        }
-
-        let campusData = (data.campus);
-            let campusLength = campusData.length;
-        
-         if(campusLength>0){
-          var campusDataHTML =`<option value="${campusData[0].id}">${ campusData[0].name}</option>`;
-          for (let m = 1; m < campusLength; m++) {
-       
-          var campusDataHTML = campusDataHTML+`<option value="${campusData[m].id}">${campusData[m].name}</option>`
-        
-
-          }  
-          
-        
-
-         $('#campusid').html(campusDataHTML);
-         $("#campusid").selectpicker('refresh');
-         
-        }
+            $.ajax({
+                url: "{{ route('admin.reset-filter') }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
 
 
-       
+                },
+                success: (data) => {
+
+
+                    let univData = (data.university);
+                    let univLength = univData.length;
+
+                    if (univLength > 0) {
+                        var univHTML =
+                            `<option value="${univData[0].id}">${ univData[0].name}</option>`;
+                        for (let i = 1; i < univLength; i++) {
+
+                            var univHTML = univHTML +
+                                `<option value="${univData[i].id}">${univData[i].name}</option>`
+
+
+                        }
 
 
 
+                        $('#universityid').html(univHTML);
+                        $("#universityid").selectpicker('refresh');
+
+                    }
+
+                    let campusData = (data.campus);
+                    let campusLength = campusData.length;
+
+                    if (campusLength > 0) {
+                        var campusDataHTML =
+                            `<option value="${campusData[0].id}">${ campusData[0].name}</option>`;
+                        for (let m = 1; m < campusLength; m++) {
+
+                            var campusDataHTML = campusDataHTML +
+                                `<option value="${campusData[m].id}">${campusData[m].name}</option>`
 
 
-      }
-    })
-
-
-            });
+                        }
 
 
 
+                        $('#campusid').html(campusDataHTML);
+                        $("#campusid").selectpicker('refresh');
+
+                    }
+
+
+
+
+
+
+
+
+                }
+            })
+
+
+        });
     </script>
 @endsection

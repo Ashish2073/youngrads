@@ -2,9 +2,8 @@
 
 @section('title', 'Admin Users')
 @section('breadcumb-right')
-    <button data-toggle="modal" data-target="#dynamic-modal" id="add"
-    data-url="{{ route('admin.user.create') }}" class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle"
-    >
+    <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.user.create') }}"
+        class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">
         <i class="feather icon-plus"></i>
     </button>
 @endsection
@@ -23,13 +22,13 @@
                             <div class="table-responsive">
                                 <table id="user-table" class="table table-hover w-100 zero-configuration">
                                     <thead>
-                                    <tr>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                    </tr>
-                                    </tr>
+                                        <tr>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                        </tr>
                                     </thead>
                                 </table>
                             </div>
@@ -44,7 +43,7 @@
 @section('page-script')
     <script>
         var dataTable;
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Datatable
             dataTable = $("#user-table").DataTable({
                 "processing": true,
@@ -53,15 +52,15 @@
                 "pageLength": 100,
                 "fixedHeader": true,
                 ajax: {
-                    url: route('admin.users').url(),
-                    data: function (d) {
+                    url: "{{ url('admin/users') }}",
+                    data: function(d) {
                         // d.quiz_id = $('select[name="quiz_id"]').val();
                     }
                 },
                 columns: [{
-                    data: 'first_name',
-                    name: 'first_name'
-                },
+                        data: 'first_name',
+                        name: 'first_name'
+                    },
                     {
                         data: 'last_name',
                         name: 'last_name'
@@ -80,38 +79,38 @@
                 //         visible: false
                 //     }
                 // ],
-                'createdRow': function (row, data, dataIndex) {
+                'createdRow': function(row, data, dataIndex) {
                     $(row).addClass('action-row');
                     let id = data['id'];
-                    let editUrl = route('admin.user.edit', id).url();
+                    let editUrl = "{{ url('admin/users') }}" + "/" + id + "/" + "edit";
                     $(row).attr('data-url', editUrl);
                     $(row).attr('data-target', "#dynamic-modal");
                     $(row).attr('data-toggle', "modal");
                 },
-                initComplete: function (res, json) {
+                initComplete: function(res, json) {
 
                 }
             });
 
 
-            $("body").on('click', "#add", function (e) {
+            $("body").on('click', "#add", function(e) {
                 let url = $(this).data('url');
                 $(".dynamic-title").html('Add User');
                 getContent({
                     "url": url,
-                    success: function (data) {
+                    success: function(data) {
                         $(".dynamic-body").html(data);
                         runScript();
                     }
                 });
             });
 
-            $("body").on('click', ".action-row", function (e) {
+            $("body").on('click', ".action-row", function(e) {
                 let url = $(this).data('url');
                 $('.dynamic-title').html('Update User');
                 getContent({
                     "url": url,
-                    success: function (data) {
+                    success: function(data) {
                         $(".dynamic-body").html(data);
 
                         runScript();
@@ -127,10 +126,10 @@
 
 
             submitForm($("#user-create-form"), {
-                beforeSubmit: function () {
+                beforeSubmit: function() {
                     submitLoader("#submit-btn");
                 },
-                success: function (data) {
+                success: function(data) {
                     setAlert(data);
                     if (data.success) {
                         modalReset();
@@ -143,10 +142,10 @@
             });
 
             submitForm($("#user-update-form"), {
-                beforeSubmit: function () {
+                beforeSubmit: function() {
                     submitLoader("#submit-btn");
                 },
-                success: function (data) {
+                success: function(data) {
                     setAlert(data);
                     if (data.success) {
                         modalReset();
@@ -156,18 +155,18 @@
                         runScript();
                     }
                 },
-                error: function (data) {
+                error: function(data) {
                     toast("error", "Something went wrong.", "Error");
                 }
             });
 
             submitForm($("#user-delete-form"), {
-                beforeSubmit: function () {
+                beforeSubmit: function() {
                     if (!confirm('Are you sure want to delete?')) {
                         return;
                     }
                 },
-                success: function (data) {
+                success: function(data) {
                     if (isJson(data)) {
                         data = JSON.parse(data);
                         dataTable.ajax.reload();
@@ -188,11 +187,11 @@
 
             //delete form
             submitForm($("#delete-form"), {
-                beforeSubmit: function () {
+                beforeSubmit: function() {
                     if (!confirm('Are you sure you want to delete')) return false;
                     submitLoader("#submit-btn-delete");
                 },
-                success: function (data) {
+                success: function(data) {
                     setAlert(data);
                     if (data.success) {
                         modalReset();
@@ -202,12 +201,10 @@
                         runScript();
                     }
                 },
-                error: function (data) {
+                error: function(data) {
                     toast("error", "Something went wrong.", "Error");
                 }
             });
         }
-
-
     </script>
 @endsection

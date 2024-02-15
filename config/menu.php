@@ -22,26 +22,33 @@ return [
         "navheader" => "Users",
         "icon" => ""
     ],
-    // [
-    //     'menu_name' => 'User Management',
-    //     'route' => 'admin.users',
-    //     'icon_class' => 'fa fa-users',
-    //     'sub_menu' => [
-    //         [
-    //             'menu_name' => 'Admin Users',
-    //             'route' => 'admin.users',
-    //             'icon_class' => '',
-    //             'permission' => 'users_view'
-    //         ],
-    //         [
-    //             'menu_name' => 'Roles & Permission',
-    //             'route' => 'admin.roles',
-    //             'icon_class' => '',
-    //             'permission' => 'roles_and_permissions_view'
-    //         ]
-    //     ],
-    // ],
     [
+        'menu_name' => 'User Management',
+        'route' => 'admin.users',
+        'icon_class' => 'fa fa-users',
+        'sub_menu' => [
+            [
+                'menu_name' => 'Admin Users',
+                'route' => 'admin.users',
+                'icon_class' => '',
+                'permission' => 'users_view'
+            ],
+            [
+                'menu_name' => 'Modifires Users',
+                'route' => 'admin.modifires',
+                'icon_class' => 'fa-solid fa-people-arrows',
+                'permission' => 'roles_and_permissions_view'
+            ],
+            [
+                'menu_name' => 'Roles & Permission',
+                'route' => 'admin.roles',
+                'icon_class' => '',
+                'permission' => 'roles_and_permissions_view'
+            ],
+          
+        ], 
+    ],
+    [ 
         'menu_name' => 'Students',
         'route' => 'admin.students',
         'icon_class' => 'fa fa-users',

@@ -29,18 +29,15 @@ class ImportController extends Controller
  
     public function importUnivCampus()
     {
-        $records = Excel::import(new UnivCampusImport, request()->file('univ_campus_file'));
-        return response()->json([
-            'success' => true,
-            'title' => 'Success',
-            'code' => 'success',
-            'message' => 'File Imported Successfully!',
-        ]);
+        $import = new  UnivCampusImport();
+        Excel::import($import, request()->file('univ_campus_file'));
+        
+        return response()->json($import->response); 
     }
 
     public function importPrograms()
     {
-        $import = new CampusProgramImport();
+        $import = new CampusProgramImport(); 
         
        Excel::import($import, request()->file('programs_file'));
 

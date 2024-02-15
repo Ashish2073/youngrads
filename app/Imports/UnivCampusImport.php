@@ -21,7 +21,8 @@ use Illuminate\Support\Facades\Log;
 
 // class UnivCampusImport implements ToCollection, WithHeadingRow, WithChunkReading, WithBatchInserts, ShouldQueue
 class UnivCampusImport implements ToCollection, WithHeadingRow
-{
+{ 
+    public $response;
     public function collection(Collection $records)
     {
         $univsNameIdArr = University::getNameIdIndexedArray();
@@ -32,21 +33,22 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
         $cityNameIdArr = City::getCityNameIdArr();
   
         $sheetError = []; 
-        $rowNumber = 2;
+        $rowNumber = 1;
 
-      
+       
    
         
    
     
         foreach ($records as $record) {
              // University Record
+             $rowNumber++;
 
             if(isset($record['university'])){
-            if (!isset($univsNameIdArr[strtolower($record['university'])])) {
+            if (!isset($univsNameIdArr[trim(strtolower($record['university']))])) {
                 $university = new University;
             } else {
-                $university = University::find($univsNameIdArr[strtolower($record['university'])]);
+                $university = University::find($univsNameIdArr[trim(strtolower($record['university']))]);
             }
 
             $university->name = $record['university'];
@@ -55,14 +57,23 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
             
             $univsNameIdArr[strtolower($university->name)] = $university->id;
             $universityId = $university->id;
-            }
+            }else{
+                Log::debug('University  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'University not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            continue;
+
+        }
         
             // Campus Record
             if(isset($universityId) && isset($record['campus'])){
-            if (!isset($univIdCampusNameArr[$universityId . "__" . strtolower($record['campus'])])) {
+            if (!isset($univIdCampusNameArr[$universityId . "__" . trim(strtolower($record['campus']))])) {
                 $campus = new Campus;
             } else {
-                $campus = Campus::find($univIdCampusNameArr[$universityId . "__" . strtolower($record['campus'])]);
+                $campus = Campus::find($univIdCampusNameArr[$universityId . "__" . trim(strtolower($record['campus']))]);
             }
 
             $campus->name = $record['campus'];
@@ -81,43 +92,70 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
             $campus->save();
 
             $campusId = $campus->id;
-            $univIdCampusNameArr[$universityId . "__" . strtolower($record['campus'])] = $campusId;
-        }
+            $univIdCampusNameArr[$universityId . "__" . trim(strtolower($record['campus']))] = $campusId;
+        }else{
+            Log::debug('campus  not given!' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'Campus not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+        continue;
+
+    }
             // Campus Address
             // Country
             if(isset($record['country'])){
-            if (isset($countryNameIdArr[strtolower($record['country'])])) {
-                $countryId = $countryNameIdArr[strtolower($record['country'])];
+            if (isset($countryNameIdArr[trim(strtolower($record['country']))])) {
+                $countryId = $countryNameIdArr[trim(strtolower($record['country']))];
             } else {
                 $country = Country::create([
                     'name' => $record['country']
                 ]);
                 $countryId = $country->id;
-                $countryNameIdArr[strtolower($record['country'])] = $countryId;
+                $countryNameIdArr[trim(strtolower($record['country']))] = $countryId;
             }
-             }
+             }else{
+                Log::debug('country  not given!' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            continue;
+
+        }
             // State
             if(isset($countryId) && isset($record['state'])){
-            if (isset($stateNameIdArr[$countryId . "__" . strtolower($record['state'])])) {
-                $stateId = $stateNameIdArr[$countryId . "__" . strtolower($record['state'])];
+            if (isset($stateNameIdArr[$countryId . "__" . trim(strtolower($record['state']))])) {
+                $stateId = $stateNameIdArr[$countryId . "__" . trim(strtolower($record['state']))];
             } else {
                 $state = State::create([
                     'name' => $record['state'],
                     'country_id' => $countryId
                 ]);
                 $stateId = $state->id;
-                $stateNameIdArr[$countryId . "__" . strtolower($record['state'])] = $stateId;
+                $stateNameIdArr[$countryId . "__" . trim(strtolower($record['state']))] = $stateId;
             }
 
-        }   
+        }else{
+            Log::debug('University  not given!' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'state not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+        continue;
+
+    }   
          ////city
          if(isset($stateId) && isset($record['city'])){
-            if (isset($cityNameIdArr[$countryId . "__" . $stateId . "__" . strtolower($record['city'])])) {
+            if (isset($cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))])) {
               
                 
                
 
-                $cityId = $cityNameIdArr[$countryId . "__" . $stateId . "__" . strtolower($record['city'])];
+                $cityId = $cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))];
              
             } else {
                 $city = City::create([
@@ -125,9 +163,18 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                     'state_id' => $stateId
                 ]);
                 $cityId = $city->id;
-                $cityNameIdArr[$countryId . "__" . $stateId . "__" . strtolower($record['city'])] = $cityId;
+                $cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))] = $cityId;
             }
-        }
+        }else{
+            Log::debug('University  not given!' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'City not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+        continue;
+
+    }
 
         ////addressss///////
         if(isset($campus) && isset($stateId) && isset($countryId) && isset($cityId)){
@@ -146,17 +193,47 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
 
             $campus->address_id = $address->id;
             $campus->save();
-        }
+        }else{
+            Log::debug('address  not given!' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'state ,country,city, of campus not given !' . $record['address'],
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+        continue;
+
+    }
             $rowNumber++;
         }
 
-        return [
-            'success' => true,
-            'title' => 'Sheet Imported',
-            'code' => 'success',
-            'message' => 'Sheet imported successfully',
-            'sheetError' => $sheetError,
-        ];
+        if(empty($sheetError)){
+           
+            $this->response = [
+                'success' => true,
+                'title' => 'Sheet Imported',
+                'code' => 'success',
+                 'message' => 'Sheet imported successfully',
+                
+            ];
+
+            return $this->response;
+
+        }else{ 
+            
+          
+            $this->response = [
+                'success' => false,
+                'title' => 'Sheet Not Imported',
+                'code' => 'fail',
+                'message' => 'Sheet Not Imported',
+                'sheetError' => $sheetError,
+            ];
+           
+          
+            return $this->response;
+           
+            
+        }
     }
 
     public function chunkSize(): int

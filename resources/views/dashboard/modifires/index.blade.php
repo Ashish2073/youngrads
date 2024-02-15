@@ -1,39 +1,47 @@
-@extends('dashboard.layouts.app')
-@section('title')
-    User Management
+@extends('layouts/contentLayoutMaster')
+
+@section('title', 'Modeifires Users')
+@section('breadcumb-right')
+    <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.modifires.create') }}"
+        class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">
+        <i class="feather icon-plus"></i>
+    </button>
 @endsection
 @section('content')
-    <ul class="breadcrumb">
-        <li><a href="{{ route('admin.home') }}">Dashboard</a></li>
-        <li class="active"><span class='fa fa-users'></span> Users</li>
-    </ul>
 
-    <div id="add-btn" class="hide">
-        <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.user.create') }}"
-            class="btn btn-default">
-            <span class="fa fa-plus"></span>Add User
-        </button>
-    </div>
+    <section id="basic-datatable">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        {{-- <h4 class="card-title">Students</h4> --}}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body card-dashboard">
 
-
-    <div class="row">
-        <div class="col-md-12">
-
-            <table id="user-table" class="table dt-responsive nowrap" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-            </table>
-
+                            <div class="table-responsive">
+                                <table id="user-table" class="table table-hover w-100 zero-configuration">
+                                    <thead>
+                                        <tr>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                        </tr>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 @endsection
 
-@section('foot_script')
+@section('page-script')
     <script>
         var dataTable;
         $(document).ready(function() {
@@ -44,29 +52,8 @@
                 "bInfo": true,
                 "pageLength": 100,
                 "fixedHeader": true,
-                // dom: "<'row custom-row'<'col-sm-3'l><'col-sm-3 first-place'><'col-sm-6 second-place'f>>tr<'row'<'col-sm-6'i><'col-sm-6'p>>",
-                dom: "<'panel panel-default'" +
-                    "<'panel-heading'" +
-                    "<'row'" +
-                    "<'col-sm-12 custom-heading'>" +
-                    ">" +
-                    "<'row custom-row'" +
-                    "<'col-sm-3'l>" +
-                    "<'col-sm-9 second-place'f>" +
-                    ">" +
-                    ">" +
-                    "<'panel-body'" +
-                    "tr" +
-                    ">" +
-                    "<'panel-footer'" +
-                    "<'row'" +
-                    "<'col-sm-6'i>" +
-                    "<'col-sm-6'p>" +
-                    ">" +
-                    ">" +
-                    ">",
                 ajax: {
-                    url: "{{ url('admin/users') }}",
+                    url: "{{ url('admin/modifires') }}",
                     data: function(d) {
                         // d.quiz_id = $('select[name="quiz_id"]').val();
                     }
@@ -96,23 +83,20 @@
                 'createdRow': function(row, data, dataIndex) {
                     $(row).addClass('action-row');
                     let id = data['id'];
-                    let editUrl = "{{ url('admin/users') }}" + "/" + id + "/" + "edit";
+                    let editUrl = "{{ url('admin/modifires') }}" + "/" + id + "/" + "edit";
                     $(row).attr('data-url', editUrl);
                     $(row).attr('data-target', "#dynamic-modal");
                     $(row).attr('data-toggle', "modal");
                 },
                 initComplete: function(res, json) {
-                    $(".second-place").append($("#add-btn").html());
-                    $(".second-place").addClass('text-right');
-                    $("#add-btn").remove();
-                    initDatatable();
+
                 }
             });
 
 
             $("body").on('click', "#add", function(e) {
                 let url = $(this).data('url');
-                $(".dynamic-title").html('Add Team Member');
+                $(".dynamic-title").html('Add modifires');
                 getContent({
                     "url": url,
                     success: function(data) {
@@ -124,7 +108,7 @@
 
             $("body").on('click', ".action-row", function(e) {
                 let url = $(this).data('url');
-                $('.dynamic-title').html('Update Team Member');
+                $('.dynamic-title').html('Update modifires');
                 getContent({
                     "url": url,
                     success: function(data) {
@@ -139,59 +123,8 @@
         })
 
         function runScript() {
-            initAccordin();
-            $(".select").selectpicker();
+            $(".select").select2();
 
-            validateForm($("#user-create-form"), {
-                rules: {
-                    "profession_type": {
-                        required: true
-                    },
-                    name: {
-                        required: true,
-                    },
-                    username: {
-                        required: true,
-                    },
-                    email: {
-                        required: true
-                    },
-                    password: {
-                        required: true
-                    },
-                    "password_confirmation": {
-                        equalTo: "#password"
-                    },
-                    "#user_type": {
-                        required: true
-                    }
-                },
-                messages: {}
-            });
-
-            validateForm($("#user-update-form"), {
-                rules: {
-                    "profession_type": {
-                        required: true
-                    },
-                    name: {
-                        required: true,
-                    },
-                    username: {
-                        required: true,
-                    },
-                    email: {
-                        required: true
-                    },
-                    "confirm_password": {
-                        equalTo: "#password"
-                    },
-                    "is_active": {
-                        required: true
-                    }
-                },
-                messages: {}
-            });
 
             submitForm($("#user-create-form"), {
                 beforeSubmit: function() {
@@ -250,6 +183,27 @@
                         $(".dynamic-body").html(data);
                         runScript();
                     }
+                }
+            });
+
+            //delete form
+            submitForm($("#delete-form"), {
+                beforeSubmit: function() {
+                    if (!confirm('Are you sure you want to delete')) return false;
+                    submitLoader("#submit-btn-delete");
+                },
+                success: function(data) {
+                    setAlert(data);
+                    if (data.success) {
+                        modalReset();
+                        dataTable.draw('page');
+                    } else {
+                        $(".dynamic-body").html(data);
+                        runScript();
+                    }
+                },
+                error: function(data) {
+                    toast("error", "Something went wrong.", "Error");
                 }
             });
         }

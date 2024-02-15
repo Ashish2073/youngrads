@@ -18,11 +18,11 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
-    }
+    } 
 
     public function index()
     {
-        if(request()->ajax()) {
+        if(request()->ajax()) { 
             $users = Admin::all();
             return Datatables::of($users)
                 ->editColumn('last_name', function($row) {

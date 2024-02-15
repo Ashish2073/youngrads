@@ -262,7 +262,7 @@ class UserApplicationController extends Controller
 		}
 	}
 
-	public function show($id)
+ 	public function show($id)
 	{
 		$application = UserApplication::findOrFail($id);
 		if ($application->status == UserApplication::ARCHIVE) {

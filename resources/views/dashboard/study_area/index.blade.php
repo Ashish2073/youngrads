@@ -10,9 +10,6 @@
 @endsection
 
 @if (session()->has('used_study_area'))
-
-
-
     @php $usedstudyarea=session()->get('used_study_area'); @endphp
 
     @php
@@ -38,22 +35,18 @@
                                 <span class="fa fa-plus"></span> Add Study Area
                             </button> --}}
                             <div class="row application-filter align-items-center">
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-5 col-12">
                                     <div class="form-group">
                                         <label for="studyid">Study Area</label>
                                         <select data-colum="0" id="studyid" name="studyid[]" data-live-search="true"
                                             multiple class=" select form-control">
                                             @foreach ($study as $stddata)
                                                 @if (isset($stddata->id))
+                                                    <option {{ $stddata->id == ($usedstudyareaid ?? '') ? 'selected' : '' }}
+                                                        value="{{ $stddata->id }}">
 
-                                               
-                                                    
-                                                <option 
-                                                {{ $stddata->id == ($usedstudyareaid ?? '') ? 'selected' : '' }}
-                                                value="{{ $stddata->id }}">
-                                                    
-                                                    
-                                                    {{ $stddata->name }}
+
+                                                        {{ $stddata->name }}
 
                                                     </option>
                                                 @endif
@@ -61,7 +54,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-5 col-12">
                                     <div class="form-group">
                                         <label for="substudyid">Sub Study Area</label>
                                         <select id="substudyid" name="substudyid[]" data-live-search="true" multiple
@@ -79,7 +72,7 @@
                                 </div>
 
 
-                                <div class="col-md-4 col-12 text-right">
+                                <div class="col-md-2 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
 
                                 </div>
@@ -93,7 +86,7 @@
                                         <tr>
                                         <tr>
                                             <th>Study Area Name</th>
-                                            <th> Study Area Parent Name</th>
+                                            <th> Sub Study Area Name</th>
                                         </tr>
                                         </tr>
                                     </thead>
@@ -127,7 +120,7 @@
 
                         },
                         success: (data) => {
-                         
+
                             let studyLength = data.length;
 
                             if (studyLength > 0) {
@@ -167,7 +160,7 @@
                 "processing": true,
                 "serverSide": true,
                 "bInfo": true,
-                "pageLength": 100,
+                "pageLength": 50,
                 "fixedHeader": true,
                 ajax: {
                     url: "{{ route('admin.studies') }}",
@@ -176,13 +169,15 @@
                         d.substudyid = $('#substudyid').val();
                     }
                 },
+
                 columns: [{
-                        data: 'name',
-                        name: 'name'
+                        data: 'study_area',
+                        name: 'study_area'
                     },
                     {
-                        data: 'parent_name',
-                        name: 'parent_study.name'
+                        data: 'sub_study_area',
+                        name: 'sub_stydy_area',
+
                     },
 
                 ],
@@ -233,7 +228,7 @@
         });
 
         function runScript() {
-            $(".select").selectpicker(); 
+            $(".select").selectpicker();
             $(".select2").select2();
             validateForm($('#study-create-form'), {
                 rules: {
@@ -331,73 +326,71 @@
             dataTable.draw();
 
             $.ajax({
-                          url: "{{ route('admin.reset-study-area-filter') }}",
-                          type: 'POST',
-                          data: {
-                          _token: "{{ csrf_token() }}",
-                           
+                url: "{{ route('admin.reset-study-area-filter') }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
 
-                          },
-                         success: (data) => {
 
-                            console.log(data);
+                },
+                success: (data) => {
 
-                            
-                            let studyData = (data.study);
-                            let studyLength = studyData.length;
-                        
-                         if(studyLength>0){
-                          var studyHTML =`<option value="${studyData[0].id}">${ studyData[0].name}</option>`;
-                          for (let i = 1; i < studyLength; i++) {
-                       
-                          var studyHTML = studyHTML+`<option value="${studyData[i].id}">${studyData[i].name}</option>`
-                        
+                    console.log(data);
 
-                          }  
-                          
-                    
 
-                         $('#studyid').html(studyHTML);
-                         $("#studyid").selectpicker('refresh');
-                         
-                        }
+                    let studyData = (data.study);
+                    let studyLength = studyData.length;
 
-                        let substudyData = (data.substudy);
-                            let substudyLength = substudyData.length;
-                        
-                         if(substudyLength>0){
-                          var substudyDataHTML =`<option value="${substudyData[0].id}">${ substudyData[0].name}</option>`;
-                          for (let m = 1; m < substudyLength; m++) {
-                       
-                          var substudyDataHTML = substudyDataHTML+`<option value="${substudyData[m].id}">${substudyData[m].name}</option>`
-                        
+                    if (studyLength > 0) {
+                        var studyHTML =
+                            `<option value="${studyData[0].id}">${ studyData[0].name}</option>`;
+                        for (let i = 1; i < studyLength; i++) {
 
-                          }  
-                          
-                        
+                            var studyHTML = studyHTML +
+                                `<option value="${studyData[i].id}">${studyData[i].name}</option>`
 
-                         $('#substudyid').html(substudyDataHTML);
-                         $("#substudyid").selectpicker('refresh');
-                         
+
                         }
 
 
-                        dataTable.draw();
+
+                        $('#studyid').html(studyHTML);
+                        $("#studyid").selectpicker('refresh');
+
+                    }
+
+                    let substudyData = (data.substudy);
+                    let substudyLength = substudyData.length;
+
+                    if (substudyLength > 0) {
+                        var substudyDataHTML =
+                            `<option value="${substudyData[0].id}">${ substudyData[0].name}</option>`;
+                        for (let m = 1; m < substudyLength; m++) {
+
+                            var substudyDataHTML = substudyDataHTML +
+                                `<option value="${substudyData[m].id}">${substudyData[m].name}</option>`
+
+
+                        }
+
+
+
+                        $('#substudyid').html(substudyDataHTML);
+                        $("#substudyid").selectpicker('refresh');
+
+                    }
+
+
+                    dataTable.draw();
 
 
 
 
 
-                      }
-                    })
-                
-                    
+                }
+            })
+
+
         });
-
-
-
-
-
-       
     </script>
 @endsection

@@ -29,6 +29,23 @@ class StudyController extends Controller
      */
     public function index(Request $request)
     {
+
+    //     $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
+        
+    //     ->select('study_areas.*', "parent_study.name as parent_name"
+       
+    //      )->get();
+
+
+
+        
+
+    //  dd(json_decode($records));
+
+        
+
+   
+
         if (request()->ajax()) {
 
               if(($request->get('studyid')!=null) || ($request->get('substudyid')!=null)){
@@ -43,7 +60,7 @@ class StudyController extends Controller
               }else{
 
                 $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
-                ->select('study_areas.*', "parent_study.name as parent_name");
+                ->select('study_areas.*', "parent_study.name as parent_name")->get();
 
               }
 
@@ -51,22 +68,27 @@ class StudyController extends Controller
 
            
             return DataTables::of($records)
-                ->editColumn('parent_name', function ($row) {
-                    session()->forget('used_study_area');
-                    if ($row->parent_id == 0) {
-                        return "N/A";
-                    }
-                    return \Str::limit($row->parent_name." "."(Study-Area)", 50, "...");
-                })
-                ->editColumn('name', function ($row) {
-                    if($row->parent_id==0){
-                        return \Str::limit($row->name." "."(Study-Area)", 50, "...");
+                ->addColumn('study_area', function ($row) {
+                     session()->forget('used_study_area');
+                    if ($row->parent_id == 0 ) {
+                        return \Str::limit($row->name, 50, "...");
                     }else{
-                        return \Str::limit($row->name." "."(Sub-Study-Area)", 50, "...");
+                        return \Str::limit($row->parent_name, 50, "...");
+                    }
+                   
+                })->addIndexColumn()
+                ->addColumn('sub_study_area', function ($row) {
+                    if($row->parent_id==0){
+                        return "N/A";
+                        // return \Str::limit($row->name." "."(Study-Area)", 50, "...");
+                    }else{
+                        return \Str::limit($row->name, 50, "...");
+                       
                     }
  
                     
-                })
+                })->addIndexColumn()
+                
                 ->make(true);
 
         } else {

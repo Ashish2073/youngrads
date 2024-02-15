@@ -70,7 +70,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
         
         
          
-           
+            
         foreach ($records as $record) {
             
             $rowNumber++;
@@ -83,7 +83,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             // University ID
 
             if(isset($record['university'])){
-            if (!isset($univsNameIdArr[strtolower($record['university'])])) {
+            if (!isset($univsNameIdArr[trim(strtolower($record['university']))])) {
                 Log::debug('University does not exists!' . json_encode($record));
                 $sheetError[] = [
                     'message' => 'University does not exists!' . json_encode($record),
@@ -91,14 +91,16 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     'rowNumber' => $rowNumber,
                 ];
                 continue;
+            }else{
+                $univId = $univsNameIdArr[strtolower($record['university'])];
             }
-            $univId = $univsNameIdArr[strtolower($record['university'])];
+           
             }
 
 
             // Campus ID
              if(isset($record['campus'])){
-            if (!isset($univIdCampusNameArr[$univId . "__" . strtolower($record['campus'])])) {
+            if (!isset($univIdCampusNameArr[$univId . "__" . trim(strtolower($record['campus']))])) {
                 Log::debug('Campus does not exists!'.$record['campus'] . json_encode($record));
                 $sheetError[] = [
                     'message' => 'Campus does not exists!'.$record['campus'],
@@ -106,13 +108,15 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     'rowNumber' => $rowNumber,
                 ];
                 continue;
+            }else{
+                $campusId = $univIdCampusNameArr[$univId . "__" . trim(strtolower($record['campus']))];
             }
-            $campusId = $univIdCampusNameArr[$univId . "__" . strtolower($record['campus'])];
+           
            }
             // Program Level ID
 
             if(isset($record['level'])){
-            if (!isset($programLevelIdArr[str_replace(' ','',strtolower($record['level']))])) {
+            if (!isset($programLevelIdArr[trim(strtolower($record['level']))])) {
                             
             
               
@@ -124,28 +128,28 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 ];
                 continue;
             } else {
-                $programLevelId = $programLevelIdArr[str_replace(' ','',strtolower($record['level']))];
+                $programLevelId = $programLevelIdArr[str_replace(' ','',trim(strtolower($record['level'])))];
             }
           }
             // Study Area ID
             if(isset($record['study_area'])){
              
-            if (!isset($studyAreaNameIdArr[strtolower($record['study_area'])])) {
+            if (!isset($studyAreaNameIdArr[trim(strtolower($record['study_area']))])) {
                 $studyArea = new Study;
                 $studyArea->name = $record['study_area'];
                 $studyArea->slug = Str::slug($record['study_area'], "-");
                 $studyArea->save();
                 $studyAreaId = $studyArea->id;
             } else {
-                $studyAreaId = $studyAreaNameIdArr[strtolower($record['study_area'])];
+                $studyAreaId = $studyAreaNameIdArr[trim(strtolower($record['study_area']))];
             }
              }
             // Program
             if(isset($record['program'])){
-            if (!isset($programNameIdArr[strtolower($record['program'])])) {
+            if (!isset($programNameIdArr[trim(strtolower($record['program']))])) {
                 $program = new Program;
             } else {
-                $program = Program::find($programNameIdArr[strtolower($record['program'])]);
+                $program = Program::find($programNameIdArr[trim(strtolower($record['program']))]);
             }
 
             $program->name = $record['program'];
@@ -170,8 +174,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             if (!empty($record['sub_study_area'])) {
                 $subStudyArea = explode(",", $record['sub_study_area']);
                 foreach ($subStudyArea as $area) {
-                    if (isset($subStudyNameIdArr[$studyAreaId . "__" . strtolower($area)])) {
-                        $subStudyAreaId = $subStudyNameIdArr[$studyAreaId . "__" . strtolower($area)];
+                    if (isset($subStudyNameIdArr[$studyAreaId . "__" . trim(strtolower($area))])) {
+                        $subStudyAreaId = $subStudyNameIdArr[$studyAreaId . "__" . trim(strtolower($area))];
                     } else {
                         $subStudyAreaRecord = Study::create([
                             'name' => $area,
@@ -401,8 +405,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 
                
 
-                if (isset($currenciesArr[strtolower($currencyType)])) {
-                    $currencyId = $currenciesArr[strtolower($currencyType)];
+                if (isset($currenciesArr[trim(strtolower($currencyType))])) {
+                    $currencyId = $currenciesArr[trim(strtolower($currencyType))];
                    
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
@@ -428,8 +432,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
              
 ;
 
-                if (isset($currenciesArr[strtolower($currencyType)])) {
-                    $currencyId = $currenciesArr[strtolower($currencyType)];
+                if (isset($currenciesArr[trim(strtolower($currencyType))])) {
+                    $currencyId = $currenciesArr[trim(strtolower($currencyType))];
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
                         'fee_type_id' => $feeType['admission_fee'],
@@ -453,8 +457,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
             
 
-                if (isset($currenciesArr[strtolower($currencyType)])) {
-                    $currencyId = $currenciesArr[strtolower($currencyType)];
+                if (isset($currenciesArr[trim(strtolower($currencyType))])) {
+                    $currencyId = $currenciesArr[trim(strtolower($currencyType))];
                     CampusProgramFee::create([
                         'campus_program_id' => $campusProgramId,
                         'fee_type_id' => $feeType['application_fee'],
@@ -477,8 +481,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 $intakes = explode(",", $record['intake']);
                 CampusProgramIntake::where('campus_program_id', $campusProgramId)->delete();
                 foreach ($intakes as $intake) {
-                    if (isset($intakeIdNameArr[strtolower($intake)])) {
-                        $intakeId = $intakeIdNameArr[strtolower($intake)];
+                    if (isset($intakeIdNameArr[trim(strtolower($intake))])) {
+                        $intakeId = $intakeIdNameArr[trim(strtolower($intake))];
                         CampusProgramIntake::create([
                             'campus_program_id' => $campusProgramId,
                             'intake_id' => $intakeId

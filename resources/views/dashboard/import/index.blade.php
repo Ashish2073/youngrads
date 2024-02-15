@@ -144,9 +144,20 @@
                 success: function(data) {
                     if (data.success) {
                         toast("success", data.message, "Congratulations");
-                        displaySheetError(data.sheetError);
+
                     } else {
-                        toast("error", "Something went wrong.", "Error");
+                        let sheetError = data.sheetError;
+
+
+
+                        let sheetErrorCount = sheetError.length;
+                        let errrorMessage = "";
+                        for (let i = 0; i < sheetErrorCount; i++) {
+                            errrorMessage = errrorMessage + " " + (i + 1) + "-" + sheetError[i].message + "\n";
+
+                        }
+                        toast("error", errrorMessage, "Error");
+                        displaySheetError(data.sheetError);
                     }
                 },
                 complete: function() {
@@ -163,6 +174,9 @@
                 }
             });
 
+
+
+
             submitForm($('#import-programs-form'), {
                 beforeSubmit: function() {
                     submitLoader("#import-programs-btn");
@@ -170,7 +184,7 @@
                 success: function(data) {
                     if (data.success) {
                         toast("success", data.message, "Congratulations");
-                        displaySheetError(data.sheetError);
+
                     } else {
                         let sheetError = data.sheetError;
 
@@ -184,6 +198,7 @@
 
 
                         toast("error", errrorMessage, "Error");
+                        displaySheetError(data.sheetError);
                     }
                 },
                 complete: function() {

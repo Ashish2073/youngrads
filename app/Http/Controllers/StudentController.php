@@ -889,11 +889,36 @@ class StudentController extends Controller
 
 		$subTests = DB::table('special_test_sub')->where('test_id', '=', $request->test_type)->get();
 		$testName = Test::find($request->test_type)->test_name;
+		$testMin=Test::find($request->test_type)->min;
+		$testMax=Test::find($request->test_type)->max;
 		$test_record = Test::find($request->test_type);
+
+		// $validator = Validator::make($request->all(), [
+		// 	'score' => 'required|numeric'|function($attribute,$value,$fail) use($testMin,$testMax,$testName){
+		// 		if($value>$testMin && $value<$testMin ){
+		// 			$fail($testName." ".'should between'." ".$testMin." "."to".$testMax);
+
+		// 		}
+
+
+		// 	},
+		// 	'exam_date' => 'required',
+		// ]);
+
 		$validator = Validator::make($request->all(), [
-			'score' => 'required|numeric',
+			'score' => [
+				'required',
+				'numeric',
+				function ($attribute, $value, $fail) use ($testMin, $testMax, $testName) {
+					if ($value > $testMin && $value < $testMax) {
+						$fail($testName." " .'score vale should be between ' . $testMin . ' and ' . $testMax);
+					}
+				},
+			],
 			'exam_date' => 'required',
 		]);
+
+
 
 		if ($validator->fails()) {
 			$validator->errors()->add('form_error', 'Error! Please check below');

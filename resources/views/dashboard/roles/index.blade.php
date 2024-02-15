@@ -79,7 +79,7 @@
                 'createdRow': function(row, data, dataIndex) {
                     $(row).addClass('action-row');
                     let id = data['id'];
-                    let editUrl = "{{ url('admin/role') }}" + "/" + id + "edit";
+                    let editUrl = "{{ url('admin/roles') }}" + "/" + id + "/" + "edit";
                     $(row).attr('data-url', editUrl);
                     $(row).attr('data-target', "#dynamic-modal");
                     $(row).attr('data-toggle', "modal");
@@ -134,7 +134,7 @@
                 that = $(this);
                 if (confirm("Are you sure you want to delete?")) {
                     $.ajax({
-                        url: route('admin.role.destroy', id).url(),
+                        url: "{{ url('admin/roles') }}" + "/" + id,
                         type: 'POST',
                         data: {
                             _token: "{{ csrf_token() }}",

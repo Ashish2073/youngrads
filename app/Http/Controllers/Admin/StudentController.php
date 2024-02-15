@@ -121,7 +121,7 @@ class StudentController extends Controller
 					return "<button class='btn btn-outline-primary student-shortlist btn-sm' data-id={$row->id}><i class='feather icon-check-circle'></i> Shortlisted Programs</button>";
 				})
 				->rawColumns(['email', 'delete', 'shortlist'])
-				->make(true);
+				->make(true); 
 		} else {
 			$userId=User::select('id')->get();
 			$userEmail=User::select('email')->get();

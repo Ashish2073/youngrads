@@ -22,7 +22,7 @@
 
                             <p class="text-muted">Note: Click/Tap row for viewing profile</p>
                             <div class="row application-filter align-items-center">
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="userid">Student Id</label>
                                         <select data-colum="0" id="userid" name="id[]" data-live-search="true"
@@ -36,7 +36,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="useremail">Email</label>
                                         <select id="useremail" name="email[]" data-live-search="true" multiple
@@ -51,7 +51,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="userphone">Phone Number</label>
                                         <select id="userphone" name="phone[]" data-live-search="true" multiple
@@ -67,7 +67,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4 col-12 text-right">
+                                <div class="col-md-3 col-12 text-center">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
 
                                 </div>

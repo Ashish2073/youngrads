@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\IntakeController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\UniversityController;
+use App\Http\Controllers\Admin\ModifiresController;
 
 
 
@@ -133,12 +134,27 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         'names' => [
             'index' => 'users',
             'create' => 'user.create',
-            'edit' => 'user.edit',
+            'edit' => 'user.edit', 
             'update' => 'user.update',
             'store' => 'user.store',
             'destroy' => 'user.destroy'
         ]
     ]);
+  //Moderator Mangment
+  Route::resource('modifires', '\App\Http\Controllers\Admin\ModifiresController', [
+    'names' => [
+        'index' => 'modifires', 
+        'create' => 'modifires.create',
+        'edit' => 'modifires.edit',
+        'update' => 'modifires.update',
+        'store' => 'modifires.store',
+        'destroy' => 'modifires.destroy'
+    ]
+]);
+
+
+  //////
+
 
 
     Route::resource('roles', '\App\Http\Controllers\Admin\RoleController', [

@@ -73,19 +73,18 @@
                     $role_options[$role] = strtoupper($role);
                 }
             @endphp
-            {{-- @include('dashboard.common.fields.select', [
-              'label_name' => 'Role',
-              'id' => 'role',
-              'name' => 'role',
-              'options' => $role_options,
-              'attributes' => [],
-            //   'value' => old('role')
-              'value' => 'Admin'
-            ]) --}}
+            @include('dashboard.common.fields.select', [
+                'label_name' => 'Role',
+                'id' => 'role',
+                'name' => 'role',
+                'options' => $role_options,
+                'attributes' => [],
+                'value' => old('role'),
+            ])
 
 
             <div class="form-group">
-                <button type="submit" id="submit-btn" class="btn btn-primary">Add Admin User</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Add User</button>
             </div>
     </div>
     </form>
