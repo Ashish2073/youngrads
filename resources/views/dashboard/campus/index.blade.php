@@ -130,6 +130,10 @@
     <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
     <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
 @endsection
+
+
+
+
 @section('page-script')
     <script>
         var dataTable;
@@ -430,7 +434,7 @@
                     submitLoader("#submit-btn");
                 },
                 success: function(data) {
-                    // setAlert(data);
+                    // setAlert(data);    
                     if (data.success) {
                         modalReset();
                         toast(data.code, data.message, data.title);

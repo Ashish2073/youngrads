@@ -36,13 +36,140 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
         $rowNumber = 1;
 
        
-   
+           foreach($records as $record){
+            if(!isset($record['university'])){
+                Log::debug('University  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'University not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+            
+
+            }else{
+               continue; 
+            }
+            if(!isset($record['campus'])){
+
+                Log::debug('University  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'University not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            if(!isset($record['country'])){
+
+                Log::debug('Country  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            if(!isset($record['country'])){
+
+                Log::debug('Country  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            if(!isset($record['city'])){
+
+                Log::debug('City  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            if(!isset($record['postcode'])){
+
+                Log::debug('State  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            
+            if(!isset($record['state'])){
+
+                Log::debug('State  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+              
+            if(!isset($record['address'])){
+
+                Log::debug('Address not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Address not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+
+
+           }
         
-   
-    
+          
+       if(empty($sheetError)){
+        $rowNumber=1;
+       
         foreach ($records as $record) {
              // University Record
              $rowNumber++;
+
+
 
             if(isset($record['university'])){
             if (!isset($univsNameIdArr[trim(strtolower($record['university']))])) {
@@ -166,7 +293,7 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 $cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))] = $cityId;
             }
         }else{
-            Log::debug('University  not given!' . json_encode($record));
+            Log::debug('city  not given!' . json_encode($record));
             $sheetError[] = [
             'message' => 'City not given!',
             'record' => $record,
@@ -205,6 +332,11 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
     }
             $rowNumber++;
         }
+      
+    }
+
+
+
 
         if(empty($sheetError)){
            

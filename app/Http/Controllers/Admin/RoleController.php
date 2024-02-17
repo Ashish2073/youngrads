@@ -64,7 +64,7 @@ class RoleController extends Controller
         }else{
             $role = Role::create([
                 'name' => $request->name,
-                'guard_name' => 'modifires'
+                'guard_name' => 'modifier'
             ]);
 
         }
@@ -110,13 +110,17 @@ class RoleController extends Controller
     public function update(Request $request, $id)
     {
         if ($role = Role::findOrFail($id)) {
+            
             $permissions = $request->get('permissions', []);
             Permission::checkNewPermissions($permissions);
             // admin role has everything
             if ($role->name === 'Admin') {
                 $role->syncPermissions(Permission::all());
-            }
+            }else{
 
+            }
+                
+        
             $permissions = $request->get('permissions', []);
             $role->syncPermissions($permissions);
 

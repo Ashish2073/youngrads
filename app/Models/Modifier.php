@@ -11,25 +11,25 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 
-class Modifires extends Model
+class Modifier extends Model
 {
     use HasFactory;
     use LogsActivity; 
   
     protected static $logOnlyDirty = true;
-    protected $table="modifires";
+    protected $table="modifiers";
    protected static $logFillable = true;
    use HasRoles;
    use Notifiable;
    use SoftDeletes;
+ 
 
-
-   protected $guard = 'moderators';
+   protected $guard = 'modifier';
    protected $softDelete = true;
    protected $guarded = [];
 
-   const ROLE_MODERATOR = 'Moderator';
-   const GUARD_MODERATOR = 'moderators';
+   const ROLE_MODERATOR = 'Modifier'; 
+   const GUARD_MODERATOR = 'Modifier';
    protected $hidden = [
     'password', 'remember_token',
 ];
@@ -52,12 +52,12 @@ public function profileImage()
         return asset('images/portrait/small/avatar-s-11.jpg');
     }
 } 
-
+ 
 
 public function getInitials()
 {
-    $first = auth('moderator')->user()->first_name[0];
-    $second = auth('moderator')->user()->last_name[0] ?? "";
+    $first = auth('modifier')->user()->first_name[0];
+    $second = auth('modifier')->user()->last_name[0] ?? "";
     return $first . $second;
 }
 

@@ -1,13 +1,56 @@
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Modeifires Users')
+
+@section('title', 'Modeifires')
 @section('breadcumb-right')
-    <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.modifires.create') }}"
+    <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.modifier.create') }}"
         class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">
         <i class="feather icon-plus"></i>
     </button>
 @endsection
 @section('content')
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <!-- Modal content goes here -->
+                    <form id="myForm">
+                        <div class="form-group ">
+
+                            <label for="inputName t-center">
+                                <h2 id="">
+                                    User Roles
+                                </h2>
+                            </label>
+
+                            {{-- <input type="text" class="form-control" hidden id="modelname" name="name" required
+                                value=""> --}}
+                        </div>
+                        <div class="form-group">
+                            <label for="positiveNumber">
+                                <h5 id="userrole"></h5>
+                            </label>
+
+                        </div>
+                        <!-- Add other form fields as needed -->
+
+                        {{-- <button type="button" class="btn btn-primary" id="submitFormApplicationForm">Submit</button> --}}
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
 
     <section id="basic-datatable">
         <div class="row">
@@ -20,7 +63,7 @@
                         <div class="card-body card-dashboard">
 
                             <div class="table-responsive">
-                                <table id="user-table" class="table table-hover w-100 zero-configuration">
+                                <table id="modifier-table" class="table table-hover w-100 zero-configuration">
                                     <thead>
                                         <tr>
                                         <tr>
@@ -41,19 +84,23 @@
     </section>
 @endsection
 
+
+
 @section('page-script')
     <script>
         var dataTable;
         $(document).ready(function() {
+            $(".select").selectpicker();
+            $("#rolename").selectpicker('refresh');
             // Datatable
-            dataTable = $("#user-table").DataTable({
+            dataTable = $("#modifier-table").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "bInfo": true,
                 "pageLength": 100,
                 "fixedHeader": true,
                 ajax: {
-                    url: "{{ url('admin/modifires') }}",
+                    url: "{{ url('admin/modifiers') }}",
                     data: function(d) {
                         // d.quiz_id = $('select[name="quiz_id"]').val();
                     }
@@ -71,6 +118,11 @@
                         name: 'email'
                     },
 
+                    {
+                        data: 'role',
+                        name: 'role'
+                    }
+
                     // { data: 'questions', orderable: false, searchable: false },
                     // { data: 'created_at' }
                 ],
@@ -83,7 +135,7 @@
                 'createdRow': function(row, data, dataIndex) {
                     $(row).addClass('action-row');
                     let id = data['id'];
-                    let editUrl = "{{ url('admin/modifires') }}" + "/" + id + "/" + "edit";
+                    let editUrl = "{{ url('admin/modifiers') }}" + "/" + id + "/" + "edit";
                     $(row).attr('data-url', editUrl);
                     $(row).attr('data-target', "#dynamic-modal");
                     $(row).attr('data-toggle', "modal");
@@ -96,7 +148,7 @@
 
             $("body").on('click', "#add", function(e) {
                 let url = $(this).data('url');
-                $(".dynamic-title").html('Add modifires');
+                $(".dynamic-title").html('Add modifiers');
                 getContent({
                     "url": url,
                     success: function(data) {
@@ -104,14 +156,17 @@
                         runScript();
                     }
                 });
+
             });
 
             $("body").on('click', ".action-row", function(e) {
                 let url = $(this).data('url');
-                $('.dynamic-title').html('Update modifires');
+
+                $('.dynamic-title').html('Update modifiers');
                 getContent({
                     "url": url,
                     success: function(data) {
+
                         $(".dynamic-body").html(data);
 
                         runScript();
@@ -123,10 +178,11 @@
         })
 
         function runScript() {
-            $(".select").select2();
+            // $(".select").select2();
+            $(".select").selectpicker();
 
 
-            submitForm($("#user-create-form"), {
+            submitForm($("#modifier-create-form"), {
                 beforeSubmit: function() {
                     submitLoader("#submit-btn");
                 },
@@ -142,7 +198,7 @@
                 }
             });
 
-            submitForm($("#user-update-form"), {
+            submitForm($("#modifier-update-form"), {
                 beforeSubmit: function() {
                     submitLoader("#submit-btn");
                 },
@@ -161,7 +217,7 @@
                 }
             });
 
-            submitForm($("#user-delete-form"), {
+            submitForm($("#modifier-delete-form"), {
                 beforeSubmit: function() {
                     if (!confirm('Are you sure want to delete?')) {
                         return;
@@ -206,6 +262,48 @@
                     toast("error", "Something went wrong.", "Error");
                 }
             });
+        }
+
+        function userRole(id) {
+            let that = $(this);
+            event.stopPropagation();
+            $.ajax({
+                url: "{{ route('admin.user-roles') }}",
+                type: 'post',
+                data: {
+                    id: id,
+                    _token: "{{ csrf_token() }}"
+                },
+                beforeSend: function() {
+                    that.attr('disabled', true).html(
+                        "<i class='fa fa-spinner fa-spin'></i> ")
+                },
+                success: (data) => {
+
+                    $('#myModal').modal('show');
+
+                    let roleLength = data.length;
+
+
+                    let userRoleHTML = "";
+                    for (let i = 0; i < roleLength; i++) {
+                        userRoleHTML = userRoleHTML + data[i] + ",";
+
+                    }
+
+
+
+                    $('#userrole').html(userRoleHTML);
+                    console.log(data);
+
+                    // toast(data.code, data.message, data.title);
+                    that.removeAttr('disabled').html('Priority');
+                }
+            })
+
+
+
+
         }
     </script>
 @endsection

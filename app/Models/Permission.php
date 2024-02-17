@@ -28,12 +28,19 @@ class Permission extends \Spatie\Permission\Models\Permission
             if (empty($permission) || is_null($permission)) {
                 continue;
             }
-            if (Permission::where(['name' => $permission, 'guard_name' => 'admin'])->count() > 0) {
+            // if (Permission::where(['name' => $permission, 'guard_name' => 'admin'])->count() > 0) {
+            //     continue;
+            // }
+            if (Permission::where(['name' => $permission, 'guard_name' => 'modifier'])->count() > 0) {
                 continue;
             }
+            // Permission::create([
+            //     'name' => $permission,
+            //     'guard_name' => 'admin'
+            // ]);
             Permission::create([
                 'name' => $permission,
-                'guard_name' => 'admin'
+                'guard_name' => 'modifier'
             ]);
         }
     }

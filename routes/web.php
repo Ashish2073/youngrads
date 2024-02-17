@@ -36,7 +36,7 @@ use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\IntakeController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\UniversityController;
-use App\Http\Controllers\Admin\ModifiresController;
+use App\Http\Controllers\Admin\ModifiersController;
 
 
 
@@ -141,16 +141,18 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         ]
     ]);
   //Moderator Mangment
-  Route::resource('modifires', '\App\Http\Controllers\Admin\ModifiresController', [
+  Route::resource('modifiers', '\App\Http\Controllers\Admin\ModifiersController', [
     'names' => [
-        'index' => 'modifires', 
-        'create' => 'modifires.create',
-        'edit' => 'modifires.edit',
-        'update' => 'modifires.update',
-        'store' => 'modifires.store',
-        'destroy' => 'modifires.destroy'
+        'index' => 'modifiers', 
+        'create' => 'modifier.create',
+        'edit' => 'modifier.edit',
+        'update' => 'modifier.update',
+        'store' => 'modifier.store',
+        'destroy' => 'modifier.destroy'
     ]
 ]);
+
+Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class,'userRoles'])->name('user-roles');
 
 
   //////

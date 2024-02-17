@@ -34,8 +34,8 @@ return [
                 'permission' => 'users_view'
             ],
             [
-                'menu_name' => 'Modifires Users',
-                'route' => 'admin.modifires',
+                'menu_name' => 'Modifiers Users',
+                'route' => 'admin.modifiers',
                 'icon_class' => 'fa-solid fa-people-arrows',
                 'permission' => 'roles_and_permissions_view'
             ],

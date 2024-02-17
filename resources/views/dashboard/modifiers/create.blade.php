@@ -1,9 +1,9 @@
 <div class="row">
     <div class="col-md-12">
         @include('dashboard.inc.message')
-        <form id="user-update-form" action="{{ route('admin.user.update', $user->id) }}" method="post">
+        <form id="modifier-create-form" action="{{ route('admin.modifier.store') }}" method="post">
             @csrf
-            @method('PUT')
+
             @include('dashboard.common.fields.text', [
                 'label_name' => 'First Name',
                 'id' => 'first_name',
@@ -11,7 +11,7 @@
                 'placeholder' => 'Enter First Name',
                 'input_attribute' => [
                     'type' => 'text',
-                    'value' => old('first_name', $user->first_name),
+                    'value' => old('first_name'),
                 ],
                 'classes' => '',
             ])
@@ -23,7 +23,7 @@
                 'placeholder' => 'Enter Last Name',
                 'input_attribute' => [
                     'type' => 'text',
-                    'value' => old('last_name', $user->last_name),
+                    'value' => old('last_name'),
                 ],
                 'classes' => '',
             ])
@@ -35,7 +35,7 @@
                 'placeholder' => 'Enter Email Address',
                 'input_attribute' => [
                     'type' => 'email',
-                    'value' => old('email', $user->email),
+                    'value' => old('email'),
                 ],
                 'classes' => '',
             ])
@@ -50,7 +50,7 @@
                     'value' => '',
                 ],
                 'classes' => '',
-                'help_text' => 'Leave blank to use existing password',
+                'help_text' => '',
             ])
 
             @include('dashboard.common.fields.text', [
@@ -65,33 +65,65 @@
                 'classes' => '',
             ])
 
-            @php
+            {{-- @php
                 $role_options = [
                     '' => '--Select Role--',
                 ];
                 foreach ($roles as $role) {
                     $role_options[$role] = strtoupper($role);
                 }
-            @endphp
+            @endphp --}}
             {{-- @include('dashboard.common.fields.select', [
-              'label_name' => 'Role',
-              'id' => 'role',
-              'name' => 'role',
-              'options' => $role_options,
-              'attributes' => [],
-              'value' => old('role', $user->role)
+                'label_name' => 'Role',
+                'id' => 'role',
+                'name' => 'role',
+                'options' => $role_options,
+                'attributes' => [],
+                'value' => old('role'),
             ]) --}}
+
+            <div class="col-md-12 col-12">
+                <div class="form-group">
+                    <label for="rolename">Role</label>
+                    <select id="rolename" name="rolename[]" data-live-search="true" multiple
+                        class=" select form-control">
+                        <option value="" disabled>Please Select Roles</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->name }}">{{ strtoupper($role->name) }}</option>
+                        @endforeach
+
+                    </select>
+                </div>
+            </div>
+
+
             <div class="form-group">
-                <button type="submit" id="submit-btn" class="btn btn-primary">Update User</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Add modifier</button>
             </div>
     </div>
     </form>
-    <div class="form-group delete mx-1" style="margin-top:1%">
-        <form id="delete-form" method="POST" action="{{ route('admin.user.destroy', $user->id) }}">
-            @csrf
-            @method('DELETE')
-            <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
-        </form>
-    </div>
 </div>
 </div>
+
+@section('vendor-script')
+    {{-- vendor files --}}
+    <script src="{{ asset(mix('vendors/js/tables/datatable/pdfmake.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/vfs_fonts.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.html5.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.print.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
+@endsection
+
+
+
+@section('page-script')
+    <script>
+        $(document).ready(function() {
+            $(".select").selectpicker();
+            $("#rolename").selectpicker('refresh');
+        });
+    </script>
+@endsection

@@ -35,7 +35,7 @@ return [
     |
     */
     'guard' => [
-        'admin' => 'admin','modifire'=>'modifire'
+        'admin' => 'admin','modifier'=>'modifier'
     ],
 
     'guards' => [
@@ -47,9 +47,9 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
-        'modifire' => [
+        'modifier' => [
             'driver' => 'session',
-            'provider' => 'modifires',
+            'provider' => 'modifiers',
         ],
 
         'api' => [
@@ -91,9 +91,9 @@ return [
             'model' => App\Models\Admin::class,
         ],
 
-        'modifires' => [
+        'modifiers' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Modifires::class,
+            'model' => App\Models\Modifier::class,
         ],
     ],
 
@@ -129,8 +129,8 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
-        'modifires' => [
-            'provider' => 'modifires',
+        'modifiers' => [
+            'provider' => 'modifiers',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

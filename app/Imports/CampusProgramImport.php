@@ -67,10 +67,288 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
         $sheetError = [];
         $rowNumber = 1;
-        
-        
-         
+
+
+        foreach($records as $record){
+            if(!isset($record['university'])){
+                Log::debug('University  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'University not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
             
+
+            }else{
+
+                if (!isset($univsNameIdArr[trim(strtolower($record['university']))])) {
+                    Log::debug('University does not exists!' . json_encode($record));
+                    $sheetError[] = [
+                        'message' => 'University does not exists!' . json_encode($record),
+                        'record' => $record,
+                        'rowNumber' => $rowNumber,
+                    ];
+                    break;
+
+                }else{
+
+                    continue;
+
+                }
+
+
+
+             
+            }
+            if(!isset($record['campus'])){
+
+                Log::debug('Campus  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Campus not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+
+                if (!isset($univIdCampusNameArr[$univId . "__" . trim(strtolower($record['campus']))])) {
+                    Log::debug('Campus does not exists!'.$record['campus'] . json_encode($record));
+                    $sheetError[] = [
+                        'message' => 'Campus does not exists!'.$record['campus'],
+                        'record' => $record,
+                        'rowNumber' => $rowNumber,
+                    ];
+                    break;
+
+                
+            }else{
+                continue;
+            }
+
+
+        }
+
+            if(!isset($record['level'])){
+
+                Log::debug('level  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'level not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+
+                if (!isset($programLevelIdArr[trim(strtolower($record['level']))])) {
+                            
+            
+              
+                    Log::debug('Program Level does not exists!' . json_encode($record));
+                    $sheetError[] = [
+                        'message' => 'Program Level does not exists!'.$record['level'],
+                        'record' => $record,
+                        'rowNumber' => $rowNumber,
+                    ];
+
+                    break;
+
+                }else{
+                    continue;
+                }
+
+
+              
+            }
+
+            if(!isset($record['study_area'])){
+
+                Log::debug('study area  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Study area  not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            if(!isset($record['sub_study_area'])){
+
+                Log::debug('Sub Study Area   not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Country not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+                continue;
+            }
+
+            if(!isset($record['currency_type'])){
+
+                Log::debug('Currency type  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Currency type  not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+
+                if (!isset($currenciesArr[trim(strtolower($record['currency_type']))])) {
+
+                    Log::debug('Currency type not match  given !' . json_encode($record));
+                    $sheetError[] = [
+                    'message' => 'Currency type not match!',
+                    'record' => $record,
+                    'rowNumber' => $rowNumber,
+                ];
+                break;
+
+
+
+                }else{
+                    continue;
+                }
+              
+            }
+
+            
+            if(!isset($record['app_fee'])){
+
+                Log::debug('Application fees  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Application Tuition fees  not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+
+                if(!is_numeric($record['app_fee'])){
+                    Log::debug('Application  fesss  not Numeric !' . json_encode($record));
+                    $sheetError[] = [
+                    'message' => 'Application fees  not Numeric!',
+                    'record' => $record,
+                    'rowNumber' => $rowNumber,
+                ];
+                break;
+
+                }else{
+                    continue;
+                }
+
+
+
+
+            
+            }
+
+
+
+            if(!isset($record['annual_tuition_fee'])){
+
+                Log::debug('Annual Tuition fesss  not given !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Annual Tuition fesss  not given!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+
+            }else{
+
+                if(!is_numeric($record['annual_tuition_fee'])){
+                    Log::debug('Annual Tuition fees  not Numeric !' . json_encode($record));
+                    $sheetError[] = [
+                    'message' => 'Annual Tuition fees  not Numeric!',
+                    'record' => $record,
+                    'rowNumber' => $rowNumber,
+                ];
+                break;
+
+                }else{
+                    continue;
+                }
+
+
+
+
+            
+            }
+
+          ////annual_tuition_fee program_fee
+
+
+          if(!isset($record['program_fee'])){
+
+            Log::debug('Program fees  not given !' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'Program Tuition fees  not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+        break;
+
+
+        }else{
+
+            if(!is_numeric($record['program_fee'])){
+                Log::debug('Program fees  not Numeric !' . json_encode($record));
+                $sheetError[] = [
+                'message' => 'Program fees  not Numeric!',
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+            break;
+
+            }else{
+                continue;
+            }
+
+
+
+
+        
+        }
+
+
+
+            
+
+
+
+
+
+              
+          
+
+
+
+           }
+        
+
+
+
+        
+        if(empty($sheetError)) {
+            $rowNumber=1;
         foreach ($records as $record) {
             
             $rowNumber++;
@@ -92,7 +370,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 ];
                 continue;
             }else{
-                $univId = $univsNameIdArr[strtolower($record['university'])];
+                $univId = $univsNameIdArr[trim(strtolower($record['university']))];
             }
            
             }
@@ -128,7 +406,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 ];
                 continue;
             } else {
-                $programLevelId = $programLevelIdArr[str_replace(' ','',trim(strtolower($record['level'])))];
+                $programLevelId = $programLevelIdArr[trim(strtolower($record['level']))];
             }
           }
             // Study Area ID
@@ -503,7 +781,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
         
     }
 
-    
+}
   
         if(empty($sheetError)){
            
