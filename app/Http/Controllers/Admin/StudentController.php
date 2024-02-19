@@ -16,6 +16,7 @@ use App\Models\UserMeta;
 use App\Models\SpecialTest;
 use App\Models\State;
 use App\Models\Test;
+use App\Models\Modifier;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserAcademic;
 use App\Models\UserApplication;
@@ -84,7 +85,11 @@ class StudentController extends Controller
 
 				  }else{
 					
-					$users=User::all();
+					$users=User::leftJoin('modifiers','modifiers.id','=','users.moderator_id')
+					->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','modifiers.username as moderator_username')->get();
+
+
+				
 					
 				  }
 			
@@ -92,9 +97,19 @@ class StudentController extends Controller
 				// ->addColumn('action', function($row){
 				//   return "<button class='btn btn-primary'>View Profile</button>";
 				//  })
+				->addColumn('moderator_checkbox',function ($row){
+					return "<input class='moderator-checkbox' hidden name='studentid[]' type='checkbox' value='$row->id' />";
+
+				})
+				
 				->addColumn('student_id', function ($row) {
 					
 					return  "young_stu_" . $row->id;
+				})
+
+				->addColumn('moderator_username', function ($row) {
+					
+					return   ($row->moderator_username)?? "N/A";
 				})
 				 
 				->addColumn('name', function ($row) {
@@ -120,18 +135,21 @@ class StudentController extends Controller
 				->addColumn('shortlist', function ($row) {
 					return "<button class='btn btn-outline-primary student-shortlist btn-sm' data-id={$row->id}><i class='feather icon-check-circle'></i> Shortlisted Programs</button>";
 				})
-				->rawColumns(['email', 'delete', 'shortlist'])
+				->rawColumns(['email', 'delete', 'shortlist','moderator_checkbox'])
 				->make(true); 
 		} else {
 			$userId=User::select('id')->get();
 			$userEmail=User::select('email')->get();
 			$userPhone=User::select('personal_number')->get();
+			$moderator=Modifier::select('id','username')->role('moderator')->get();
+
+	
 			
 			$breadcrumbs = [
 				['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Students"]
 			];
 			return view('dashboard.students.index', [
-				'breadcrumbs' => $breadcrumbs,'userId'=>$userId,'userEmail'=>$userEmail,'userPhone'=>$userPhone
+				'breadcrumbs' => $breadcrumbs,'userId'=>$userId,'userEmail'=>$userEmail,'userPhone'=>$userPhone,'moderator'=>$moderator
 			]);
 		}
 	}

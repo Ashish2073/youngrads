@@ -67,8 +67,10 @@
                                     <thead>
                                         <tr>
                                         <tr>
+                                            <th>Modifiers Users Name</th>
                                             <th>First Name</th>
                                             <th>Last Name</th>
+
                                             <th>Email</th>
                                             <th>Role</th>
                                         </tr>
@@ -106,6 +108,12 @@
                     }
                 },
                 columns: [{
+                        data: 'username',
+                        name: 'username'
+                    },
+
+                    {
+
                         data: 'first_name',
                         name: 'first_name'
                     },
@@ -113,6 +121,7 @@
                         data: 'last_name',
                         name: 'last_name'
                     },
+
                     {
                         data: 'email',
                         name: 'email'

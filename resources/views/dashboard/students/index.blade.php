@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="{{ asset(mix('vendors/css/tables/datatable/datatables.min.css')) }}">
 @endsection
 
+<style>
+    .form-check.warning .form-check-input:checked {
+        background-color: #ffc107;
+        /* Bootstrap warning color */
+    }
+</style>
+
 @section('content')
 
     <section id="basic-datatable">
@@ -26,7 +33,7 @@
                                     <div class="form-group">
                                         <label for="userid">Student Id</label>
                                         <select data-colum="0" id="userid" name="id[]" data-live-search="true"
-                                            multiple class=" select form-control">
+                                            multiple class=" select form-control apply-filter-student">
                                             @foreach ($userId as $user)
                                                 @if (isset($user->id))
                                                     <option value="{{ $user->id }}">{{ 'young_stu_' . $user->id }}
@@ -40,7 +47,7 @@
                                     <div class="form-group">
                                         <label for="useremail">Email</label>
                                         <select id="useremail" name="email[]" data-live-search="true" multiple
-                                            class=" select form-control">
+                                            class=" select form-control apply-filter-student">
 
 
                                             @foreach ($userEmail as $user)
@@ -55,7 +62,7 @@
                                     <div class="form-group">
                                         <label for="userphone">Phone Number</label>
                                         <select id="userphone" name="phone[]" data-live-search="true" multiple
-                                            class=" select form-control">
+                                            class=" select form-control apply-filter-student">
 
                                             @foreach ($userPhone as $user)
                                                 @if (isset($user->personal_number))
@@ -66,6 +73,25 @@
                                         </select>
                                     </div>
                                 </div>
+
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="userphone">Moderator Id</label>
+                                        <select id="userphone" name="moderatorid[]" data-live-search="true" multiple
+                                            class=" select form-control apply-filter-student">
+
+                                            @foreach ($moderator as $moderatoruser)
+                                                @if (isset($moderatoruser->username))
+                                                    <option value="{{ $moderatoruser->id }}">
+                                                        {{ $moderatoruser->username }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
 
                                 <div class="col-md-3 col-12 text-center">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
@@ -82,11 +108,88 @@
                             <a href="{{ route('admin.students-data-export') }}" class="btn btn-primary mt-3">Export Students
                                 Application Data In Excel Form</a>
 
+                            <a href="javascript:void(0)" class="btn btn-primary mt-3" id="assignstudentmoderator">Assign
+                                Students
+                                To Moderator</a>
+
+
+                            <div class="row application-filter align-items-center" id="studentassigndiv" hidden>
+
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="moderator">Moderator Id</label>
+                                        <select id="moderator" name="moderatorid" data-live-search="true"
+                                            class=" select form-control">
+                                            <option value="" selected disabled>Please Select Moderator</option>
+                                            @foreach ($moderator as $moderatoruser)
+                                                @if (isset($moderatoruser->username))
+                                                    <option value="{{ $moderatoruser->id }}">
+                                                        {{ $moderatoruser->username }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+
+                                {{-- <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="userid">Select Student </label>
+                                        <select data-colum="0" id="userid" name="id[]" data-live-search="true"
+                                            multiple class=" select form-control">
+                                            @foreach ($userId as $user)
+                                                @if (isset($user->id))
+                                                    <option value="{{ $user->id }}">{{ 'young_stu_' . $user->id }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div> --}}
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <input class="form-check-input " type="checkbox" value=""
+                                            id="assign-all-student">
+                                        <label for="assignstudent form-check-label">Assign To All Students</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-12 ">
+                                    <div class="form-group ">
+                                        <input class="form-check-input " type="checkbox" value=""
+                                            id="nonassignstudents">
+                                        <label for="nonassignstudents form-check-label">Non Assign Students</label>
+
+
+                                    </div>
+                                </div>
+
+
+
+
+
+                                <div class="col-md-3 col-12 text-center">
+                                    <button class="btn btn-primary" id="reset-filter">Save</button>
+
+                                </div>
+
+
+
+                            </div>
+
+
+
+
+
                             <div class="table-responsive">
                                 <table id="user-table" class="table table-hover w-100 zero-configuration">
                                     <thead>
                                         <tr>
+                                            <th id="thead-moderator-checkbox" hidden>Checkbox</th>
                                             <th>Id</th>
+                                            <th>Moderator Id</th>
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Phone No.</th>
@@ -127,10 +230,40 @@
         jQuery(document).ready(function() {
 
 
+            $("#assignstudentmoderator").on('click', function() {
+
+                if ($("#studentassigndiv").is(":hidden")) {
+                    $("#studentassigndiv").removeAttr("hidden");
+                    $(".moderator-checkbox").removeAttr("hidden");
+                    $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
+                    $("#thead-moderator-checkbox").removeAttr("hidden");
+                    $("#assign-all-student").on('change', function() {
+                        if ($(this).is(':checked'))
+
+                            $(".moderator-checkbox").attr("checked", true);
+                        else {
+                            $(".moderator-checkbox").attr("checked", false);
+                        }
+                    })
+
+
+
+
+
+
+                } else {
+                    $("#studentassigndiv").attr("hidden", true);
+                    $(".moderator-checkbox").attr("hidden", true);
+                    $("#thead-moderator-checkbox").attr("hidden", true);
+                    $(".moderator-checkbox").closest("td").attr("hidden", true);
+                }
+
+            })
+
+
             $(".select").selectpicker();
-            $(".application-filter").find("select").on("change", function() {
-                console.log('gf');
-                console.log($("#userid").val());
+            $(".application-filter").find(".apply-filter-student").on("change", function() {
+
 
                 dataTable.draw();
             });
@@ -160,8 +293,22 @@
                     [7, "desc"]
                 ],
                 columns: [{
+                        data: 'moderator_checkbox',
+                        name: 'moderator_checkbox',
+                        // searchable: true,
+                        // visible: false
+
+                    },
+                    {
                         data: 'student_id',
                         name: 'student_id',
+
+                    },
+
+
+                    {
+                        data: 'moderator_username',
+                        name: 'moderator_username',
 
                     },
 
@@ -204,7 +351,14 @@
                 //         visible: false
                 //     }
                 // ],
+
                 'createdRow': function(row, data, dataIndex) {
+                    var checkboxCell = $(row).find('.moderator-checkbox').closest('td');
+
+
+                    // Hide the cell
+                    checkboxCell.attr('hidden', true);
+
                     $(row).addClass('action-row');
                     let id = data['id'];
                     let editUrl = "{{ url('admin/user') }}" + "/" + id + "/edit";
@@ -263,6 +417,13 @@
                     }
                 });
             });
+
+            /////////////////////checkBox to select to student //////////// 
+
+            $(document).on('click', '.moderator-checkbox', function(e) {
+                e.stopPropagation();
+            })
+
 
             //delete
             $(document).on('click', '.student-delete', function(e) {

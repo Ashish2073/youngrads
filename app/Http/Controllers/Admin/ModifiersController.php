@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\Modifier;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Yajra\Datatables\Datatables;
 
@@ -76,14 +77,30 @@ class ModifiersController extends Controller
             return view('dashboard.modifiers.create', compact('roles'))->withErrors($validator);
         }
 
-        $user = Modifier::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        // $user = Modifier::create([
+        //     'first_name' => $request->first_name,
+        //     'last_name' => $request->last_name,
+        //     'email' => $request->email,
+        //     'username'=>strtoupper($user->id .'YGMOD'),
+        //     'password' => Hash::make($request->password)
+        // ]);
+       
 
+        
+            $user = Modifier::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
+            ]);
+        
+            // Update the 'username' field after creating the user
+           
+        
         if($user) {
+            $user->update([
+                'username' => strtoupper('YGMOD'.$user->id)
+            ]);
             
             $user->assignRole($request->rolename);
         
@@ -104,6 +121,10 @@ class ModifiersController extends Controller
             ]);
         }
 
+
+
+
+
     }
 
     public function edit($id)
@@ -113,6 +134,8 @@ class ModifiersController extends Controller
         $roles = Role::where('name','!=','Admin')->get();
 
          $user->role =($user->getRoleNames());
+
+        
 
        
        
