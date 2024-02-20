@@ -61,26 +61,40 @@ class StudentController extends Controller
 				// 	$users=User::all();
 				// }
 				     
-			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)){
+			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)){
+
+					
 				
 			    //    $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
 				//    ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
 				// ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):[(DB::raw('personal_number'))])
 				//    ->get();
 
-				   $users = User::select('id', 'name', 'last_name', 'email', 'personal_number', 'passport', 'dob')
-                            ->whereIn('id', ($request->get('id') != null) ? $request->get('id') : [DB::raw('id')])
-                             ->whereIn('email', ($request->get('email') != null) ? $request->get('email') : [DB::raw('email')])
-                              ->where(function ($query) use ($request) {
+			
+
+				   $users = User::leftJoin('modifiers','modifiers.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','modifiers.username as moderator_username')
+                             ->whereIn('users.id', ($request->get('id') != null) ? $request->get('id') : [DB::raw('users.id')])
+                             ->whereIn('users.email', ($request->get('email') != null) ? $request->get('email') : [DB::raw('users.email')])
+						     ->where(function ($query) use ($request) {
 								if(($request->has('personal_number'))){
-									$query->whereIn('personal_number', $request->get('personal_number'));
+									$query->whereIn('users.personal_number', $request->get('personal_number'));
 								}else{
-									$query->whereIn('personal_number', ($request->get('personal_number') != null) ? $request->personal_number : [DB::raw('personal_number')])
-									->orWhereNull('personal_number');
+									$query->whereIn('users.personal_number', ($request->get('personal_number') != null) ? $request->personal_number : [DB::raw('users.personal_number')])
+									->orWhereNull('users.personal_number');
+								}
+
+                              })->where(function ($query) use ($request) {
+								if(($request->has('moderator_filter_id'))){
+									$query->whereIn('users.moderator_id', $request->get('moderator_filter_id'));
+								}else{
+									$query->whereIn('users.moderator_id', ($request->get('moderator_filter_id') != null) ? $request->moderator_filter_id : [DB::raw('users.moderator_id')])
+									->orWhereNull('users.moderator_id');
 								}
 
                               })
                             ->get();
+
+						
 
 
 				  }else{
@@ -129,18 +143,25 @@ class StudentController extends Controller
 					
 					return $row->dob ? date("d M Y", strtotime($row->dob)) : "N/A";
 				})
-				->addColumn('delete', function ($row) {
-					return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-trash'></i></button>";
+				->addColumn('action', function ($row) {
+					return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-trash'></i></button>
+					<button class='btn btn-primary student-edit btn-icon btn-round' data-id={$row->id}><i class='fa fa-edit'></i></button>";
 				})
+				// ->addColumn('edit', function ($row) {
+				// 	return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-edit'></i></button>";
+				// })
 				->addColumn('shortlist', function ($row) {
 					return "<button class='btn btn-outline-primary student-shortlist btn-sm' data-id={$row->id}><i class='feather icon-check-circle'></i> Shortlisted Programs</button>";
+					
 				})
-				->rawColumns(['email', 'delete', 'shortlist','moderator_checkbox'])
+				->rawColumns(['email', 'action', 'shortlist','moderator_checkbox'])
 				->make(true); 
 		} else {
 			$userId=User::select('id')->get();
 			$userEmail=User::select('email')->get();
 			$userPhone=User::select('personal_number')->get();
+
+			
 			$moderator=Modifier::select('id','username')->role('moderator')->get();
 
 	
@@ -250,8 +271,38 @@ class StudentController extends Controller
 		return Excel::download(new StudentData, 'studentsdata.xlsx');
 	}
 
-	public function filterstudentdata(Request $request){
+	public function edit($id)  
+	{
+	  $user = User::find($id);
+	  $moderator=Modifier::select('id','username')->role('moderator')->get();
+
+
+	  return view('dashboard.students.edit', compact('user','moderator'));
+	}
+
+	public function moderator_assign_to_students(Request $request){
+    
 		
 
+		$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>$request->moderatorid]);
+		if($user){
+			return response()->json([
+				'success' => true,
+				'code' => 'success',
+				'title' => 'Congratulations',
+				'message' => 'Moderator assign  successfully'
+			]);
+		}
+
 	}
+
+
+
+
+
+
+
+
+
+
 }

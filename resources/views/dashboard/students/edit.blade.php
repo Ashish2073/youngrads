@@ -1,11 +1,12 @@
 <div class="row">
     <div class="col-md-12">
         @include('dashboard.inc.message')
+
         <form id="user-update-form" action="{{ route('admin.user.update', $user->id) }}" method="post">
             @csrf
             @method('PUT')
 
-
+            {{-- 
             @include('dashboard.common.fields.text', [
                 'label_name' => 'First Name',
                 'id' => 'first_name',
@@ -13,7 +14,7 @@
                 'placeholder' => 'Enter First Name',
                 'input_attribute' => [
                     'type' => 'text',
-                    'value' => old('first_name', $user->first_name),
+                    'value' => old('first_name', $user->name),
                 ],
                 'classes' => '',
             ])
@@ -52,7 +53,7 @@
                     'value' => '',
                 ],
                 'classes' => '',
-                'help_text' => 'Leave blank to use existing password'
+                'help_text' => 'Leave blank to use existing password',
             ])
 
             @include('dashboard.common.fields.text', [
@@ -65,28 +66,31 @@
                     'value' => '',
                 ],
                 'classes' => '',
-            ])
+            ]) --}}
 
             @php
                 $role_options = [
-                  '' => '--Select Role--'
+                    '' => '--Select Role--',
                 ];
-                foreach($roles as $role) {
-                  $role_options[$role] = strtoupper($role);
+                foreach ($moderator as $role) {
+                    $role_options[$role->id] = strtoupper($role->username);
                 }
             @endphp
             @include('dashboard.common.fields.select', [
-              'label_name' => 'Role',
-              'id' => 'role',
-              'name' => 'role',
-              'options' => $role_options,
-              'attributes' => [],
-              'value' => old('role', $user->role)
+                'label_name' => 'Moderator ID',
+                'id' => 'moderatorid',
+                'name' => 'moderatorid',
+                'options' => $role_options,
+                'attributes' => [],
+                'value' => old('role', $user->moderator_id),
             ])
+
+
             <div class="form-group">
-                <button type="submit" id="submit-btn" class="btn btn-primary">Update User</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Update Students Moderator</button>
             </div>
     </div>
     </form>
+
 </div>
 </div>

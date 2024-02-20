@@ -185,6 +185,8 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
         ]
     ]);
 
+    Route::post('moderator-assign-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_assign_to_students'])->name('moderator-assign-students');
+
     Route::post('students-data-filter',[\App\Http\Controllers\Admin\StudentController::class,'filterstudentdata'])->name('students-data-filter');
 
     Route::get('students-data-export', [App\Http\Controllers\Admin\StudentController::class, 'get_student_data'])->name('students-data-export');

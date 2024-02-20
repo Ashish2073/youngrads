@@ -76,9 +76,9 @@
 
                                 <div class="col-md-3 col-12">
                                     <div class="form-group">
-                                        <label for="userphone">Moderator Id</label>
-                                        <select id="userphone" name="moderatorid[]" data-live-search="true" multiple
-                                            class=" select form-control apply-filter-student">
+                                        <label for="moderator-filter-id">Moderator Id</label>
+                                        <select id="moderator-filter-id" name="moderatorid[]" data-live-search="true"
+                                            multiple class=" select form-control apply-filter-student">
 
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
@@ -117,8 +117,8 @@
 
                                 <div class="col-md-3 col-12">
                                     <div class="form-group">
-                                        <label for="moderator">Moderator Id</label>
-                                        <select id="moderator" name="moderatorid" data-live-search="true"
+                                        <label for="moderatorid">Moderator Id</label>
+                                        <select id="moderatorid" name="moderatorid" data-live-search="true"
                                             class=" select form-control">
                                             <option value="" selected disabled>Please Select Moderator</option>
                                             @foreach ($moderator as $moderatoruser)
@@ -171,7 +171,7 @@
 
 
                                 <div class="col-md-3 col-12 text-center">
-                                    <button class="btn btn-primary" id="reset-filter">Save</button>
+                                    <button class="btn btn-primary" id="moderator-save">Save</button>
 
                                 </div>
 
@@ -238,11 +238,18 @@
                     $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
                     $("#thead-moderator-checkbox").removeAttr("hidden");
                     $("#assign-all-student").on('change', function() {
-                        if ($(this).is(':checked'))
+                        if ($(this).is(':checked')) {
+                            console.log($(this));
 
-                            $(".moderator-checkbox").attr("checked", true);
-                        else {
-                            $(".moderator-checkbox").attr("checked", false);
+                            $(".moderator-checkbox").prop("checked", true);
+
+
+                        } else {
+                            $(".moderator-checkbox").prop("checked", false);
+
+
+
+
                         }
                     })
 
@@ -287,6 +294,7 @@
                         d.id = $("#userid").val();
                         d.email = $('#useremail').val();
                         d.personal_number = $('#userphone').val();
+                        d.moderator_filter_id = $('#moderator-filter-id').val();
                     }
                 },
                 "order": [
@@ -338,9 +346,13 @@
                         name: 'shortlist'
                     },
                     {
-                        data: 'delete',
-                        name: 'delete'
+                        data: 'action',
+                        name: 'action'
                     },
+                    // {
+                    //     data: 'edit',
+                    //     name: 'edit'
+                    // },
 
                     // { data: 'questions', orderable: false, searchable: false },
                     // { data: 'created_at' }
@@ -361,7 +373,7 @@
 
                     $(row).addClass('action-row');
                     let id = data['id'];
-                    let editUrl = "{{ url('admin/user') }}" + "/" + id + "/edit";
+
                     $(row).attr('data-id', id);
                     $(row).attr('data-target', "#apply-model");
                     $(row).attr('data-toggle', "modal");
@@ -376,10 +388,33 @@
 
 
 
+            $('body').on('click', '.student-edit', function(e) {
+                e.stopPropagation();
+                id = $(this).data('id');
+                $('#dynamic-modal').modal();
+                $('.dynamic-title').text('Update Student Moderator');
+
+                $.ajax({
+                    url: "{{ url('admin/students') }}" + "/" + id + "/edit",
+                    beforeSend: function() {
+                        $('.dynamic-body').html("Loading...");
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        $('.dynamic-body').html(data);
+
+                    }
+                })
 
 
 
 
+
+
+            });
+
+
+            runScript();
 
 
 
@@ -423,9 +458,58 @@
             $(document).on('click', '.moderator-checkbox', function(e) {
                 e.stopPropagation();
             })
+            /////////////////////////Moderator value save/////////////////////////////////
+            $("#moderator-save").on('click', function(e) {
+                e.preventDefault();
+                that = $(this);
+                var checkedValues = $(".moderator-checkbox:checked").map(function() {
+                    return $(this).val();
+                }).get();
+                var moderatorid = $('#moderatorid').val();
+
+                $.ajax({
+                    url: "{{ url('admin/moderator-assign-students') }}",
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        _method: "POST",
+                        moderatorid: moderatorid,
+                        checkedValues: checkedValues
+                    },
+                    beforeSend: function() {
+
+                        that.attr('disabled', true).prepend(
+                            "<i class='fa fa-spinner fa-spin'></i> ");
+                    },
+                    success: function(data) {
+                        setAlert(data);
+
+                        dataTable.draw();
+
+                        $("#thead-moderator-checkbox").attr('hidden', true);
+                        $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
+                        $("#studentassigndiv").attr("hidden", true);
 
 
-            //delete
+
+                        that.removeAttr('disabled').html(
+                            "Save"
+                        );
+
+
+                    },
+                    error: function(data) {
+                        toast("error", "Something went wrong.", "Error");
+                    }
+                });
+
+
+
+
+            })
+
+
+            //delete///////////////////////////////////////////
             $(document).on('click', '.student-delete', function(e) {
                 e.stopPropagation();
                 id = $(this).data('id');
@@ -470,6 +554,7 @@
                         $('.dynamic-body').html("Loading...");
                     },
                     success: function(data) {
+                        console.log(data);
                         $('.dynamic-body').html(data);
                         $("#shortlist-table").dataTable();
                     }
