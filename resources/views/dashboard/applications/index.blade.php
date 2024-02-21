@@ -100,7 +100,8 @@
                                         <select id="program" name="program[]" data-live-search="true" multiple
                                             class=" select form-control">
                                             @foreach ($programs ?? [] as $program)
-                                                <option {{ $program->id == ($usedCampusProgramId ?? '') ? 'selected' : '' }}
+                                                <option
+                                                    {{ $program->id == ($usedCampusProgramId ?? '') ? 'selected' : '' }}
                                                     value="{{ $program->id }}">{{ $program->name }}</option>
                                             @endforeach
                                         </select>
@@ -205,6 +206,7 @@
                                             <tr>
                                                 <th>Favourite</th>
                                                 <th>Student</th>
+                                                <th>Moderator ID</th>
                                                 <th>Application ID</th>
                                                 <th>University</th>
                                                 <th>Campus</th>
@@ -431,10 +433,19 @@
                         orderable: true,
                         searchable: true
 
+
+                    },
+                    {
+                        name: 'modifiers.username ',
+                        data: 'moderator_username',
+
+
+
                     },
                     {
                         name: 'users_applications.application_number',
-                        data: 'application_number'
+                        data: 'application_number',
+
                     },
                     {
                         name: 'universities.name',

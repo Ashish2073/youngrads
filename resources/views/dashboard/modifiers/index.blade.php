@@ -61,6 +61,28 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body card-dashboard">
+                            <div class="row application-filter align-items-center">
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="rolename">Role Name</label>
+                                        <select data-colum="0" id="rolename" name="rolename[]" data-live-search="true"
+                                            multiple class=" select form-control apply-filter-role">
+                                            @foreach ($roles as $role)
+                                                <option value="{{ $role->name }}">{{ ucfirst($role->name) }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-3 col-12 text-center">
+                                    <button class="btn btn-primary" id="reset-filter">Reset</button>
+
+                                </div>
+
+                            </div>
 
                             <div class="table-responsive">
                                 <table id="modifier-table" class="table table-hover w-100 zero-configuration">
@@ -93,7 +115,13 @@
         var dataTable;
         $(document).ready(function() {
             $(".select").selectpicker();
-            $("#rolename").selectpicker('refresh');
+
+
+            $(".application-filter").find(".apply-filter-role").on("change", function() {
+                dataTable.draw();
+            });
+
+
             // Datatable
             dataTable = $("#modifier-table").DataTable({
                 "processing": true,
@@ -104,6 +132,7 @@
                 ajax: {
                     url: "{{ url('admin/modifiers') }}",
                     data: function(d) {
+                        d.rolename = $('#rolename').val();
                         // d.quiz_id = $('select[name="quiz_id"]').val();
                     }
                 },
@@ -314,5 +343,12 @@
 
 
         }
+
+        $('#reset-filter').on('click', function() {
+            $(".select").selectpicker('deselectAll');
+            $(".select").val("");
+            $(".select").selectpicker('refresh');
+
+        });
     </script>
 @endsection

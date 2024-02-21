@@ -18,14 +18,24 @@ class ModifiersController extends Controller
         $this->middleware('auth:admin');
     } 
 
-    public function index(){
+    public function index(Request $request){
 
         // $users = Modifier::find(10);
 
         // dd( $users->getRoleNames());
     
         if(request()->ajax()) { 
-            $users = Modifier::all();
+
+            if($request->get('rolename')!=null){
+                $rolename=$request->get('rolename');
+                $users=Modifier::role($rolename)->get();
+
+                
+
+            }else{
+                $users = Modifier::all();
+            }
+          
             return Datatables::of($users)
                 ->editColumn('last_name', function($row) {
                     return $row->last_name ?? "N/A";
@@ -39,11 +49,11 @@ class ModifiersController extends Controller
                 ->make(true);
         } else {
 
-
+            $roles = Role::where('name','!=','Admin')->select('name', 'id')->get();
         $breadcrumbs = [
             ['link'=>"admin.home",'name'=>"Dashboard"], ['name'=>"Modifiers Users"]
         ];
-        return view('dashboard.modifiers.index', compact('breadcrumbs'));
+        return view('dashboard.modifiers.index', compact('breadcrumbs','roles'));
     }
     }
 

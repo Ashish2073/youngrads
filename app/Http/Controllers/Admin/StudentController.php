@@ -63,7 +63,7 @@ class StudentController extends Controller
 				     
 			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)){
 
-					
+				
 				
 			    //    $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
 				//    ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
@@ -79,15 +79,23 @@ class StudentController extends Controller
 								if(($request->has('personal_number'))){
 									$query->whereIn('users.personal_number', $request->get('personal_number'));
 								}else{
-									$query->whereIn('users.personal_number', ($request->get('personal_number') != null) ? $request->personal_number : [DB::raw('users.personal_number')])
+									$query->whereIn('users.personal_number', [DB::raw('users.personal_number')])
 									->orWhereNull('users.personal_number');
 								}
 
                               })->where(function ($query) use ($request) {
 								if(($request->has('moderator_filter_id'))){
-									$query->whereIn('users.moderator_id', $request->get('moderator_filter_id'));
+
+									if($request->get('moderator_filter_id')!=[0]){
+									
+										$query->whereIn('users.moderator_id', $request->get('moderator_filter_id'))->orWhereNull('users.moderator_id');
+								  }else{
+								
+									 $query->whereNull('users.moderator_id');
+								}
+									
 								}else{
-									$query->whereIn('users.moderator_id', ($request->get('moderator_filter_id') != null) ? $request->moderator_filter_id : [DB::raw('users.moderator_id')])
+									$query->whereIn('users.moderator_id',[DB::raw('users.moderator_id')])
 									->orWhereNull('users.moderator_id');
 								}
 
@@ -144,9 +152,9 @@ class StudentController extends Controller
 					return $row->dob ? date("d M Y", strtotime($row->dob)) : "N/A";
 				})
 				->addColumn('action', function ($row) {
-					return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-trash'></i></button>
-					<button class='btn btn-primary student-edit btn-icon btn-round' data-id={$row->id}><i class='fa fa-edit'></i></button>";
+					return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-trash'></i></button>";
 				})
+				//<button class='btn btn-primary student-edit btn-icon btn-round' data-id={$row->id}><i class='fa fa-edit'></i></button>";
 				// ->addColumn('edit', function ($row) {
 				// 	return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-edit'></i></button>";
 				// })
@@ -282,20 +290,40 @@ class StudentController extends Controller
 
 	public function moderator_assign_to_students(Request $request){
     
-		
-
-		$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>$request->moderatorid]);
+		if($request->moderatorid==0){
+		$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>null]);
 		if($user){
 			return response()->json([
 				'success' => true,
 				'code' => 'success',
 				'title' => 'Congratulations',
-				'message' => 'Moderator assign  successfully'
+				'message' => 'Moderator Removed Successfully'
 			]);
 		}
 
+		}else{
+			$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>$request->moderatorid]);
+		    if($user){
+			   return response()->json([
+				'success' => true,
+				'code' => 'success',
+				'title' => 'Congratulations',
+				'message' => 'Moderator assign  successfully'
+			 ]);
+		}
+
+		}
+
+		
+
 	}
 
+
+
+public function update(Request $request ,$id){
+	// dd($request,$id);
+
+}
 
 
 

@@ -2,7 +2,7 @@
     <div class="col-md-12">
         @include('dashboard.inc.message')
 
-        <form id="user-update-form" action="{{ route('admin.user.update', $user->id) }}" method="post">
+        <form id="user-update-form" action="{{ route('admin.student.update', $user->id) }}" method="post">
             @csrf
             @method('PUT')
 

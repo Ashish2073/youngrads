@@ -164,7 +164,7 @@ class ProgramController extends Controller
    * @param  \App\Course  $course
    * @return \Illuminate\Http\Response
    */
-  public function edit($id)
+  public function edit($id)  
   {
     $program = Program::find($id);
     config([

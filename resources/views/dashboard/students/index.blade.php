@@ -78,7 +78,8 @@
                                     <div class="form-group">
                                         <label for="moderator-filter-id">Moderator Id</label>
                                         <select id="moderator-filter-id" name="moderatorid[]" data-live-search="true"
-                                            multiple class=" select form-control apply-filter-student">
+                                            multiple class="select form-control apply-filter-student">
+                                            <option value="0">N/A(Non Assign Student)</option>
 
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
@@ -121,6 +122,7 @@
                                         <select id="moderatorid" name="moderatorid" data-live-search="true"
                                             class=" select form-control">
                                             <option value="" selected disabled>Please Select Moderator</option>
+                                            <option value="0">N/A(Remove Moderator)</option>
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
                                                     <option value="{{ $moderatoruser->id }}">
@@ -156,7 +158,7 @@
 
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-12 ">
+                                {{-- <div class="col-md-3 col-12 ">
                                     <div class="form-group ">
                                         <input class="form-check-input " type="checkbox" value=""
                                             id="nonassignstudents">
@@ -164,7 +166,7 @@
 
 
                                     </div>
-                                </div>
+                                </div> --}}
 
 
 
@@ -237,26 +239,6 @@
                     $(".moderator-checkbox").removeAttr("hidden");
                     $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
                     $("#thead-moderator-checkbox").removeAttr("hidden");
-                    $("#assign-all-student").on('change', function() {
-                        if ($(this).is(':checked')) {
-                            console.log($(this));
-
-                            $(".moderator-checkbox").prop("checked", true);
-
-
-                        } else {
-                            $(".moderator-checkbox").prop("checked", false);
-
-
-
-
-                        }
-                    })
-
-
-
-
-
 
                 } else {
                     $("#studentassigndiv").attr("hidden", true);
@@ -367,9 +349,32 @@
                 'createdRow': function(row, data, dataIndex) {
                     var checkboxCell = $(row).find('.moderator-checkbox').closest('td');
 
+                    var ckeckbox = $(row).find('.moderator-checkbox');
+
+
+                    $("#assign-all-student").on('change', function() {
+                        if ($(this).is(':checked')) {
+                            console.log($(this));
+
+                            ckeckbox.prop("checked", true);
+
+
+                        } else {
+                            ckeckbox.prop("checked", false);
+
+
+
+
+                        }
+                    })
+
 
                     // Hide the cell
                     checkboxCell.attr('hidden', true);
+                    if ($("#studentassigndiv").is(":hidden") == false) {
+                        checkboxCell.attr('hidden', false);
+                        ckeckbox.attr("hidden", false);
+                    }
 
                     $(row).addClass('action-row');
                     let id = data['id'];
@@ -388,33 +393,33 @@
 
 
 
-            $('body').on('click', '.student-edit', function(e) {
-                e.stopPropagation();
-                id = $(this).data('id');
-                $('#dynamic-modal').modal();
-                $('.dynamic-title').text('Update Student Moderator');
+            // $('body').on('click', '.student-edit', function(e) {
+            //     e.stopPropagation();
+            //     id = $(this).data('id');
+            //     $('#dynamic-modal').modal();
+            //     $('.dynamic-title').text('Update Student Moderator');
 
-                $.ajax({
-                    url: "{{ url('admin/students') }}" + "/" + id + "/edit",
-                    beforeSend: function() {
-                        $('.dynamic-body').html("Loading...");
-                    },
-                    success: function(data) {
-                        console.log(data);
-                        $('.dynamic-body').html(data);
+            //     $.ajax({
+            //         url: "{{ url('admin/students') }}" + "/" + id + "/edit",
+            //         beforeSend: function() {
+            //             $('.dynamic-body').html("Loading...");
+            //         },
+            //         success: function(data) {
+            //             console.log(data);
+            //             $('.dynamic-body').html(data);
 
-                    }
-                })
-
-
+            //         }
+            //     })
 
 
 
 
-            });
 
 
-            runScript();
+            // });
+
+
+            // runScript();
 
 
 
