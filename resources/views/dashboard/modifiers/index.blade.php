@@ -1,7 +1,7 @@
 @extends('layouts/contentLayoutMaster')
 
 
-@section('title', 'Modeifires')
+@section('title', 'Modeifiers')
 @section('breadcumb-right')
     <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.modifier.create') }}"
         class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">

@@ -10,7 +10,7 @@ return [
         'route' => 'admin.home',
         'icon_class' => 'fa fa-dashboard',
         'permission' => 'dashboard'
-    ],
+    ], 
     [
         'menu_name' => 'Import Data',
         'route' => 'admin.import.index',
@@ -213,7 +213,7 @@ return [
     //     'icon_class' => 'fa fa-comments-o',
     //     'permission' => 'messages_view'
     // ],
-    // [
+    // [ 
     //     'menu_name' => 'Pages',
     //     'route' => 'admin.pages',
     //     'icon_class' => 'fa fa-pagelines',

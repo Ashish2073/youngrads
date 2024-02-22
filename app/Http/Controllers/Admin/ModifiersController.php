@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Role;
-use App\Models\Modifier;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +20,7 @@ class ModifiersController extends Controller
 
     public function index(Request $request){
 
-        // $users = Modifier::find(10);
+        // $users = Admin::find(10);
 
         // dd( $users->getRoleNames());
     
@@ -28,12 +28,12 @@ class ModifiersController extends Controller
 
             if($request->get('rolename')!=null){
                 $rolename=$request->get('rolename');
-                $users=Modifier::role($rolename)->get();
+                $users=Admin::role($rolename)->get();
 
                 
 
             }else{
-                $users = Modifier::all();
+                $users = Admin::all();
             }
           
             return Datatables::of($users)
@@ -51,7 +51,7 @@ class ModifiersController extends Controller
 
             $roles = Role::where('name','!=','Admin')->select('name', 'id')->get();
         $breadcrumbs = [
-            ['link'=>"admin.home",'name'=>"Dashboard"], ['name'=>"Modifiers Users"]
+            ['link'=>"admin.home",'name'=>"Dashboard"], ['name'=>"admins Users"]
         ];
         return view('dashboard.modifiers.index', compact('breadcrumbs','roles'));
     }
@@ -73,7 +73,7 @@ class ModifiersController extends Controller
         $validations_arr = [
             'first_name' => 'required|max:255',
              'last_name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:modifiers,email',
+            'email' => 'required|email|max:255|unique:admins,email',
             'password' => 'required|min:6|confirmed',
            
         ];
@@ -87,7 +87,7 @@ class ModifiersController extends Controller
             return view('dashboard.modifiers.create', compact('roles'))->withErrors($validator);
         }
 
-        // $user = Modifier::create([
+        // $user = Admin::create([
         //     'first_name' => $request->first_name,
         //     'last_name' => $request->last_name,
         //     'email' => $request->email,
@@ -97,7 +97,7 @@ class ModifiersController extends Controller
        
 
         
-            $user = Modifier::create([
+            $user = Admin::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
@@ -139,7 +139,7 @@ class ModifiersController extends Controller
 
     public function edit($id)
     {
-        $user = Modifier::find($id);
+        $user = Admin::find($id);
         // $roles = Role::pluck('name', 'id');
         $roles = Role::where('name','!=','Admin')->get();
 
@@ -172,14 +172,14 @@ class ModifiersController extends Controller
        
        
  
-        $user =  Modifier::findOrFail($id);
+        $user =  Admin::findOrFail($id);
         $roles = Role::where('name','!=','Admin')->get();
         // $user->role = $user->getRoleNames()[0];
 
         $validations_arr = [
             'first_name' => 'required|max:255',
             'last_name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:modifiers,email,' . $id,
+            'email' => 'required|email|max:255|unique:admins,email,' . $id,
             // 'role' => 'required'
         ];
         if(!empty($request->password)) {
@@ -241,7 +241,7 @@ class ModifiersController extends Controller
 
         // return redirect()->back();
 
-        $user = Modifier::find($id);
+        $user = Admin::find($id);
         $user->delete();
           if($user->save()){
               return response()->json([
@@ -254,7 +254,7 @@ class ModifiersController extends Controller
     }
 
     public function userRoles(Request $request){
-        $user=Modifier::find($request->id);
+        $user=Admin::find($request->id);
        
         return $user->getRoleNames();
 

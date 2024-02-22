@@ -45,6 +45,7 @@ use App\Http\Controllers\Admin\ModifiersController;
 
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -78,7 +79,15 @@ Route::name('auth.')->namespace('Auth')->group(function () {
 });
 
 
+// Modifiers///
+Route::prefix('/modifier')->name('modifier.')->namespace('Modifier')->group(function (){
+    Route::namespace('Auth')->group(function () { 
+        Route::get('/login', [App\Http\Controllers\Modifier\Auth\LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [App\Http\Controllers\Modifier\Auth\LoginController::class, 'login']);
+        Route::post('/logout', [App\Http\Controllers\Modifier\Auth\LoginController::class, 'logout'])->name('logout');
+    });
 
+});
 
 /** 
  * Application Routes
@@ -86,8 +95,8 @@ Route::name('auth.')->namespace('Auth')->group(function () {
  */
 Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     //All the admin routes will be defined here...
-    Route::namespace('Auth')->group(function () {
-
+    Route::namespace('Auth')->group(function () { 
+        
         //Login Routes
         Route::get('/login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'login']);
@@ -103,8 +112,9 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         Route::post('/password/update', [App\Http\Controllers\Admin\Auth\ChangePasswordController::class, 'changePassword'])->name('changepassword')->middleware('auth:admin');
         Route::post('/email/update', [App\Http\Controllers\Admin\Auth\ChangeEmailController::class, 'changeEmail'])->name('changeemail')->middleware('auth:admin');
     });
+    // Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
-    Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
+  Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
 
     // Activities
     Route::resource('/activity', '\App\Http\Controllers\Admin\ActivityController', [
@@ -458,6 +468,8 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
         return view('dashboard.campus.campus_details');
     });
 });
+
+
 
 // Auth::routes(['verify' => true]);
 

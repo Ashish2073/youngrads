@@ -136,8 +136,13 @@
                 <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link"
                         href="#" data-toggle="dropdown">
                         <div class="user-nav d-sm-flex d-none"><span class="user-name text-bold-600">
-                                {{ auth('admin')->user()->first_name . ' ' . auth('admin')->user()->last_name }}</span><span
-                                class="user-status">{{ auth('admin')->user()->getRoleNames()[0] }}</span>
+                                {{ auth('admin')->user()->first_name . ' ' . auth('admin')->user()->last_name }}</span>
+                            @php $roles=auth('admin')->user()->getRoleNames()   @endphp
+                            @php $rolesLength=count($roles); @endphp
+                            @for ($i = 0; $i < $rolesLength; $i++)
+                                <span class="user-status">{{ $roles[$i] }}</span>
+                            @endfor
+
                         </div>
                         <span>
                             {{-- <img class="round pro-image" src="{{ auth('admin')->user()->profileImage() }}"
@@ -163,10 +168,19 @@
                         <a onclick="event.preventDefault();
                 document.getElementById('logout-form').submit();"
                             class="dropdown-item" href="auth-login"><i class="feather icon-power"></i> Logout</a>
-                        <form id="logout-form" action="{{ route('admin.logout') }}" method="POST"
-                            style="display: none;">
-                            @csrf
-                        </form>
+
+
+                        @if (auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                            <form id="logout-form" action="{{ route('admin.logout') }}" method="POST"
+                                style="display: none;">
+                                @csrf
+                            </form>
+                        @else
+                            <form id="logout-form" action="{{ route('modifier.logout') }}" method="POST"
+                                style="display: none;">
+                                @csrf
+                            </form>
+                        @endif
                     </div>
                 </li>
             </ul>

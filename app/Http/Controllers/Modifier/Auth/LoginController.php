@@ -1,26 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Auth;
-
+namespace App\Http\Controllers\Modifier\Auth;
 use Auth; 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 
-class LoginController extends Controller 
-{
-    use ThrottlesLogins;
 
-    public function __construct()
+class LoginController extends Controller
+{
+   
+    use ThrottlesLogins;
+     public function __construct()
     {
         $this->middleware('guest:admin')->except('logout');
         $this->middleware('guest')->except('logout');
     }
-    /**
-     * Show the login form.
-     * 
-     * @return \Illuminate\Http\Response
-     */
+
     public function showLoginForm()
     {
         $pageConfigs = [
@@ -28,20 +24,16 @@ class LoginController extends Controller
             'blankPage' => true
         ];
 
-        return view('dashboard.auth.login', [
+        return view('modifier.auth.login', [
             'pageConfigs' => $pageConfigs
         ]);
     }
 
-    /**
-     * Login the admin.
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+
+
     public function login(Request $request)
     {
-       
+
         $this->validator($request);
 
         //check if the user has too many login attempts.
@@ -53,14 +45,15 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        //attempt login.
-        if (Auth::guard('admin')->attempt($request->only('email', 'password'), $request->filled('remember'))|| (auth()->guard('modifier')->user())) {
+        //attempt login. 
+      
+        if (Auth::guard('admin')->attempt($request->only('username', 'password'), $request->filled('remember'))) {
             //Authenticated
             
-
+        
             return redirect()
                 ->intended(route('admin.home'))
-                ->with('status', 'You are Logged in as Admin!');
+                ->with('status', 'You are Logged in as admin!');
         }
 
         //keep track of login attempts from the user.
@@ -70,48 +63,35 @@ class LoginController extends Controller
         return $this->loginFailed();
     }
 
-    /**
-     * Logout the admin.
-     * 
-     * @return \Illuminate\Http\RedirectResponse
-     */
+
+
     public function logout()
     {
 
         Auth::guard('admin')->logout();
         return redirect()
-            ->route('admin.login')
-            ->with('status', 'Admin has been logged out!');
+            ->route('modifier.login')
+            ->with('status', 'Modifier has been logged out!');
     }
 
-    /**
-     * Validate the form data.
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return 
-     */
     private function validator(Request $request)
     {
         //validation rules.
         $rules = [
-            'email' => 'required|email|exists:admins|min:5|max:191',
+            'username' => 'required|exists:admins|min:5|max:191',
             'password' => 'required|string|min:4|max:255',
         ];
 
         //custom validation error messages.
         $messages = [
-            'email.exists' => 'These credentials do not match our records.',
+            'username.exists' => 'These credentials do not match our records.',
         ];
 
         //validate the request.
         $request->validate($rules, $messages);
     }
 
-    /**
-     * Redirect back after a failed login.
-     * 
-     * @return \Illuminate\Http\RedirectResponse
-     */
+
     private function loginFailed()
     {
         return redirect()
@@ -120,13 +100,12 @@ class LoginController extends Controller
             ->with('error', 'Login failed, please try again!');
     }
 
-    /**
-     * Username used in ThrottlesLogins trait
-     * 
-     * @return string
-     */
+    
     public function username()
     {
-        return 'email';
+        return 'username';
     }
+
+
+   
 }

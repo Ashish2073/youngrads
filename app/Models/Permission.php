@@ -31,7 +31,7 @@ class Permission extends \Spatie\Permission\Models\Permission
             // if (Permission::where(['name' => $permission, 'guard_name' => 'admin'])->count() > 0) {
             //     continue;
             // }
-            if (Permission::where(['name' => $permission, 'guard_name' => 'modifier'])->count() > 0) {
+            if (Permission::where(['name' => $permission, 'guard_name' => 'admin'])->count() > 0) {
                 continue;
             }
             // Permission::create([
@@ -40,7 +40,7 @@ class Permission extends \Spatie\Permission\Models\Permission
             // ]);
             Permission::create([
                 'name' => $permission,
-                'guard_name' => 'modifier'
+                'guard_name' => 'admin'
             ]);
         }
     }

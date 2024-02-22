@@ -64,7 +64,7 @@ class RoleController extends Controller
         }else{
             $role = Role::create([
                 'name' => $request->name,
-                'guard_name' => 'modifier'
+                'guard_name' => 'admin'
             ]);
 
         }

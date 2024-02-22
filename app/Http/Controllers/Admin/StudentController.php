@@ -16,7 +16,7 @@ use App\Models\UserMeta;
 use App\Models\SpecialTest;
 use App\Models\State;
 use App\Models\Test;
-use App\Models\Modifier;
+use App\Models\Admin;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserAcademic;
 use App\Models\UserApplication;
@@ -72,7 +72,7 @@ class StudentController extends Controller
 
 			
 
-				   $users = User::leftJoin('modifiers','modifiers.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','modifiers.username as moderator_username')
+				   $users = User::leftJoin('admins','admins.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')
                              ->whereIn('users.id', ($request->get('id') != null) ? $request->get('id') : [DB::raw('users.id')])
                              ->whereIn('users.email', ($request->get('email') != null) ? $request->get('email') : [DB::raw('users.email')])
 						     ->where(function ($query) use ($request) {
@@ -107,8 +107,8 @@ class StudentController extends Controller
 
 				  }else{
 					
-					$users=User::leftJoin('modifiers','modifiers.id','=','users.moderator_id')
-					->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','modifiers.username as moderator_username')->get();
+					$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
+					->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')->get();
 
 
 				
@@ -170,7 +170,7 @@ class StudentController extends Controller
 			$userPhone=User::select('personal_number')->get();
 
 			
-			$moderator=Modifier::select('id','username')->role('moderator')->get();
+			$moderator=Admin::select('id','username')->role('moderator')->get();
 
 	
 			
@@ -282,7 +282,7 @@ class StudentController extends Controller
 	public function edit($id)  
 	{
 	  $user = User::find($id);
-	  $moderator=Modifier::select('id','username')->role('moderator')->get();
+	  $moderator=Admin::select('id','username')->role('moderator')->get();
 
 
 	  return view('dashboard.students.edit', compact('user','moderator'));

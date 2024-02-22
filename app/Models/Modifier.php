@@ -4,6 +4,7 @@ namespace App\Models;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+
 use App\Notifications\AdminResetPasswordNotification as Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,10 +12,11 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 
-class Modifier extends Model
+class Modifier extends Authenticatable
 {
     use HasFactory;
-    use LogsActivity; 
+    use LogsActivity;  
+   
   
     protected static $logOnlyDirty = true;
     protected $table="modifiers";
