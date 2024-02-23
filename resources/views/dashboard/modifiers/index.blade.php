@@ -8,6 +8,54 @@
         <i class="feather icon-plus"></i>
     </button>
 @endsection
+<style>
+    #userrole {
+        display: flex;
+        gap: 10px;
+        /* text-align: center; */
+        justify-content: center;
+    }
+
+    .role-card-1 {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+        width: 100px;
+        height: 35px;
+        background-color: #ff8510;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        text-align: center;
+
+    }
+
+    .role-card-1 h5 {
+        color: hsl(0deg 25.67% 97.53%);
+    }
+
+    .role-card-1:hover {
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    }
+
+    .close-button {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        cursor: pointer;
+        color: #ff8510;
+        background-color: #f1eaea;
+        width: 15px;
+        height: 15px;
+        transition: top 0.3s ease;
+
+    }
+
+    .close-button:hover {
+        top: -10px;
+        /* Adjust to move the button inside on hover */
+    }
+</style>
 @section('content')
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -21,28 +69,29 @@
                 </div>
                 <div class="modal-body" style="text-align: center;">
                     <!-- Modal content goes here -->
-                    <form id="myForm">
-                        <div class="form-group ">
 
-                            <label for="inputName t-center">
-                                <h2 id="">
-                                    User Roles
-                                </h2>
-                            </label>
+                    <div class="form-group ">
 
-                            {{-- <input type="text" class="form-control" hidden id="modelname" name="name" required
+                        <label for="inputName t-center">
+                            <h2 id="">
+                                User Roles
+                            </h2>
+                        </label>
+
+                        {{-- <input type="text" class="form-control" hidden id="modelname" name="name" required
                                 value=""> --}}
-                        </div>
-                        <div class="form-group">
-                            <label for="positiveNumber">
-                                <h5 id="userrole"></h5>
-                            </label>
+                    </div>
 
-                        </div>
-                        <!-- Add other form fields as needed -->
+                    <label for="positiveNumber" id="userrole">
 
-                        {{-- <button type="button" class="btn btn-primary" id="submitFormApplicationForm">Submit</button> --}}
-                    </form>
+
+                    </label>
+
+
+                    <!-- Add other form fields as needed   -->
+
+                    {{-- <button type="button" class="btn btn-primary" id="submitFormApplicationForm">Submit</button> --}}
+
                 </div>
 
             </div>
@@ -325,7 +374,10 @@
 
                     let userRoleHTML = "";
                     for (let i = 0; i < roleLength; i++) {
-                        userRoleHTML = userRoleHTML + data[i] + ",";
+                        userRoleHTML = userRoleHTML + `<div class="role-card-1">
+                                    <div class="close-button">✖</div>
+                                    <h5>${data[i]}</h5>
+                                </div>`;
 
                     }
 

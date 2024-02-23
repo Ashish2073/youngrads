@@ -112,13 +112,40 @@
                                     <div class="form-group">
                                         <label for="status">Status</label>
                                         <select id="status_filter" name="status[]" data-live-search="true" multiple
-                                            name="status_filter" class='form-control select' id="status-filter">
+                                            name="status_filter" class='form-control select'>
                                             @foreach (config('setting.application.status') as $key => $value)
                                                 <option value="{{ $key }}">{{ $value }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
+
+
+
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="moderator_id">Moderator Id</label>
+                                        <select id="moderator_id" name="moderator_id[]" data-live-search="true" multiple
+                                            class='form-control select'>
+
+                                            @foreach ($moderator as $key => $value)
+                                                <option value="{{ $value->id }}"
+                                                    @if (auth()->guard('admin')->user()->username == $value->username) selected @endif>
+                                                    {{ $value->username }}
+
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
                                 <div class="col-md-4 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
                                     <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit Of
@@ -214,10 +241,12 @@
                                                 <th>Intake</th>
                                                 <th>Status</th>
                                                 <th>Applied Date</th>
+
                                                 {{-- <th>Count</th> --}}
                                                 {{-- <th>Count</th>
                                             --}}
                                                 <th>Message</th>
+                                                <th>Message(Moderator & Admin)</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -400,6 +429,9 @@
             $(".application-filter").find("select").on("change", function() {
                 console.log('gf');
                 console.log($('#program').val());
+
+                console.log($('#moderator_id').val());
+
                 dataTable.draw();
             });
 
@@ -417,6 +449,7 @@
                         d.status = $("#status_filter").val();
                         d.favourite = $("input[name='favourite']").val();
                         d.view = $("input[name='view']").val();
+                        d.moderator_id = $('#moderator_id').val();
                     }
                 },
                 // dom: "tps",
@@ -436,7 +469,7 @@
 
                     },
                     {
-                        name: 'modifiers.username ',
+                        name: 'admins.username ',
                         data: 'moderator_username',
 
 
@@ -476,7 +509,13 @@
                         name: 'count',
                         data: 'count',
                         searchable: false
-                        // "visible":false,
+                        // "visible":false, moderatortoadmincount
+                    },
+                    {
+                        name: 'moderatortoadmincount',
+                        data: 'moderatortoadmincount',
+                        searchable: false
+                        // "visible":false, moderatortoadmincount
                     },
                     {
                         //   name: 'toggle-admin-status',

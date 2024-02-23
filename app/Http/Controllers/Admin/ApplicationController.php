@@ -26,6 +26,7 @@ use App\Models\Program;
 use App\Models\University;
 use App\Models\User; 
 use App\Models\AddDataLimit;
+use App\Models\Admin;
 
 class ApplicationController extends Controller
 {
@@ -44,14 +45,14 @@ class ApplicationController extends Controller
 		];
 
 		$pageConfigs = [
-			//'pageHeader' => false,
+			//'pageHeader' => false, 
 			//'contentLayout' => "content-left-sidebar",
 			'bodyClass' => 'chat-application',
 			'sidebarCollapsed' => true
 		];
 
 
-		
+		     $moderatorusername= auth()->guard('admin')->user()->username;
 
 
 			if((session()->has('used_campus_program'))){
@@ -88,8 +89,12 @@ class ApplicationController extends Controller
 				->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
 				->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 				->join('universities', 'campus.university_id', '=', 'universities.id')
-				->select('intakes.name as intake','admins.username as moderator_username', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))
-				->groupBy('users_applications.id');
+				->select('intakes.name as intake','admins.username as moderator_username', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
+				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"),
+				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && role_name = 'Moderator') as moderatortoadmincount"))
+				 
+				 
+			    ->groupBy('users_applications.id');
 
 				
 
@@ -119,6 +124,11 @@ class ApplicationController extends Controller
 
 		if ($request->has('status')) {
 			$userApplications->whereIn('users_applications.status', $request->status);
+		}
+
+		if ($request->has('moderator_id')) {
+			
+			$userApplications->whereIn('admins.id',$request->moderator_id );
 		}
 
 		switch (request()->get('view')) {
@@ -230,6 +240,39 @@ class ApplicationController extends Controller
 				//     return $row->count;
 
 				//  })
+
+				->editColumn('moderatortoadmincount', function ($row) {
+
+					$html = "<button class='btn btn-icon btn-outline-primary admin-message' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#dynamic-modal' >";
+					// $html .= "<i class='ficon feather icon-bell'></i><span
+					// class='badge badge-pill badge-primary badge-up'>5</span>";
+	
+					$html .= "<i class='ficon feather icon-message-circle'></i>";
+					// $row->count = 5;
+					if ($row->count > 0) {
+						$html .= "<span class=
+            badge badge-pill badge-default badge-up'>$row->count</span>";
+					}
+					$html .= "</button>";
+					// return $html;
+					if ($row->count > 0) {
+						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->count . '</span>';
+					} else {
+						$count = '';
+					}
+					$html = '<div class="avatar bg-primary admin-message" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
+            <div class="avatar-content position-relative">
+              <i class="avatar-icon feather icon-message-circle"></i>
+              ' . $count . '
+            </div>
+          </div>';
+					return $html;
+				})
+
+
+
+
+
 				->editColumn('status', function ($row) {
 
 					if ($row->status == 'pending') {
@@ -244,16 +287,27 @@ class ApplicationController extends Controller
 					$status_meta = config('setting.application.status_meta.' . $row->status);
 					$class = "badge-" . $status_meta['color'];
 					$icon = $status_meta['icon_class'];
-					return "<span class='p-50 badge $class font-weight-bold status' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#apply-model'><i class='$icon'></i> " . config('setting.application.status')[$row->status] . "</span>";
+	 				return "<span class='p-50 badge $class font-weight-bold status' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#apply-model'><i class='$icon'></i> " . config('setting.application.status')[$row->status] . "</span>";
 				})
-				->rawColumns(['favorite', 'toggle_status', 'apply_date', 'name', 'message', 'status', 'campus', 'university','moderator_username', 'program', 'count', 'delete'])
+				->rawColumns(['favorite', 'toggle_status', 'apply_date', 'name', 'message', 'status', 'campus','moderatortoadmincount','university','moderator_username', 'program', 'count', 'delete'])
 				->make(true);
 		} else {
 			$univs = University::all();
 			$programs = Program::all();
 			$campuses = Campus::all();
 			$limitApplyApplication=AddDataLimit::where('model_name','App/Model/AddDataLimit')->where('action','create')->select('count')->get();
-			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses','limitApplyApplication'));
+			
+			if(!in_array('Admin', json_decode(auth('admin')->user()->getRoleNames()))){
+			$moderator=Admin::select('id','username')->where('username',auth()->guard('admin')->user()->username)->role('moderator')->get();
+
+		}else{
+			$moderator=Admin::select('id','username')->role('moderator')->get();
+
+
+		}
+
+
+			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses','limitApplyApplication','moderator'));
 		}
 	}
 

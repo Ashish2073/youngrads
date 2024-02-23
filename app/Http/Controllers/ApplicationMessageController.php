@@ -47,12 +47,27 @@ class ApplicationMessageController extends Controller
 			return back()->withErrors($validator);
 		}
 
+		if (auth('admin')->check()) {
+			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
+               $role="Admin"; 
+			}else{
+				$role="Moderator";
+			}
+			
+		} elseif(auth('web')->check()) {
+			
+			$role="user";
+		}
+
+
+
 
 		$applicationMessage = new ApplicationMessage;
 		$applicationMessage->application_id = $request->id;
 		$applicationMessage->user_id = $request->auth_id;
 		$applicationMessage->message = $request->message;
 		$applicationMessage->guard = $request->gaurd;
+		$applicationMessage->role_name = $role;
 		$applicationMessage->save();
 
 		if (isset($request->document)) {
@@ -97,7 +112,7 @@ class ApplicationMessageController extends Controller
 
 			->leftJoin('message_attachments', 'application_message.id', '=', 'message_attachments.message_id')
 			->leftJoin('files', 'message_attachments.file_id', '=', 'files.id')
-			->select('users.id as user_id', 'users.name as user_name', 'admins.first_name as admin_name', 'users.profile_img as user_img', 'admins.id as admin_id', 'admins.profile_image as admin_img', 'application_message.message', 'application_message.created_at as time', 'application_message.id as id', 'message_attachments.file_id as file_id', 'files.title as file', 'application_message.is_important as is_important', 'application_message.user_id as sent_user_id', 'application_message.guard as guard')
+			->select('users.id as user_id','application_message.role_name','admins.username' ,'users.name as user_name', 'admins.first_name as admin_name', 'users.profile_img as user_img', 'admins.id as admin_id', 'admins.profile_image as admin_img', 'application_message.message', 'application_message.created_at as time', 'application_message.id as id', 'message_attachments.file_id as file_id', 'files.title as file', 'application_message.is_important as is_important', 'application_message.user_id as sent_user_id', 'application_message.guard as guard')
 			->get();
 
 
@@ -112,7 +127,11 @@ class ApplicationMessageController extends Controller
 		return Datatables::of($Messages)
 			// ->orderColumn('time', 'time')
 			->addColumn('html', function ($row) use ($id, $logged_guard) {
+
+
 				$html = "";
+				
+
 				$name = ($row->user_name) ? $row->user_name : $row->admin_name;
 				$avtar = $name[0];
 				$userId = ($row->user_id) ? $row->user_id : $row->admin_id;
@@ -196,7 +215,7 @@ class ApplicationMessageController extends Controller
 				$join->on('admins.id', '=', 'application_message.user_id')
 					->where('application_message.guard', '=', 'admin');
 			})
-			->select('files.title as file', 'users.name as user_name', 'admins.first_name as admin_name', 'application_message.created_at as time')
+			->select('files.title as file','application_message.role_name as rolename', 'users.name as user_name', 'admins.first_name as admin_name', 'application_message.created_at as time')
 			->get();
 
 		return $attachments;

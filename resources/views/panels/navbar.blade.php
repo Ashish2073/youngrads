@@ -155,8 +155,11 @@
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="{{ route('admin.profile', auth('admin')->user()->id) }}"><i
-                                class="feather icon-user"></i> Edit Profile</a>
+                        @if (auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                            <a class="dropdown-item"
+                                href="{{ route('admin.profile', auth('admin')->user()->id) }}"><i
+                                    class="feather icon-user"></i> Edit Profile</a>
+                        @endif
                         <a class="dropdown-item" href="{{ route('home') }}"><i class="feather icon-user"></i> Visit
                             Site</a>
                         <a class="dropdown-item d-none" href="app-email"><i class="feather icon-mail"></i> My
