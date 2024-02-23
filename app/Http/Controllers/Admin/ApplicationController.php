@@ -90,8 +90,8 @@ class ApplicationController extends Controller
 				->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 				->join('universities', 'campus.university_id', '=', 'universities.id')
 				->select('intakes.name as intake','admins.username as moderator_username', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
-				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"),
-				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && role_name = 'Moderator') as moderatortoadmincount"))
+				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='0') as count"),
+				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='1') as moderatortoadmincount"))
 				 
 				 
 			    ->groupBy('users_applications.id');
@@ -218,7 +218,7 @@ class ApplicationController extends Controller
 					$html .= "<i class='ficon feather icon-message-circle'></i>";
 					// $row->count = 5;
 					if ($row->count > 0) {
-						$html .= "<span class=
+						$html .= "<span class= 
             badge badge-pill badge-default badge-up'>$row->count</span>";
 					}
 					$html .= "</button>";
@@ -228,7 +228,7 @@ class ApplicationController extends Controller
 					} else {
 						$count = '';
 					}
-					$html = '<div class="avatar bg-primary admin-message" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
+					$html = '<div class="avatar bg-primary admin-message" data-custom="0" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
             <div class="avatar-content position-relative">
               <i class="avatar-icon feather icon-message-circle"></i>
               ' . $count . '
@@ -249,18 +249,18 @@ class ApplicationController extends Controller
 	
 					$html .= "<i class='ficon feather icon-message-circle'></i>";
 					// $row->count = 5;
-					if ($row->count > 0) {
+					if ($row->moderatortoadmincount > 0) {
 						$html .= "<span class=
-            badge badge-pill badge-default badge-up'>$row->count</span>";
+            badge badge-pill badge-default badge-up'>$row->moderatortoadmincount</span>";
 					}
 					$html .= "</button>";
 					// return $html;
-					if ($row->count > 0) {
-						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->count . '</span>';
+					if ($row->moderatortoadmincount > 0) {
+						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->moderatortoadmincount . '</span>';
 					} else {
 						$count = '';
 					}
-					$html = '<div class="avatar bg-primary admin-message" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
+					$html = '<div class="avatar bg-primary admin-message" data-custom="1" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
             <div class="avatar-content position-relative">
               <i class="avatar-icon feather icon-message-circle"></i>
               ' . $count . '

@@ -17,18 +17,19 @@
 @section('content')
     <section id="basic-datatable">
         <div class="row align-items-center mb-2">
-          <div class="col-md-3 col-12">
-            <div class="form-group">
-              <label for="intake">Program Name</label>
-              <select data-style="bg-white border-light" class="select form-control" name="program" id="campus-program">
-                  <option value="">All Programs</option>
-                  @foreach ($programs as $program)
-                      <option {{ request()->get('id') == $program->campus_program_id ? 'selected' : '' }}
-                          value="{{ $program->campus_program_id }}">{{ \Str::limit($program->program, 40, "...") }}</option>
-                  @endforeach
-              </select>
-          </div>
-          </div>
+            <div class="col-md-3 col-12">
+                <div class="form-group">
+                    <label for="intake">Program Name</label>
+                    <select data-style="bg-white border-light" class="select form-control" name="program" id="campus-program">
+                        <option value="">All Programs</option>
+                        @foreach ($programs as $program)
+                            <option {{ request()->get('id') == $program->campus_program_id ? 'selected' : '' }}
+                                value="{{ $program->campus_program_id }}">{{ \Str::limit($program->program, 40, '...') }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-3 col-12">
                 <div class="form-group">
                     <label for="intake">Intake</label>
@@ -48,7 +49,8 @@
                     <select data-style="bg-white border-light" class="select form-control" name="year" id="year">
                         <option value="">All Years</option>
                         @foreach ($years as $year)
-                            <option {{ request()->get('year') == $year->year ? 'selected' : '' }} value="{{ $year->year }}">
+                            <option {{ request()->get('year') == $year->year ? 'selected' : '' }}
+                                value="{{ $year->year }}">
                                 {{ $year->year }}</option>
                         @endforeach
                     </select>
@@ -110,7 +112,7 @@
                 "processing": true,
                 "serverSide": true,
                 ajax: {
-                    url: "{{route('applications')}}",
+                    url: "{{ route('applications') }}",
                     data: function(d) {
                         d.id = $('#campus-program').val();
                         d.intake = $("select[name='intake']").val();
@@ -122,16 +124,16 @@
                     [6, "desc"]
                 ],
                 columns: [
-                  // {
-                  //       name: 'campus.name',
-                  //       data: 'campus'
-                  //   },
+                    // {
+                    //       name: 'campus.name',
+                    //       data: 'campus'
+                    //   },
                     {
                         name: 'users_applications.application_number',
                         data: 'application_number'
                     },
                     {
-                         name: 'universities.name',
+                        name: 'universities.name',
                         data: 'university'
                     },
                     {
@@ -211,9 +213,16 @@
             $(document).on('click', '.user-message', function() {
 
                 $('.dynamic-title').text('Chat with us');
+                message_scenario = $(this).attr("data-custom");
                 id = $(this).data('id');
                 $.ajax({
-                    url: "{{url('application')}}"+"/"+id+"/"+"message",
+                    url: "{{ url('application') }}" + "/" + id + "/" + "message",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        message_scenario: message_scenario,
+
+                    },
+
                     success: function(data) {
                         $('.dynamic-body').html(data);
                         initMessageScript(id);
@@ -226,13 +235,10 @@
             });
 
             $("select[name='intake'], select[name='year'], select[name='program']").change(function() {
-              dataTable.draw();
+                dataTable.draw();
             });
 
 
         });
-
-        
-
     </script>
 @endsection

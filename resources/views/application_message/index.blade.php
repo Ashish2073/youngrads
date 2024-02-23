@@ -43,8 +43,11 @@
                         <p class="text-danger">{{ $message }}</p>
                     @enderror
                 </div>
+
                 <input type="hidden" name=""><input type="hidden" name="auth_id" value="{{ $auth }}">
                 <input type="hidden" name=""><input type="hidden" name="gaurd" value="{{ $gaurd }}">
+                <input type="hidden" id="message_scenario" name="message_scenario"
+                    value="{{ request()->get('message_scenario') }}">
                 @error('document')
                     <p class="text-danger">{{ $message }}</p>
                 @enderror
@@ -62,9 +65,12 @@
             </table>
         </div>
     </div>
+    @php  $message_scenario=request()->get('message_scenario')  @endphp
     <div class="tab-pane" id="attachment" role="tabpanel" aria-labelledby="profile-tab-fill">
 
-        @include('application_message.attachment', ['attachments' => $attachment::sharedAttachment($id)])
+        @include('application_message.attachment', [
+            'attachments' => $attachment::sharedAttachment($message_scenario, $id),
+        ])
 
     </div>
 </div>
@@ -100,6 +106,7 @@
             ajax: {
                 url: "{{ url('application/message/all') }}" + "/" + id,
                 data: function(d) {
+                    d.message_scenario = $('#message_scenario').val();
 
                 }
             },

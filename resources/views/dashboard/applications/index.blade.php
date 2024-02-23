@@ -245,7 +245,7 @@
                                                 {{-- <th>Count</th> --}}
                                                 {{-- <th>Count</th>
                                             --}}
-                                                <th>Message</th>
+                                                <th>Message(Moderator & Admin & User)</th>
                                                 <th>Message(Moderator & Admin)</th>
                                                 <th>Action</th>
                                             </tr>
@@ -719,9 +719,17 @@
 
             $(document).on('click', '.admin-message', function() {
                 $('.dynamic-title').text('');
+                message_scenario = $(this).attr("data-custom");
+                console.log(message_scenario);
                 id = $(this).data('id');
                 $.ajax({
                     url: "{{ url('admin/application') }}" + "/" + id + "/" + "message",
+                    method: "GET",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        message_scenario: message_scenario,
+
+                    },
                     beforeSend: function() {
                         $(".dynamic-apply").html("");
                         $(".dynamic-body").html("");

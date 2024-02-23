@@ -68,6 +68,8 @@ class ApplicationMessageController extends Controller
 		$applicationMessage->message = $request->message;
 		$applicationMessage->guard = $request->gaurd;
 		$applicationMessage->role_name = $role;
+		$applicationMessage->message_scenario = $request->message_scenario;
+		
 		$applicationMessage->save();
 
 		if (isset($request->document)) {
@@ -96,8 +98,9 @@ class ApplicationMessageController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function showMessages($id)
+	public function showMessages(Request $request,$id)
 	{
+ 
 
 
 		$Messages = ApplicationMessage::where('application_id', '=', $id)
@@ -113,6 +116,7 @@ class ApplicationMessageController extends Controller
 			->leftJoin('message_attachments', 'application_message.id', '=', 'message_attachments.message_id')
 			->leftJoin('files', 'message_attachments.file_id', '=', 'files.id')
 			->select('users.id as user_id','application_message.role_name','admins.username' ,'users.name as user_name', 'admins.first_name as admin_name', 'users.profile_img as user_img', 'admins.id as admin_id', 'admins.profile_image as admin_img', 'application_message.message', 'application_message.created_at as time', 'application_message.id as id', 'message_attachments.file_id as file_id', 'files.title as file', 'application_message.is_important as is_important', 'application_message.user_id as sent_user_id', 'application_message.guard as guard')
+			->where('application_message.message_scenario',$request->get('message_scenario'))
 			->get();
 
 
@@ -202,7 +206,7 @@ class ApplicationMessageController extends Controller
 
 
 
-	public static function sharedAttachment($id)
+	public static function sharedAttachment($message_scenario,$id)
 	{
 		$attachments = ApplicationMessage::where('application_id', '=', $id)
 			->join('message_attachments', 'application_message.id', '=', 'message_attachments.message_id')
@@ -216,8 +220,9 @@ class ApplicationMessageController extends Controller
 					->where('application_message.guard', '=', 'admin');
 			})
 			->select('files.title as file','application_message.role_name as rolename', 'users.name as user_name', 'admins.first_name as admin_name', 'application_message.created_at as time')
+			->where('application_message.message_scenario',$message_scenario)
 			->get();
-
+ 
 		return $attachments;
 	}
 }

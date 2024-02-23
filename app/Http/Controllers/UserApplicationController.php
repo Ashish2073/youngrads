@@ -246,7 +246,7 @@ class UserApplicationController extends Controller
 						} else {
 							$count = '';
 						}
-						$html .= '<div class="avatar bg-primary user-message" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
+						$html .= '<div class="avatar bg-primary user-message" data-custom="0" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
 							<div class="avatar-content position-relative">
 							<i class="avatar-icon feather icon-message-circle"></i>
 							' . $count . '
