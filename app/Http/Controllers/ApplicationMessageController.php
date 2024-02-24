@@ -49,9 +49,9 @@ class ApplicationMessageController extends Controller
 
 		if (auth('admin')->check()) {
 			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
-               $role="Admin"; 
+               $role="admin"; 
 			}else{
-				$role="Moderator";
+				$role="moderator";
 			}
 			
 		} elseif(auth('web')->check()) {
@@ -224,5 +224,5 @@ class ApplicationMessageController extends Controller
 			->get();
  
 		return $attachments;
-	}
+	} 
 }

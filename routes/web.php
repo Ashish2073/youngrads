@@ -564,6 +564,9 @@ Route::resource('other-document', '\App\Http\Controllers\OtherDocumentController
 Route::get('shortlist-programs', [UserShortlistProgramController::class, 'index'])->name('shortlist-programs');
 Route::post('shortlist-programs-add', [UserShortlistProgramController::class, 'addProgram'])->name('shortlist-programs-add');
 Route::post('shortlist-programs-remove', [UserShortlistProgramController::class, 'removeProgram'])->name('shortlist-programs-remove');
+ 
+
+
 //auto complete ajax
 Route::get('/country-auto', [CourseFinderController::class, 'countryAutoComplete'])->name('country-auto');
 Route::get('/program-auto', [CourseFinderController::class, 'programAutoComplete'])->name('program-auto');

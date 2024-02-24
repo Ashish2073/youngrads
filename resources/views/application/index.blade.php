@@ -56,6 +56,29 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-3 col-12">
+                <div class="form-group">
+                    <label for="application_id">Application Id</label>
+                    <select data-style="bg-white border-light" class="select form-control" name="application_id[]"
+                        data-live-search="true" name="application_id" multiple id="application_id">
+
+                        @if (session()->has('application_id_message'))
+                            @php $application_id_message=session()->get('application_id_message'); @endphp
+                        @else
+                            @php $application_id_message = [] ;@endphp
+                        @endif
+
+                        @foreach ($application_numbers as $application_number)
+                            <option
+                                {{ request()->get('application_id') == $application_number->id || in_array($application_number->id, $application_id_message) ? 'selected' : '' }}
+                                value="{{ $application_number->id }}">
+                                {{ $application_number->application_number }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+
             <div class="col-md-3 col-12 text-right">
                 <button class="btn  btn-outline-primary clear-filter">Clear</button>
             </div>
@@ -63,7 +86,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    {{-- <div class="card-header">
+                    {{-- <div class="card-header"> application_number
 
                     </div> --}}
                     <div class="card-content">
@@ -98,12 +121,45 @@
 @section('page-script')
     <!-- Page js files -->
 
+
+
     <script src="{{ asset(mix('js/scripts/pages/app-chat.js')) }}"></script>
     <script>
         $(document).ready(function() {
+
+
+
+
+            $("#showlatestmessage").click(function() {
+
+
+                let applictionIdLatestMessage = "";
+                console.log(typeof($(this).data('id')));
+                if ((typeof(($(this).data('id'))) == 'number')) {
+                    applictionIdLatestMessage = [parseInt($(this).data('id'))];
+                } else {
+
+                    applictionIdLatestMessage = $(this).data('id').split(',');
+                }
+
+
+
+
+
+                $("#application_id").val(applictionIdLatestMessage);
+                $(".select").selectpicker('refresh');
+                dataTable.draw();
+
+
+
+            });
+
+
+
             $(".select").selectpicker();
             $(".clear-filter").click(function() {
-                $("select[name='intake'], select[name='year'],select[name='program']").val("");
+                $("select[name='intake'], select[name='year'],select[name='program'],select[name='application_id[]']")
+                    .val("");
                 $(".select").selectpicker('refresh');
                 dataTable.draw();
             })
@@ -117,6 +173,7 @@
                         d.id = $('#campus-program').val();
                         d.intake = $("select[name='intake']").val();
                         d.year = $("select[name='year']").val();
+                        d.application_id = $("#application_id").val();
                     }
                 },
                 //dom: "tps",
@@ -234,9 +291,11 @@
                 dataTable.draw('page');
             });
 
-            $("select[name='intake'], select[name='year'], select[name='program']").change(function() {
-                dataTable.draw();
-            });
+            $("select[name='intake'], select[name='year'], select[name='program'],select[name='application_id[]']")
+                .change(function() {
+
+                    dataTable.draw();
+                });
 
 
         });

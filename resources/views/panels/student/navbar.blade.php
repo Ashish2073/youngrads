@@ -97,7 +97,8 @@
                                     class="white darken-2">My Messages</span>
                             </div>
                         </li>
-                        @foreach ($messageUnreadData as $data)
+                        @php   $application_id=[]; @endphp
+                        @foreach ($messageUnreadData as $k => $data)
                             <li class="scrollable-container media-list">
                                 <a class="d-flex justify-content-between" href="javascript:void(0)">
                                     <div class="media d-flex align-items-start">
@@ -105,26 +106,52 @@
                                                 class="ficon feather icon-message-square font-medium-5 primary"></i>
                                         </div>
                                         <div class="media-body">
+                                            @php $application_id[$k]=$data->application_id; @endphp
 
                                             <h6 class="primary media-heading">{{ $data->application_number }}!
                                             </h6>
+
 
                                             <small class="notification-text">
                                                 {{ \Str::limit($data->message, 40, '....') }}</small>
                                         </div>
                                         <small>
-                                            <time class="media-meta" datetime="2015-06-11T18:29:20+08:00">9
-                                                hours
-                                                ago
+                                            <time class="media-meta" datetime="2015-06-11T18:29:20+08:00">
+
+                                                @php
+
+                                                    $formattedTime = \Carbon\Carbon::parse($data->time)->diffForHumans();
+                                                @endphp
+                                                {{ $formattedTime }}
+                                                {{-- {{ \Carbon\Carbon::parse($data->time)->diffForHumans() }}
+                                                {{ date('d M Y h:i A', strtotime($data->time)) }} --}}
                                             </time>
                                         </small>
                                     </div>
                                 </a>
                             </li>
                         @endforeach
-                        <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
-                                href="javascript:void(0)">Read
-                                all Messages</a></li>
+
+
+                        @php session()->put('application_id_message', $application_id) ; @endphp
+
+                        @if ($messageUnreadData->sum('count') > 0)
+                            @if (\Request::segment(1) != 'applications')
+                                <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
+                                        href="{{ url('applications') }}">Read
+                                        all Messages</a></li>
+                            @endif
+                            @if (\Request::segment(1) == 'applications')
+                                <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
+                                        data-id="{{ implode(',', $application_id) }}" id="showlatestmessage"
+                                        href="javascript:void(0)">Read all
+                                        Message</a></li>
+                            @endif
+                        @else
+                            <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
+                                    href="javascript:void(0)">No new Message</a></li>
+
+                        @endif
                     </ul>
                 </li>
                 <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link"

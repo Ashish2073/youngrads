@@ -52,7 +52,20 @@ class ApplicationController extends Controller
 		];
 
 
-		     $moderatorusername= auth()->guard('admin')->user()->username;
+		if (auth('admin')->check()) {
+			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
+               $role="admin"; 
+			}else{
+				$role="moderator";
+			}
+			
+		} elseif(auth('web')->check()) {
+			
+			$role="user";
+		}
+
+
+		   
 
 
 			if((session()->has('used_campus_program'))){
@@ -71,7 +84,9 @@ class ApplicationController extends Controller
 			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
 			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 			->join('universities', 'campus.university_id', '=', 'universities.id')
-			->select('intakes.name as intake','admins.username as moderator_username','users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))
+			->select('intakes.name as intake','admins.username as moderator_username','users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
+			DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='0' && role_name !='".$role."') as count"),
+			DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='1' && role_name !='".$role."') as moderatortoadmincount"))
 			->where('campus.university_id','=',$usedCampusProgramUniversityId)
 			->where('campus_programs.campus_id','=',$usedCampusProgramCampusId)
 			->where('campus_programs.program_id','=',$usedCampusProgramId)
@@ -90,8 +105,8 @@ class ApplicationController extends Controller
 				->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 				->join('universities', 'campus.university_id', '=', 'universities.id')
 				->select('intakes.name as intake','admins.username as moderator_username', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
-				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='0') as count"),
-				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='1') as moderatortoadmincount"))
+				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='0' && role_name !='".$role."') as count"),
+				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='1' && role_name !='".$role."') as moderatortoadmincount"))
 				 
 				 
 			    ->groupBy('users_applications.id');

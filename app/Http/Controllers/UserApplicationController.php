@@ -163,13 +163,28 @@ class UserApplicationController extends Controller
 			'bodyClass' => 'chat-application',
 		];
 
+		if (auth('admin')->check()) {
+			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
+               $role="admin"; 
+			}else{
+				$role="moderator";
+			}
+			
+		} elseif(auth('web')->check()) {
+			
+			$role="user";
+		}
+
+
+
+
 		$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
 			->join('campus_programs', 'users_applications.campus_program_id', '=', 'campus_programs.id')
 			->join('intakes', 'users_applications.intake_id', '=', 'intakes.id')
 			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
 			->join('universities', 'campus.university_id', '=', 'universities.id')
 			->join('programs', 'campus_programs.program_id', "=", 'programs.id');
-		$userApplications->select('intakes.name as intake', 'users_applications.campus_program_id', 'users_applications.application_number', 'users_applications.id', 'users_applications.year', 'status', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id) as count"))->where('users_applications.user_id', '=', Auth::id());
+		$userApplications->select('intakes.name as intake', 'users_applications.campus_program_id', 'users_applications.application_number', 'users_applications.id', 'users_applications.year', 'status', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && role_name !='".$role."') as count"))->where('users_applications.user_id', '=', Auth::id());
    
 		
 
@@ -190,18 +205,37 @@ class UserApplicationController extends Controller
 			$userApplications->where('users_applications.year', '=', $request->year);
 		}
 
+		if(isset($request->application_id)){
+
+		
+			$userApplications->whereIn('users_applications.id',$request->application_id);
+			
+
+		}
+
 		$result = $userApplications->get();
 
 		$intakes = Intake::join('users_applications', 'users_applications.intake_id', '=', 'intakes.id')
 			->where('user_id', auth()->user()->id)
 			->groupBy('users_applications.intake_id')->get();
+
+
+
+
+        $application_numbers=UserApplication::where('user_id', auth()->user()->id)->select('id','application_number')->get();
+
 		$years = UserApplication::where('user_id', auth()->user()->id)->groupBy('year')->get();
 
 
 		if (request()->ajax()) {
+			session()->forget('application_id_message');
+
 			return Datatables::of($userApplications)
 
+			    
+
 				->editColumn('university', function ($row) {
+					
 					return tooltip(Str::limit($row->university, 40, '...'), $row->university);
 				})
 				->editColumn('program', function ($row) {
@@ -258,7 +292,7 @@ class UserApplicationController extends Controller
 				->rawColumns(['apply_date', 'name', 'id', 'action', 'status', 'university', 'program', 'campus', 'count', 'programs', 'intakes', 'years'])
 				->make(true);
 		} else {
-			return view('application.index', compact('breadcrumbs', 'pageConfigs', 'intakes', 'years', 'programs'));
+			return view('application.index', compact('breadcrumbs', 'pageConfigs', 'intakes', 'years', 'programs','application_numbers'));
 		}
 	}
 
