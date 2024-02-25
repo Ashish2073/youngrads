@@ -54,12 +54,21 @@ class ApplicationController extends Controller
 
 		if (auth('admin')->check()) {
 			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
-               $role="admin"; 
+               $userid=auth('admin')->user()->username;
+			   $message_status_type="admin_message_status";
+			   $role="admin" ;
+
+
+			   
 			}else{
+				$userid=auth('admin')->user()->username;
+				$message_status_type="moderator_message_status";
 				$role="moderator";
 			}
 			
 		} elseif(auth('web')->check()) {
+			$userid=Auth::id();
+			$message_status_type="user_message_status";
 			
 			$role="user";
 		}
@@ -85,14 +94,14 @@ class ApplicationController extends Controller
 			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 			->join('universities', 'campus.university_id', '=', 'universities.id')
 			->select('intakes.name as intake','admins.username as moderator_username','users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
-			DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='0' && role_name !='".$role."') as count"),
-			DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='1' && role_name !='".$role."') as moderatortoadmincount"))
+			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "'  && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='0')) as count"),
+			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1' )) as moderatortoadmincount"))
 			->where('campus.university_id','=',$usedCampusProgramUniversityId)
 			->where('campus_programs.campus_id','=',$usedCampusProgramCampusId)
 			->where('campus_programs.program_id','=',$usedCampusProgramId)
 			->groupBy('users_applications.id');
 			    
-		
+		    
 
 			}else{
 
@@ -105,8 +114,8 @@ class ApplicationController extends Controller
 				->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 				->join('universities', 'campus.university_id', '=', 'universities.id')
 				->select('intakes.name as intake','admins.username as moderator_username', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
-				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='0' && role_name !='".$role."') as count"),
-				 DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && message_scenario='1' && role_name !='".$role."') as moderatortoadmincount"))
+				 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='0')) as count"),
+				 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1')) as moderatortoadmincount"))
 				 
 				 
 			    ->groupBy('users_applications.id');
@@ -328,9 +337,33 @@ class ApplicationController extends Controller
 
 	public function applicationMessage($id)
 	{
-		$messageStatis = ApplicationMessage::where('user_id', '!=', Auth::id())->where('application_id', '=', $id)->update(['message_status' => 'read']);
+		if (auth('admin')->check()) {
+			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
+               $userid=auth('admin')->user()->username;
+			   $message_status_type="admin_message_status";
+			   $role="admin" ;
+			   $messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['admin_message_status' => 'read']);
+			}else{
+				$userid=auth('admin')->user()->username;
+				$message_status_type="moderator_message_status";
+				$role="moderator";
+				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['moderator_message_status' => 'read']);
+			}
+			
+		} elseif(auth('web')->check()) {
+			$userid=Auth::id();
+			$message_status_type="user_message_status";
+			
+			$role="user";
+			$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['user_message_status' => 'read']);
+		}
+		
 
-		return view('application_message.index', ['id' => $id, 'gaurd' => 'admin', 'auth' => Auth::id()]);
+
+
+		
+
+		return view('application_message.index', ['id' => $id, 'gaurd' => 'admin', 'auth' =>$userid ]);
 	}
 
 	public function status($id)
@@ -602,7 +635,7 @@ class ApplicationController extends Controller
 
 
  
-
+ 
 	}
 
 	public function get_student_application_data()

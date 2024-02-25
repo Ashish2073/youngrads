@@ -73,16 +73,18 @@
                     </div>
                 </li>
 
+
+
                 @php $messageUnreadData=\App\Models\Admin::getunreadmessage(); @endphp
                 <li class="dropdown dropdown-notification nav-item "><a class="nav-link nav-link-label" href="#"
                         data-toggle="dropdown"><i class="ficon feather icon-message-square">A&M&U</i><span
-                            class="badge badge-pill badge-primary badge-up">{{ $messageUnreadData->sum('count') }}</span></a>
+                            class="badge badge-pill badge-primary badge-up">{{ $messageUnreadData->count() }}</span></a>
                     <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
                         <li class="dropdown-menu-header">
                             <div class="dropdown-header m-0 p-2">
 
 
-                                <h3 class="white">{{ $messageUnreadData->sum('count') }} New</h3><span
+                                <h3 class="white">{{ $messageUnreadData->count() }} New</h3><span
                                     class="white darken-2">My Messages</span>
                             </div>
                         </li>
@@ -125,15 +127,16 @@
 
                         @php session()->put('application_id_message', $application_id) ; @endphp
 
-                        @if ($messageUnreadData->sum('count') > 0)
-                            @if (\Request::segment(1) != 'applications')
+                        @if ($messageUnreadData->count() > 0)
+                            @if (\Request::segment(2) != 'applications-all')
                                 <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
-                                        href="javascript:void(0)">Read
+                                        href="{{ url('admin/applications-all') }}">Read
                                         all Messages</a></li>
                             @endif
-                            @if (\Request::segment(1) == 'applications')
+                            @if (\Request::segment(2) == 'applications-all')
                                 <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
-                                        data-id="" id="showlatestmessage" href="javascript:void(0)">Read all
+                                        data-id="{{ implode(',', $application_id) }}" id="showlatestmessage"
+                                        href="javascript:void(0)">Read all
                                         Message</a></li>
                             @endif
                         @else
@@ -144,61 +147,74 @@
                     </ul>
                 </li>
 
+
+                @php $messageadminmoderatorUnreadData=\App\Models\Admin::getadminmoderatorunreadmessage(); @endphp
                 <li class="dropdown dropdown-notification nav-item "><a class="nav-link nav-link-label"
                         href="#" data-toggle="dropdown"><i
                             class="ficon feather icon-message-square">A&M</i><span
-                            class="badge badge-pill badge-primary badge-up"></span></a>
+                            class="badge badge-pill badge-primary badge-up">{{ $messageadminmoderatorUnreadData->count() }}</span></a>
                     <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
                         <li class="dropdown-menu-header">
                             <div class="dropdown-header m-0 p-2">
 
 
-                                <h3 class="white"> New</h3><span class="white darken-2">My Messages</span>
+                                <h3 class="white">{{ $messageadminmoderatorUnreadData->count() }} New</h3><span
+                                    class="white darken-2">My Messages</span>
                             </div>
                         </li>
+                        @php   $application_moderator_admin_id=[]; @endphp
+                        @foreach ($messageadminmoderatorUnreadData as $k => $data)
+                            <li class="scrollable-container media-list">
+                                <a class="d-flex justify-content-between" href="javascript:void(0)">
+                                    <div class="media d-flex align-items-start">
+                                        <div class="media-left"><i
+                                                class="ficon feather icon-message-square font-medium-5 primary"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            @php $application_moderator_admin_id[$k]=$data->application_id; @endphp
 
-                        <li class="scrollable-container media-list">
-                            <a class="d-flex justify-content-between" href="javascript:void(0)">
-                                <div class="media d-flex align-items-start">
-                                    <div class="media-left"><i
-                                            class="ficon feather icon-message-square font-medium-5 primary"></i>
-                                    </div>
-                                    <div class="media-body">
+                                            <h6 class="primary media-heading">
+                                                {{ $data->application_number }}!
+                                            </h6>
 
 
-                                        <h6 class="primary media-heading">
-                                        </h6>
+                                            <small class="notification-text">
+                                                {{ \Str::limit($data->message, 40, '....') }}
+                                            </small>
+                                        </div>
+                                        <small>
+                                            <time class="media-meta" datetime="2015-06-11T18:29:20+08:00">
+                                                @php
 
+                                                    $formattedTime = \Carbon\Carbon::parse($data->time)->diffForHumans();
+                                                @endphp
+                                                {{ $formattedTime }}
 
-                                        <small class="notification-text">
+                                                {{-- {{ \Carbon\Carbon::parse($data->time)->diffForHumans() }}
+                                        {{ date('d M Y h:i A', strtotime($data->time)) }} --}}
+                                            </time>
                                         </small>
                                     </div>
-                                    <small>
-                                        <time class="media-meta" datetime="2015-06-11T18:29:20+08:00">
-
-
-                                            {{-- {{ \Carbon\Carbon::parse($data->time)->diffForHumans() }}
-                                        {{ date('d M Y h:i A', strtotime($data->time)) }} --}}
-                                        </time>
-                                    </small>
-                                </div>
-                            </a>
-                        </li>
-
-
-
-                        <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
-                                href="javascript:void(0)">Read
-                                all Messages</a></li>
-
-                        <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center" data-id=""
-                                id="showlatestmessage" href="javascript:void(0)">Read all
-                                Message</a></li>
-
-
-                        <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
-                                href="javascript:void(0)">No new Message</a></li>
-
+                                </a>
+                            </li>
+                        @endforeach
+                        @php session()->put('application_moderator_admin_id', $application_moderator_admin_id) ; @endphp
+                        @if ($messageUnreadData->sum('count') > 0)
+                            @if (\Request::segment(2) != 'applications-all')
+                                <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
+                                        href="{{ url('admin/applications-all') }}">Read
+                                        all Messages</a></li>
+                            @endif
+                            @if (\Request::segment(2) == 'applications-all')
+                                <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
+                                        data-id="{{ implode(',', $application_moderator_admin_id) }}"
+                                        id="showadminmoderatorlatestmessage" href="javascript:void(0)">Read all
+                                        Message</a></li>
+                            @endif
+                        @else
+                            <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
+                                    href="javascript:void(0)">No new Message</a></li>
+                        @endif
 
                     </ul>
                 </li>

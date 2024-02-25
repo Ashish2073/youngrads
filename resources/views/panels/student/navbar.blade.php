@@ -87,13 +87,13 @@
                 @php $messageUnreadData=\App\Models\User::getunreadmessage(); @endphp
                 <li class="dropdown dropdown-notification nav-item "><a class="nav-link nav-link-label"
                         href="#" data-toggle="dropdown"><i class="ficon feather icon-message-square"></i><span
-                            class="badge badge-pill badge-primary badge-up">{{ $messageUnreadData->sum('count') }}</span></a>
+                            class="badge badge-pill badge-primary badge-up">{{ $messageUnreadData->count() }}</span></a>
                     <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
                         <li class="dropdown-menu-header">
                             <div class="dropdown-header m-0 p-2">
 
 
-                                <h3 class="white">{{ $messageUnreadData->sum('count') }} New</h3><span
+                                <h3 class="white">{{ $messageUnreadData->count() }} New</h3><span
                                     class="white darken-2">My Messages</span>
                             </div>
                         </li>
@@ -135,7 +135,7 @@
 
                         @php session()->put('application_id_message', $application_id) ; @endphp
 
-                        @if ($messageUnreadData->sum('count') > 0)
+                        @if ($messageUnreadData->count() > 0)
                             @if (\Request::segment(1) != 'applications')
                                 <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
                                         href="{{ url('applications') }}">Read

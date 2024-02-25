@@ -511,28 +511,39 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public static  function getunreadmessage()
     {
+    
+
+        
         if (auth('admin')->check()) {
 			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
-               $role="admin"; 
+               $userid=auth('admin')->user()->username;
+			   $message_status_type="admin_message_status";
+			   $role="admin" ;
 			}else{
+				$userid=auth('admin')->user()->username;
+				$message_status_type="moderator_message_status";
 				$role="moderator";
 			}
 			
 		} elseif(auth('web')->check()) {
+			$userid=Auth::id();
+			$message_status_type="user_message_status";
 			
 			$role="user";
 		}
        
        
        $userunreadMessage=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
-       ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id  && role_name !='".$role."') as count"),
-       )->where('users_applications.user_id', '=', Auth::id())
-      
-       ->where('message_status','unread')->where('message_scenario','0')
+       ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', 
+       DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "'&& application_message.user_message_status = 'unread' && application_id = users_applications.id && message_scenario='0' )) as count"),
+       )->where('users_applications.user_id', '=', $userid)
+       ->where('role_name','!=','user')
+       ->where('application_message.user_message_status','unread')
+       ->where('message_scenario','0')
        ->get();
        
+     
     
-        
         return $userunreadMessage;
     }
 

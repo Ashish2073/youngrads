@@ -28,8 +28,34 @@ class ApplicationMessageController extends Controller
 	 */
 	public function index(Request $request)
 	{
-		$messageStatis = ApplicationMessage::where('user_id', '!=', Auth::id())->where('application_id', '=', $request->id)->update(['message_status' => 'read']);
-		return view('application_message.index', ['id' => $request->id, 'gaurd' => 'user', 'auth' => Auth::id()]);
+		if (auth('admin')->check()) {
+			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
+               $userid=auth('admin')->user()->username;
+			   $message_status_type="admin_message_status";
+			   $role="admin" ;
+			   $messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['admin_message_status' => 'read']);
+			}else{
+				$userid=auth('admin')->user()->username;
+				$message_status_type="moderator_message_status";
+				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['moderator_message_status' => 'read']);
+				$role="moderator";
+			}
+			
+		} elseif(auth('web')->check()) {
+			$userid=Auth::id();
+			$message_status_type="user_message_status";
+			$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['user_message_status' => 'read']);
+			
+			$role="user";
+		}
+
+		
+ 
+
+
+
+		
+		return view('application_message.index', ['id' => $request->id, 'gaurd' => 'user', 'auth' =>$userid]);
 	}
 
 	public function store(Request $request)
@@ -59,7 +85,7 @@ class ApplicationMessageController extends Controller
 			$role="user";
 		}
 
-
+         
 
 
 		$applicationMessage = new ApplicationMessage;
@@ -71,6 +97,7 @@ class ApplicationMessageController extends Controller
 		$applicationMessage->message_scenario = $request->message_scenario;
 		
 		$applicationMessage->save();
+	
 
 		if (isset($request->document)) {
 
@@ -100,7 +127,7 @@ class ApplicationMessageController extends Controller
 	 */
 	public function showMessages(Request $request,$id)
 	{
- 
+     
 
 
 		$Messages = ApplicationMessage::where('application_id', '=', $id)
@@ -108,8 +135,8 @@ class ApplicationMessageController extends Controller
 				$join->on('users.id', '=', 'application_message.user_id')
 					->where('application_message.guard', '=', 'user');
 			})
-			->leftJoin('admins', 'application_message.user_id', '=', 'admins.id', function ($join) {
-				$join->on('admins.id', '=', 'application_message.user_id')
+			->leftJoin('admins', 'application_message.user_id', '=', 'admins.username', function ($join) {
+				$join->on('admins.username', '=', 'application_message.user_id')
 					->where('application_message.guard', '=', 'admin');
 			})
 
@@ -120,8 +147,10 @@ class ApplicationMessageController extends Controller
 			->get();
 
 
+			
+
 		if (auth('admin')->check()) {
-			$id = auth('admin')->user()->id;
+			$id = auth('admin')->user()->username; 
 			$logged_guard = 'admin';
 		} elseif (auth('web')->check()) {
 			$id = auth('web')->user()->id;

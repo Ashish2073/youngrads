@@ -184,10 +184,9 @@ class UserApplicationController extends Controller
 			->join('campus', 'campus_programs.campus_id', '=', 'campus.id')
 			->join('universities', 'campus.university_id', '=', 'universities.id')
 			->join('programs', 'campus_programs.program_id', "=", 'programs.id');
-		$userApplications->select('intakes.name as intake', 'users_applications.campus_program_id', 'users_applications.application_number', 'users_applications.id', 'users_applications.year', 'status', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', DB::raw("(SELECT count(*) FROM application_message WHERE application_message.user_id != '" . Auth::id() . "' && application_message.message_status = 'unread' && application_id = users_applications.id && role_name !='".$role."') as count"))->where('users_applications.user_id', '=', Auth::id());
-   
-		
-
+		$userApplications->select('intakes.name as intake', 'users_applications.campus_program_id', 'users_applications.application_number', 'users_applications.id', 'users_applications.year', 'status', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program',
+		 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . Auth::id() . "'    && application_message.user_message_status = 'unread' && application_id = users_applications.id && message_scenario='0' )) as count"))->where('users_applications.user_id', '=', Auth::id());
+   		
 
 
 		$programs = clone ($userApplications);
