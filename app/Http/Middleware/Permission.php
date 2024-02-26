@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Permission
 {
-    /**
+    /** 
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
@@ -21,15 +21,15 @@ class Permission
             // Check if the user has the required permission havePermission
             // if (Auth::user()->hasPermission($permission) || auth('admin')->user()->getRoleNames()[0]=="Admin") {
             //     return $next($request);
-            // }
-            $userRole=auth('admin')->user()->getRoleNames();
+            // } 
+            $userrole=json_decode(auth('admin')->user()->getRoleNames(),true);
 
-            if (havePermission($permission) || auth('admin')->user()->getRoleNames()[0]=="Admin") {
+            if (hasPermissionForRoles($permission,$userrole) || auth('admin')->user()->getRoleNames()[0]=="Admin") {
                 return $next($request);
             }
-        }
+        } 
 
         // Redirect or return an error response based on your needs
-        return redirect()->back()->with('error', 'Unauthorized. You do not have permission to access this resource.');
+        return redirect()->back()->with('permissionerror', 'Unauthorized. You do not have permission to access this resource.');
     }
 }

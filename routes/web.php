@@ -125,7 +125,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     ]);
 
     // Import Routes
-    Route::get('import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index');
+    Route::get('import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index')->middleware('userspermission:import_data_view');
     Route::post('import/univ-campus', [App\Http\Controllers\Admin\ImportController::class, 'importUnivCampus'])->name('import.univ_campus');
     Route::post('import/programs', [App\Http\Controllers\Admin\ImportController::class, 'importPrograms'])->name('import.programs');
   
@@ -429,7 +429,7 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     Route::get('/city/address/{id}', [\App\Http\Controllers\Admin\AddressController::class, 'selectCity'])->name('city');
 
     //application route
-    Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all');
+    Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all')->middleware('userspermission:application_view');
     
      Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
     

@@ -45,6 +45,28 @@
     <script>
         var dataTable;
         $(document).ready(function() {
+
+            let checkbox = $('#input[type="checkbox"]')
+            $("#toggle-permissions").on('change', function() {
+                if ($(this).is(':checked')) {
+                    console.log($(this));
+
+                    checkbox.prop("checked", true);
+
+
+                } else {
+                    checkbox.prop("checked", false);
+
+
+
+
+                }
+            })
+
+
+
+
+
             // Datatable
             dataTable = $("#role-table").DataTable({
                 "processing": true,

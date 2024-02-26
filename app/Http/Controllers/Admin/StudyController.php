@@ -21,6 +21,8 @@ class StudyController extends Controller
         config([
             'study_areas' => $study_areas
         ]);
+
+        $this->middleware('userspermission:study_view',['only'=>['index']]);
     }
     /**
      * Display a listing of the resource.

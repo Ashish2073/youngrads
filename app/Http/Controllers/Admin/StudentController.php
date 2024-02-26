@@ -32,6 +32,7 @@ class StudentController extends Controller
 	public function __construct()
 	{
 		$this->middleware('auth:admin')->except('profileResume');
+		$this->middleware('userspermission:students_view',['only'=>['index']]);
 	}
 
 	public function index(Request $request)

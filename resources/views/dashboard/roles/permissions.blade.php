@@ -7,13 +7,13 @@
         // 'dashboard' => [],
         'users' => $crud,
         'roles_and_permissions' => $crud,
-        'students' => $crud,
+        'students' => ['view', 'N/A', 'N/A', 'delete'],
         'universities' => $crud,
         'colleges' => $crud,
         'program' => $crud,
         'universities' => $crud,
-        'appliction' => $crud,
-        // 'program_level' => $crud,
+        'application' => $crud,
+        'program_level' => $crud,
         // 'pages' => $crud,
         'study' => $crud,
         // 'fee' =>$crud,
@@ -28,14 +28,14 @@
 
 @endphp
 
-{{-- <div>
-    <div class="form-group">
+<div>
+    {{-- <div class="form-group">
         <label for="toggle-permissions">
             <input id='toggle-permissions' type="checkbox"> Select/Deselect all
         </label>
     </div> --}}
 
-{{-- <ul class="dd-list permissions-list">
+    {{-- <ul class="dd-list permissions-list">
         @php $i = 1; @endphp
         @foreach ($all_permissions as $key => $value)
             <li class="dd-item " data-id="{{ $i }}">
@@ -69,7 +69,7 @@
 
 
 
-{{-- <ul class="dd-list permissions-list">
+    {{-- <ul class="dd-list permissions-list">
     @php $i = 1; @endphp
     @foreach ($all_permissions as $key => $value)
         <li class="dd-item " data-id="{{ $i }}">
@@ -103,57 +103,85 @@
 
 
 
-<div class="container mt-5">
-    <h2>Permission Table</h2>
-    <table class="table table-bordered">
-        <thead>
+    <div class="container mt-5">
+        <h2>Permission Table</h2>
+        <table class="table table-bordered">
+            <thead>
 
-            <tr>
-                <td>Website Section</td>
-
-                <td>
-                    @foreach ($crud as $value)
-                        <div class="form-check form-check-inline px-2">
-                            {{ ucfirst($value) }}
-
-                        </div>
-                    @endforeach
-                </td>
-
-            </tr>
-
-
-        </thead>
-        <tbody>
-            @foreach ($all_permissions as $key => $value)
                 <tr>
+                    <td>Website Section</td>
 
                     <td>
-                        <label for="{{ ucfirst($key) }}">
-                            <input name="permissions[]" value="" data-parent="{{ $key }}"
-                                {{ havePermission($role ?? '', $key) ? 'checked' : '' }} class="parent-item"
-                                id="{{ $key }}" type="checkbox">
-                            {{ ucfirst($key) }}
-                        </label>
-
-                    </td>
-
-
-                    <td>
-                        @foreach ($value as $k => $val)
+                        @foreach ($crud as $value)
                             <div class="form-check form-check-inline px-2">
-                                <input class="form-check-input" type="checkbox" id="{{ $key . '_' . $val }}"
-                                    value="{{ $key . '_' . $val }}" data-child="{{ $key }}"
-                                    {{ havePermission($role ?? '', $key . '_' . $val) ? 'checked' : '' }}
-                                    name="permissions[]">
-                                <label class="form-check-label" for="view1"></label>
+                                {{ ucfirst($value) }}
+
                             </div>
                         @endforeach
                     </td>
 
                 </tr>
-            @endforeach
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
-</div>
+
+
+            </thead>
+            <tbody>
+
+                @foreach ($all_permissions as $key => $value)
+                    <tr>
+
+                        <td>
+                            <label for="{{ ucfirst($key) }}">
+
+                                <input name="permissions[]" value="" data-parent="{{ $key }}"
+                                    {{ havePermission($role ?? '', $key) ? 'checked' : '' }} class="parent-item"
+                                    id="{{ $key }}" type="checkbox">
+                                {{ ucfirst($key) }}
+                            </label>
+
+                        </td>
+
+
+                        <td>
+                            @foreach ($value as $k => $val)
+                                @if ($val != 'N/A')
+                                    <div class="form-check form-check-inline px-2">
+                                        <input class="form-check-input" type="checkbox" id="{{ $key . '_' . $val }}"
+                                            value="{{ $key . '_' . $val }}" data-child="{{ $key }}"
+                                            {{ havePermission($role ?? '', $key . '_' . $val) ? 'checked' : '' }}
+                                            name="permissions[]">
+                                        <label class="form-check-label" for="{{ $key . '_' . $val }}"></label>
+                                    </div>
+                                @else
+                                    <div class="form-check form-check-inline px-2">
+                                        N / A
+                                    </div>
+                                @endif
+                            @endforeach
+                        </td>
+
+                    </tr>
+                @endforeach
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let checkbox = $('#input[name="permissions[]"]');
+        console.log(checkbox);
+        $("#toggle-permissions").on('change', function() {
+            if ($(this).is(':checked')) {
+                console.log($(this));
+
+                checkbox.prop("checked", true);
+
+
+            } else {
+                checkbox.prop("checked", false);
+
+
+
+
+            }
+        })
+    </script>

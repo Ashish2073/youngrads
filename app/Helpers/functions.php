@@ -159,7 +159,8 @@ if(!function_exists('havePermission')) {
             return false;
         }
 
-        if(gettype($role)=="string"){
+    
+           
         $permissions = $role->permissions()->get();
 
 
@@ -169,21 +170,26 @@ if(!function_exists('havePermission')) {
                 return true;
             }
         }
-    }
+    
 
-    if(gettype($role)=="array"){
+    // if(gettype($role)=="array"){
 
-        foreach($role as $value){
-            $permissions=$value->permission()->get();
-            foreach($permissions as $permission) {
-                if($permission->name == $permission_name) {
-                    return true;
-                }
-            }
+    //     foreach($role as $value){
+    //         if($value=='Admin'){
+    //             return true;
+    //         }
 
-        }
+           
+    //         $permissions=$value->permission()->get();
+    //         foreach($permissions as $permission) {
+    //             if($permission->name == $permission_name) {
+    //                 return true;
+    //             }
+    //         }
 
-    }
+    //     }
+
+    // }
 
 
 
@@ -194,6 +200,41 @@ if(!function_exists('havePermission')) {
         return false;
     }
 }
+
+
+// app/helper.php
+
+if (!function_exists('hasPermissionForRoles')) {
+    function hasPermissionForRoles($permissionName, $roleNames)
+
+    {
+        if($roleNames[0]=="Admin"){
+            return true;
+        }
+        $roleIds = DB::table('roles')->whereIn('name', $roleNames)->pluck('id');
+        $permissionId = DB::table('permissions')->where('name', $permissionName)->value('id');
+
+        $count = DB::table('role_has_permissions')
+            ->whereIn('role_id', $roleIds)
+            ->where('permission_id', $permissionId)
+            ->count();
+ 
+            
+
+        if($count > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+
+
+
+
+
+
+
 
 function can($permissions) 
 {
