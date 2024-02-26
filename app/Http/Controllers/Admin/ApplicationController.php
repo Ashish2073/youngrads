@@ -59,8 +59,8 @@ class ApplicationController extends Controller
 			   $role="admin" ;
 
 
-			   
-			}else{
+
+			}elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
@@ -150,9 +150,22 @@ class ApplicationController extends Controller
 			$userApplications->whereIn('users_applications.status', $request->status);
 		}
 
-		if ($request->has('moderator_id')) {
+		if ($request->has('moderator_id') || in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))) {
+			 
+			if(isset($request->moderator_id)){ 
+				
+				$userApplications->whereIn('admins.id',$request->moderator_id );
+			}else{
 			
-			$userApplications->whereIn('admins.id',$request->moderator_id );
+				$userApplications->whereIn('admins.id',[auth('admin')->user()->id] );
+			}
+		
+		}
+
+		if(isset($request->application_id)){
+           $userApplications->whereIn('users_applications.id',$request->application_id);
+			
+
 		}
 
 		switch (request()->get('view')) {
@@ -173,9 +186,11 @@ class ApplicationController extends Controller
 
 
 
-		//  $result =  $userApplications->get();
+		//  $result =  $userApplications->get();application_moderator_admin_id
 		if (request()->ajax()) {
-             
+			session()->forget('application_id_message');
+
+			session()->forget('application_moderator_admin_id');
 			
 			return Datatables::of($userApplications)
 
@@ -229,7 +244,7 @@ class ApplicationController extends Controller
 					}
 
 					return $html;
-				})
+				}) 
 				->addColumn('name', function ($row) {
 					return "<a href='javascript:void(0)' class='profile' data-id='" . $row->user_id . "' data-application='" . $row->application_id . "'>" . $row->first . " " . $row->last_name . "</a>";
 				})
@@ -330,8 +345,12 @@ class ApplicationController extends Controller
 
 		}
 
+		$application_numbers=UserApplication::select('id','application_number')->get();
 
-			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses','limitApplyApplication','moderator'));
+ 
+
+
+			return view('dashboard.applications.index', compact('breadcrumbs', 'pageConfigs', 'univs', 'programs', 'campuses','limitApplyApplication','moderator','application_numbers'));
 		}
 	}
 

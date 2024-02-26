@@ -158,13 +158,39 @@ if(!function_exists('havePermission')) {
         if(empty($role)) {
             return false;
         }
+
+        if(gettype($role)=="string"){
         $permissions = $role->permissions()->get();
+
+
         
         foreach($permissions as $permission) {
             if($permission->name == $permission_name) {
                 return true;
             }
         }
+    }
+
+    if(gettype($role)=="array"){
+
+        foreach($role as $value){
+            $permissions=$value->permission()->get();
+            foreach($permissions as $permission) {
+                if($permission->name == $permission_name) {
+                    return true;
+                }
+            }
+
+        }
+
+    }
+
+
+
+
+
+
+
         return false;
     }
 }

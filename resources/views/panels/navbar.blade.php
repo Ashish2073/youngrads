@@ -199,7 +199,7 @@
                             </li>
                         @endforeach
                         @php session()->put('application_moderator_admin_id', $application_moderator_admin_id) ; @endphp
-                        @if ($messageUnreadData->sum('count') > 0)
+                        @if ($messageadminmoderatorUnreadData->count() > 0)
                             @if (\Request::segment(2) != 'applications-all')
                                 <li class="dropdown-menu-footer"><a class="dropdown-item p-1 text-center"
                                         href="{{ url('admin/applications-all') }}">Read

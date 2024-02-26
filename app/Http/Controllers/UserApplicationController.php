@@ -188,7 +188,7 @@ class UserApplicationController extends Controller
 		 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . Auth::id() . "'    && application_message.user_message_status = 'unread' && application_id = users_applications.id && message_scenario='0' )) as count"))->where('users_applications.user_id', '=', Auth::id());
    		
 
-
+ 
 		$programs = clone ($userApplications);
 		$programs = $programs->groupBy('users_applications.campus_program_id')->get();
 

@@ -119,8 +119,7 @@
                                         </select>
                                     </div>
                                 </div>
-
-
+                                {{-- application_numbers --}}
 
                                 <div class="col-md-2 col-12">
                                     <div class="form-group">
@@ -128,12 +127,48 @@
                                         <select id="moderator_id" name="moderator_id[]" data-live-search="true" multiple
                                             class='form-control select'>
 
+
+
                                             @foreach ($moderator as $key => $value)
                                                 <option value="{{ $value->id }}"
-                                                    @if (auth()->guard('admin')->user()->username == $value->username) selected @endif>
+                                                    @if (auth()->guard('admin')->user()->username == $value->username &&
+                                                            in_array('moderator', json_decode(auth('admin')->user()->getRoleNames()))) selected @endif>
                                                     {{ $value->username }}
 
                                                 </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-md-2 col-12">
+                                    <div class="form-group">
+                                        <label for="application_id">Application Number</label>
+                                        <select id="application_id" name="application_id[]" data-live-search="true" multiple
+                                            class='form-control select'>
+
+                                            @if (session()->has('application_id_message'))
+                                                @php $application_id_message=session()->get('application_id_message'); @endphp
+                                            @else
+                                                @php $application_id_message = [] ;@endphp
+                                            @endif
+
+                                            @if (session()->has('application_moderator_admin_id'))
+                                                @php $application_moderator_admin_id_message=session()->get('application_moderator_admin_id'); @endphp
+                                            @else
+                                                @php $application_moderator_admin_id_message = [] ;@endphp
+                                            @endif
+
+
+
+
+                                            @foreach ($application_numbers as $application_number)
+                                                <option
+                                                    {{ request()->get('application_id') == $application_number->id || in_array($application_number->id, $application_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) ? 'selected' : '' }}
+                                                    value="{{ $application_number->id }}">
+                                                    {{ $application_number->application_number }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -406,7 +441,59 @@
             // dataTable.draw();
 
 
-            // }
+            // } showadminmoderatorlatestmessage
+
+            $("#showlatestmessage").click(function() {
+
+
+                let applictionIdLatestMessage = "";
+                console.log(typeof($(this).data('id')));
+                if ((typeof(($(this).data('id'))) == 'number')) {
+                    applictionIdLatestMessage = [parseInt($(this).data('id'))];
+                } else {
+
+                    applictionIdLatestMessage = $(this).data('id').split(',');
+                }
+
+
+
+
+
+                $("#application_id").val(applictionIdLatestMessage);
+                $(".select").selectpicker('refresh');
+                dataTable.draw();
+
+
+
+            });
+
+
+            $("#showadminmoderatorlatestmessage").click(function() {
+
+
+                let applictionIdLatestMessage = "";
+                console.log(typeof($(this).data('id')));
+                if ((typeof(($(this).data('id'))) == 'number')) {
+                    applictionIdLatestMessage = [parseInt($(this).data('id'))];
+                } else {
+
+                    applictionIdLatestMessage = $(this).data('id').split(',');
+                }
+
+
+
+
+
+                $("#application_id").val(applictionIdLatestMessage);
+                $(".select").selectpicker('refresh');
+                dataTable.draw();
+
+
+
+            });
+
+
+
 
 
 
@@ -427,10 +514,7 @@
 
             $(".select").selectpicker();
             $(".application-filter").find("select").on("change", function() {
-                console.log('gf');
-                console.log($('#program').val());
 
-                console.log($('#moderator_id').val());
 
                 dataTable.draw();
             });
@@ -450,6 +534,7 @@
                         d.favourite = $("input[name='favourite']").val();
                         d.view = $("input[name='view']").val();
                         d.moderator_id = $('#moderator_id').val();
+                        d.application_id = $("#application_id").val();
                     }
                 },
                 // dom: "tps",
