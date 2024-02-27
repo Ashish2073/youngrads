@@ -110,12 +110,28 @@
             </div>
     </div>
     </form>
+
+    @php
+        $usermoderatorcount = \App\Models\User::where('moderator_id', $user->id)->count();
+
+    @endphp
+
     <div class="form-group delete mx-1" style="margin-top:1%">
-        <form id="delete-form" method="POST" action="{{ route('admin.modifier.destroy', $user->id) }}">
-            @csrf
-            @method('DELETE')
-            <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
-        </form>
+        @if ($usermoderatorcount == 0)
+            <form id="delete-form" method="POST" action="{{ route('admin.modifier.destroy', $user->id) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
+            </form>
+        @else
+            <p>{{ config('setting.delete_notice') }}</p>
+
+            @php session()->put('used_modifier',$user->id); @endphp
+
+
+            <a href="{{ url('admin/students') }}">
+                <p> click Here to Show Uses</p><a>
+        @endif
     </div>
 </div>
 </div>

@@ -119,9 +119,9 @@
                 <tr>
                     <td>Website Section</td>
 
-                    <td>
+                    <td style="padding: 0px 26px;">
                         @foreach ($crud as $value)
-                            <div class="form-check form-check-inline px-2">
+                            <div class="form-check form-check-inline px-1">
                                 {{ ucfirst($value) }}
 
                             </div>
@@ -160,8 +160,8 @@
                                         <label class="form-check-label" for="{{ $key . '_' . $val }}"></label>
                                     </div>
                                 @else
-                                    <div class="form-check form-check-inline px-2">
-                                        (N / A)
+                                    <div class="form-check form-check-inline px-1">
+                                        (N/A)
                                     </div>
                                 @endif
                             @endforeach

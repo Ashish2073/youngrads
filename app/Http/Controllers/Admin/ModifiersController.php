@@ -16,6 +16,10 @@ class ModifiersController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
+        $this->middleware('userspermission:modifiers_view',['only'=>['index']]);
+        $this->middleware('userspermission:modifiers_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:modifiers_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:modifiers_delete',['only'=>['destroy']]); 
     } 
 
     public function index(Request $request){
@@ -25,6 +29,15 @@ class ModifiersController extends Controller
         // dd( $users->getRoleNames());
     
         if(request()->ajax()) { 
+
+            if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
 
             if($request->get('rolename')!=null){
                 $rolename=$request->get('rolename');
@@ -38,11 +51,13 @@ class ModifiersController extends Controller
           
             return Datatables::of($users)
                 ->editColumn('last_name', function($row) {
+                
+ 
                     return $row->last_name ?? "N/A";
                 })->addColumn('role',function($row){
                     // return $row->getRoleNames();
-                    return "<button class='btn btn-danger role-delete btn-icon btn-round'  onclick='userRole($row->id)' ><i class='feather icon-eye'></i></button>";
-
+                    return "<button class='btn btn-danger role-view btn-icon btn-round'  onclick='userRole($row->id)' ><i class='feather icon-eye'></i></button>";
+ 
 
                 })
                 ->rawColumns(['email','role'])

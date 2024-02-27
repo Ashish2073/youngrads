@@ -83,7 +83,17 @@
 
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
-                                                    <option value="{{ $moderatoruser->id }}">
+                                                    <option value="{{ $moderatoruser->id }}"
+                                                        @if (session()->has('used_modifier')) @if (session()->get('used_modifier') == $moderatoruser->id)
+                                                          @php  session()->forget('used_modifier') @endphp
+                                                        selected @endif
+                                                        @endif
+
+
+
+
+
+                                                        >
                                                         {{ $moderatoruser->username }}</option>
                                                 @endif
                                             @endforeach
@@ -123,9 +133,17 @@
                                             class=" select form-control">
                                             <option value="" selected disabled>Please Select Moderator</option>
                                             <option value="0">N/A(Remove Moderator)</option>
+
+
+
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
                                                     <option value="{{ $moderatoruser->id }}">
+
+
+
+
+
                                                         {{ $moderatoruser->username }}</option>
                                                 @endif
                                             @endforeach

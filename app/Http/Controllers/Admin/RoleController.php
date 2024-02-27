@@ -37,10 +37,7 @@ class RoleController extends Controller
 
         if (request()->ajax()) {
 
-
             if((session('permissionerror'))){
-
-               
                
            
                 return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
@@ -53,13 +50,31 @@ class RoleController extends Controller
 
 
 
+
+
             return Datatables::of($roles)
                 ->addColumn('action', function ($row) {
-                    if ($row->name != "Admin"):
-                        return "<button class='btn btn-danger role-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-trash'></i></button>";
-                    else:
+                    if ($row->name != "Admin"){
+                        $userrole=json_decode(auth('admin')->user()->getRoleNames(),true);
+                        if(hasPermissionForRoles('roles_and_permissions_delete',$userrole)|| auth('admin')->user()->getRoleNames()[0]=="Admin"){
+                            $userrolecount=Admin::role($row->name)->count();
+
+                             
+                         if($userrolecount==0){ 
+                            return "<button class='btn btn-danger role-delete btn-icon btn-round' data-id=$row->id><i class='fa fa-trash'></i></button>";
+                         }else{
+                             session()->put("used_role_$row->name",$row->name);  
+                            return "Cannot delete it'use in <a href='".url('admin/modifiers')."' ><p> click Here to Show Uses</p><a>";
+                         }
+                       
+                    
+                    
+                    }else{
+                        return "Delete Permission Not Given";
+                    }
+                    }else{
                         return "N/A";
-                    endif;
+                    };
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -164,6 +179,9 @@ class RoleController extends Controller
 
     function destroy($id)
     {
+
+       
+
         $role = Role::find($id);
         $role->delete();
         if ($role->save()):

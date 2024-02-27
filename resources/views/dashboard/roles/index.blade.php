@@ -256,7 +256,7 @@
                             id: id
                         },
                         beforeSend: function(data) {
-                            console.log(data);
+
                             that.attr('disabled', true).prepend(
                                 "<i class='fa fa-spinner fa-spin'></i> ");
                         },
@@ -278,7 +278,7 @@
                             that.removeAttr('disabled').html("<i class='fa fa-trash'></i>")
                         },
                         error: function(data) {
-                            console.log(data);
+
                             toast("error", "Something went wrong.", "Error");
                             that.removeAttr('disabled').html("<i class='fa fa-trash'></i>");
                         }

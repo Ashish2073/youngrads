@@ -101,6 +101,8 @@
 
 
 
+
+
     <section id="basic-datatable">
         <div class="row">
             <div class="col-12">
@@ -117,7 +119,17 @@
                                         <select data-colum="0" id="rolename" name="rolename[]" data-live-search="true"
                                             multiple class=" select form-control apply-filter-role">
                                             @foreach ($roles as $role)
-                                                <option value="{{ $role->name }}">{{ ucfirst($role->name) }}
+                                                <option
+                                                    @if (session()->has("used_role_$role->name")) @if (session()->get("used_role_$role->name") == $role->name)
+                                                    @php session()->forget("used_role_$role->name") @endphp
+                                                 selected @endif
+                                                    @endif
+                                                    value="{{ $role->name }}">
+
+
+
+
+                                                    {{ ucfirst($role->name) }}
                                                 </option>
                                             @endforeach
 
@@ -239,7 +251,30 @@
                 getContent({
                     "url": url,
                     success: function(data) {
-                        $(".dynamic-body").html(data);
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+                                    <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                                      aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <strong>Fail!</strong> ${data.errorpermissionmessage}
+                                         </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+                        }
                         runScript();
                     }
                 });
@@ -254,7 +289,30 @@
                     "url": url,
                     success: function(data) {
 
-                        $(".dynamic-body").html(data);
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+        <button type="button" id="permission_error" class="close" data-dismiss="alert"
+          aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Fail!</strong> ${data.errorpermissionmessage}
+             </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+                        }
 
                         runScript();
                     }
