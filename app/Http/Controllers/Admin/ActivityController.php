@@ -12,8 +12,12 @@ use App\Models\Admin;
 class ActivityController extends Controller
 {
     public function __construct()
-    {
+    { 
         $this->middleware('auth:admin');
+
+        $this->middleware('userspermission:user_activity_view',['only'=>['index']]);
+
+
         config([
             'users' => User::orderBy('name', 'asc')->get()
         ]);

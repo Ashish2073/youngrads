@@ -28,7 +28,8 @@ class Permission
                 return $next($request);
             }
         } 
-
+        
+       
         // Redirect or return an error response based on your needs
         return redirect()->back()->with('permissionerror', 'Unauthorized. You do not have permission to access this resource.');
     }

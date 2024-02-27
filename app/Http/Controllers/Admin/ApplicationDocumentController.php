@@ -16,6 +16,11 @@ class ApplicationDocumentController extends Controller
 	public function __construct()
 	{
 		$this->middleware('auth:admin');
+		$this->middleware('userspermission:application_document_view',['only'=>['index']]);
+		$this->middleware('userspermission:application_document_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:application_document_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:application_document_delete',['only'=>['destroy']]); 
+		
 		config(['contries' => Country::get()]);
 	}
 
@@ -32,6 +37,22 @@ class ApplicationDocumentController extends Controller
 		// }
 
 		if (request()->ajax()) {
+
+			if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+
+
+
+
+
+
+
 			$applicationDocument = ApplicationDocument::get();
 			return Datatables::of($applicationDocument)
 				->addColumn('countries', function ($row) {

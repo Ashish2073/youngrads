@@ -14,6 +14,10 @@ class ProgramLevelController extends Controller
     {
         $this->middleware('auth:admin');
         $this->middleware('userspermission:program_level_view',['only'=>['index']]);
+
+        $this->middleware('userspermission:program_level_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:program_level_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:program_level_delete',['only'=>['destroy']]); 
     }
 
     /**
@@ -26,6 +30,18 @@ class ProgramLevelController extends Controller
         $programs = ProgramLevel::get();
 
         if (request()->ajax()) {
+
+            if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+
+
+
             return DataTables::of($programs)
                 ->make(true);
         } else {

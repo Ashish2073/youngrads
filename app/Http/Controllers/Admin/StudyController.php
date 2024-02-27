@@ -17,6 +17,15 @@ class StudyController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
+        $this->middleware('userspermission:study_view',['only'=>['index']]);
+
+        $this->middleware('userspermission:study_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:study_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:study_delete',['only'=>['destroy']]); 
+
+ 
+
+
         $study_areas = Study::where('parent_id', 0)->get();
         config([
             'study_areas' => $study_areas
@@ -49,6 +58,17 @@ class StudyController extends Controller
    
 
         if (request()->ajax()) {
+
+            if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+
+
 
               if(($request->get('studyid')!=null) || ($request->get('substudyid')!=null)){
 

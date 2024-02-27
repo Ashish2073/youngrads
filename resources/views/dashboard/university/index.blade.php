@@ -2,6 +2,8 @@
 
 @section('title', 'Universities')
 
+
+
 @section('breadcumb-right')
     <button data-toggle="modal" data-target="#dynamic-modal" id="add" data-url="{{ route('admin.university.create') }}"
         class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle">
@@ -10,6 +12,17 @@
 @endsection
 
 @section('content')
+    {{-- ajaxpermissionerror --}}
+
+    @if (session('permissionerror'))
+        <div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+            <button type="button" id="permission_error" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
+            <strong>Fail!</strong> {{ session('permissionerror') }}
+        </div>
+    @endif
+
+
 
 
 
@@ -60,7 +73,9 @@
                     url: "{{ route('admin.universities') }}",
                     data: function(d) {
                         // d.quiz_id = $('select[name="quiz_id"]').val();
-                    }
+                    },
+
+
                 },
                 columns: [{
                     data: 'name',
@@ -68,6 +83,9 @@
                 }],
 
                 'createdRow': function(row, data, dataIndex) {
+
+
+
                     $(row).addClass('action-row');
                     let id = data['id'];
                     let editUrl = "{{ url('/admin/universities') }}" + "/" + id + "/edit";
@@ -77,7 +95,10 @@
                 },
                 initComplete: function(res, json) {
 
-                }
+                },
+
+
+
             });
 
 
@@ -88,11 +109,46 @@
                     url: $(this).data('url'),
                     success: function(data) {
 
-                        $('.dynamic-body').html(data);
+
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+                            <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                            aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <strong>Fail!</strong> ${data.errorpermissionmessage}
+                           </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+                        }
+
+
+
+
+
                         runScript();
+                    },
+                    error: function(error) {
+
                     }
                 });
             });
+
+
+
 
             $('body').on('click', '.action-row', function(e) {
 
@@ -101,7 +157,32 @@
                     url: $(this).data('url'),
                     success: function(data) {
 
-                        $('.dynamic-body').html(data);
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+                             <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                              aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                              <strong>Fail!</strong> ${data.errorpermissionmessage}
+                                </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+                        }
+
+
                         runScript();
                     }
                 });

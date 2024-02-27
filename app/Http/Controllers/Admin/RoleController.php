@@ -19,6 +19,14 @@ class RoleController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
+
+        $this->middleware('userspermission:roles_and_permissions_view',['only'=>['index']]);
+
+        $this->middleware('userspermission:roles_and_permissions_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:roles_and_permissions_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:roles_and_permissions_delete',['only'=>['destroy']]); 
+
+
         $this->permissions = Permission::where(['guard_name' => 'admin'])->get();
     }
 
@@ -28,6 +36,23 @@ class RoleController extends Controller
         $permissions = Permission::all();
 
         if (request()->ajax()) {
+
+
+            if((session('permissionerror'))){
+
+               
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+
+
+
+
+
             return Datatables::of($roles)
                 ->addColumn('action', function ($row) {
                     if ($row->name != "Admin"):

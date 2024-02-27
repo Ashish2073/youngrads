@@ -4,24 +4,32 @@
     $crud = ['view', 'add', 'edit', 'delete'];
 
     $all_permissions = [
-        // 'dashboard' => [],
-        'users' => $crud,
+        'dashboard' => ['view', 'N/A', 'N/A', 'N/A'],
+        'admin_users' => $crud,
         'roles_and_permissions' => $crud,
         'students' => ['view', 'N/A', 'N/A', 'delete'],
         'universities' => $crud,
-        'colleges' => $crud,
+        'campus' => $crud,
+        'campus_details' => ['view', 'add', 'N/A', 'N/A'],
+        'campus_program' => $crud,
         'program' => $crud,
         'universities' => $crud,
         'application' => $crud,
         'program_level' => $crud,
         // 'pages' => $crud,
         'study' => $crud,
+        'application_document' => $crud,
+        'user_activity' => ['view', 'N/A', 'N/A', 'N/A'],
+        'modifiers' => $crud,
+
         // 'fee' =>$crud,
         // 'intake' =>$crud,
         // 'curruncy' => $crud,
         // 'messages' => $crud,
         // 'test' => $crud,
-        'import_data' => $crud,
+        'mandatory_document' => $crud,
+        'cities' => $crud,
+        'import_data' => ['view', 'add', 'N/A', 'N/A'],
         'states' => $crud,
         'countries' => $crud,
     ];
@@ -29,11 +37,11 @@
 @endphp
 
 <div>
-    {{-- <div class="form-group">
+    <div class="form-group">
         <label for="toggle-permissions">
             <input id='toggle-permissions' type="checkbox"> Select/Deselect all
         </label>
-    </div> --}}
+    </div>
 
     {{-- <ul class="dd-list permissions-list">
         @php $i = 1; @endphp
@@ -84,7 +92,7 @@
                     @foreach ($value as $val)
                         @php $i++; @endphp
                         <tr data-id="{{ $i }}" class="dd-item">
-                            <label for="{{ $key . '_' . $val }}">
+                             <label for="{{ $key . '_' . $val }}">
                                 <input name="permissions[]" value="{{ $key . '_' . $val }}"
                                     data-child="{{ $key }}" id="{{ $key . '_' . $val }}" type="checkbox"
                                     {{ havePermission($role ?? '', $key . '_' . $val) ? 'checked' : '' }} />
@@ -153,7 +161,7 @@
                                     </div>
                                 @else
                                     <div class="form-check form-check-inline px-2">
-                                        N / A
+                                        (N / A)
                                     </div>
                                 @endif
                             @endforeach
@@ -165,23 +173,3 @@
             </tbody>
         </table>
     </div>
-
-    <script>
-        let checkbox = $('#input[name="permissions[]"]');
-        console.log(checkbox);
-        $("#toggle-permissions").on('change', function() {
-            if ($(this).is(':checked')) {
-                console.log($(this));
-
-                checkbox.prop("checked", true);
-
-
-            } else {
-                checkbox.prop("checked", false);
-
-
-
-
-            }
-        })
-    </script>

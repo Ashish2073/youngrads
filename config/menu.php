@@ -9,13 +9,14 @@ return [
         'menu_name' => 'Dashboard',
         'route' => 'admin.home',
         'icon_class' => 'fa fa-dashboard',
-        'permission' => 'dashboard'
+        'permission' => 'dashboard_view'
+       
     ], 
     [
         'menu_name' => 'Import Data',
         'route' => 'admin.import.index',
         'icon_class' => 'fa fa-file-text',
-        'permission' => 'dashboard'
+        'permission' => 'import_data_view'
     ],
     [
         "url" => "",
@@ -26,18 +27,18 @@ return [
         'menu_name' => 'User Management',
         'route' => 'admin.users',
         'icon_class' => 'fa fa-users',
-        'sub_menu' => [
+        'sub_menu' => [ 
             [
                 'menu_name' => 'Admin Users',
                 'route' => 'admin.users',
                 'icon_class' => '',
-                'permission' => 'users_view'
+                'permission' => 'admin_users_view'
             ],
             [
                 'menu_name' => 'Modifiers Users',
                 'route' => 'admin.modifiers',
                 'icon_class' => 'fa-solid fa-people-arrows',
-                'permission' => 'roles_and_permissions_view'
+                'permission' => 'modifiers_view'
             ],
             [
                 'menu_name' => 'Roles & Permission',
@@ -53,12 +54,14 @@ return [
         'route' => 'admin.students',
         'icon_class' => 'fa fa-users',
         'permission' => 'students_view'
-    ],
+    ],   
     [
-        'menu_name' => 'Applications',
-        'route' => '',
+        'menu_name' => 'Applications', 
+       
         'icon_class' => 'fa fa-file-o',
-        'route' => 'admin.applications-all'
+        'route' => 'admin.applications-all',
+        'permission' => 'applications_view'
+
         // 'sub_menu' => [
         //     [
         //         'menu_name' => 'Applications',
@@ -135,7 +138,7 @@ return [
                 'menu_name' => 'Mandatory Document',
                 'route' => 'admin.document-types',
                 'icon_class' => 'fa fa-file',
-                'permission' => 'document_type_view'
+                'permission' => 'mandatory_document_view'
             ],
             [
                 'menu_name' => 'Application Document',
@@ -169,13 +172,14 @@ return [
     [
         "url" => "",
         "navheader" => "Activities",
-        "icon" => ""
+        "icon" => "",
+        'permission' => 'countries_view'
     ],
     [
         'menu_name' => 'User Activities',
         'route' => 'admin.activities',
         'icon_class' => 'feather icon-activity',
-        'permission' => ''
+        'permission' => 'user_activity_view'
     ],
 
     [
@@ -187,19 +191,19 @@ return [
         'menu_name' => 'Countries',
         'route' => 'admin.countries',
         'icon_class' => 'fa fa-globe',
-        'permission' => 'country_type_view'
+        'permission' => 'countries_view'
     ],
     [
         'menu_name' => 'States',
         'route' => 'admin.states',
         'icon_class' => 'fa fa-list-alt',
-        'permission' => 'states_type_view'
+        'permission' => 'states_view'
     ],
     [
         'menu_name' => 'City',
         'route' => 'admin.cities',
         'icon_class' => 'fa fa-list-alt',
-        'permission' => 'states_type_view'
+        'permission' => 'cities_view'
     ],
     [
         "url" => "",

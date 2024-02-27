@@ -25,6 +25,15 @@ class ProgramController extends Controller
     $this->middleware('auth:admin')->except([
       'getPrograms'
     ]);
+
+    $this->middleware('userspermission:program_view',['only'=>['index']]);
+    $this->middleware('userspermission:program_add',['only'=>['create','store']]);
+    $this->middleware('userspermission:program_edit',['only'=>['edit','update']]);
+    $this->middleware('userspermission:program_delete',['only'=>['destroy']]); 
+
+
+
+
     config([
       'study_areas' => Study::where('parent_id', 0)->get()
     ]);
@@ -59,6 +68,24 @@ class ProgramController extends Controller
 
 
     if (request()->ajax()) {
+
+
+      if((session('permissionerror'))){
+               
+           
+        return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+      
+
+
+           }
+
+
+
+
+
+
+
+
       return DataTables::of($programs)
         ->editColumn('name', function ($row) {
           return tooltip(Str::limit($row->name, 20, '...'), $row->name);

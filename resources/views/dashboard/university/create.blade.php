@@ -1,5 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
+
+
         @include('dashboard.inc.message')
         <form id="university-create-form" action="{{ route('admin.university.store') }}" method="post">
             @csrf

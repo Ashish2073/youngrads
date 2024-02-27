@@ -14,6 +14,7 @@ class CountryController extends Controller
     public function __construct()
     {
       $this->middleware('auth:admin');
+      $this->middleware('userspermission:countries_view',['only'=>['index']]);
     }
   /**
    * Display a listing of the resource.

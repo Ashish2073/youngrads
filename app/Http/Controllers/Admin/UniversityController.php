@@ -8,12 +8,17 @@ use App\Models\University;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Validator;
 
-class UniversityController extends Controller
+class UniversityController extends Controller  
 {
 
     public function __construct()
     {
         $this->middleware('auth:admin')->except('selectUniverstiy');
+        $this->middleware('userspermission:universities_view',['only'=>['index']]);
+        $this->middleware('userspermission:universities_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:universities_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:universities_delete',['only'=>['destroy']]); 
+
     }
 
 
@@ -27,11 +32,23 @@ class UniversityController extends Controller
     public function index()
     {
 
-        $universities = University::all();
-
+        $universities = University::all(); 
+ 
         if (request()->ajax()) {
 
+            if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+          
+
             return Datatables::of($universities)
+        
+            
                 ->rawColumns(['name'])
                 ->make(true);
 
@@ -54,6 +71,7 @@ class UniversityController extends Controller
      */
     public function create()
     {
+
         return view('dashboard.university.create');
     }
 

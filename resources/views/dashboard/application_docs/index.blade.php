@@ -99,7 +99,31 @@
                     url: $(this).data('url'),
                     success: function(data) {
 
-                        $('.dynamic-body').html(data);
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+                                        <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                                         aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                       <strong>Fail!</strong> ${data.errorpermissionmessage}
+                                       </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+                        }
+
                         runScript();
                     }
                 });
@@ -112,7 +136,32 @@
                     url: $(this).data('url'),
                     success: function(data) {
 
-                        $('.dynamic-body').html(data);
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+                                      <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                                      aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                      <strong>Fail!</strong> ${data.errorpermissionmessage}
+                                      </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+                        }
+
+
                         runScript();
                     }
                 });

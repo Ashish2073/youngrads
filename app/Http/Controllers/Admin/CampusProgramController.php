@@ -28,6 +28,16 @@ class CampusProgramController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
+        $this->middleware('userspermission:campus_program_view',['only'=>['index']]);
+
+        $this->middleware('userspermission:campus_program_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:campus_program_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:campus_program_delete',['only'=>['destroy']]); 
+
+
+
+
+
         $this->templateData = [
             'universties' => University::all(),
             'programs' => Program::all(),
@@ -94,6 +104,22 @@ class CampusProgramController extends Controller
 
        
         if (request()->ajax()) {
+
+
+            if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+
+
+
+
+
+
               return Datatables::of($campusPrograms)
                 ->addColumn('action', function ($row) {
                     session()->forget('used_program');

@@ -25,6 +25,16 @@ class CampusController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin')->except('selectCampus');
+        $this->middleware('userspermission:campus_view',['only'=>['index']]);
+
+        $this->middleware('userspermission:campus_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:campus_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:campus_delete',['only'=>['destroy']]); 
+        $this->middleware('userspermission:campus_details_view',['only'=>['addDetails']]); 
+        $this->middleware('userspermission:campus_details_add',['only'=>['saveDetails']]); 
+
+
+
     }
 
     /**
@@ -65,6 +75,23 @@ class CampusController extends Controller
         }
 
         if (request()->ajax()) {
+
+
+            if((session('permissionerror'))){
+               
+           
+                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+              
+
+
+            }
+
+
+
+
+
+
+
             return Datatables::of($Campus)
                 ->editColumn('logo', function ($row) {
                     session()->forget('used_university');
@@ -91,7 +118,10 @@ class CampusController extends Controller
                     }
                 }) 
 
-                ->addColumn('action', function ($row) {
+                ->addColumn('action', function ($row) { 
+
+
+
                     return "<a class='btn btn-primary btn-sm a-link' href=" . route('admin.campus-details', $row->id) . ">Add Details</a>";
                 })
                 ->rawColumns(['logo', 'cover', 'website', 'action'])

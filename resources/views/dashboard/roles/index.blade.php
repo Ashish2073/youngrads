@@ -46,22 +46,8 @@
         var dataTable;
         $(document).ready(function() {
 
-            let checkbox = $('#input[type="checkbox"]')
-            $("#toggle-permissions").on('change', function() {
-                if ($(this).is(':checked')) {
-                    console.log($(this));
-
-                    checkbox.prop("checked", true);
 
 
-                } else {
-                    checkbox.prop("checked", false);
-
-
-
-
-                }
-            })
 
 
 
@@ -118,7 +104,63 @@
                 getContent({
                     "url": url,
                     success: function(data) {
-                        $(".dynamic-body").html(data);
+
+
+
+
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+                                         <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                                           aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                           <strong>Fail!</strong> ${data.errorpermissionmessage}
+                                            </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+
+
+                            let checkboxpermission = $('input[name="permissions[]"]');
+
+
+
+                            $("#toggle-permissions").on('change', function() {
+                                if ($(this).is(':checked')) {
+
+
+                                    checkboxpermission.prop("checked", true);
+
+
+                                } else {
+                                    checkboxpermission.prop("checked", false);
+
+
+
+
+                                }
+                            })
+
+
+
+
+                        }
+
+
+
+
                         runScript();
                     }
                 });
@@ -130,7 +172,57 @@
                 getContent({
                     "url": url,
                     success: function(data) {
-                        $(".dynamic-body").html(data);
+                        if (data.errorpermissionmessage) {
+
+                            let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
+             <button type="button" id="permission_error" class="close" data-dismiss="alert"
+               aria-label="Close"><span aria-hidden="true">&times;</span></button>
+               <strong>Fail!</strong> ${data.errorpermissionmessage}
+                </div>`;
+
+
+
+                            $('.dynamic-body').html(html);
+
+                            window.setTimeout(function() {
+                                $(".alert").fadeTo(500, 0).slideUp(500, function() {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+
+
+
+
+                        } else {
+                            $('.dynamic-body').html(data);
+
+
+                            let checkboxpermission = $('input[name="permissions[]"]');
+
+
+
+                            $("#toggle-permissions").on('change', function() {
+                                if ($(this).is(':checked')) {
+
+
+                                    checkboxpermission.prop("checked", true);
+
+
+                                } else {
+                                    checkboxpermission.prop("checked", false);
+
+
+
+
+                                }
+                            })
+
+
+
+
+                        }
+
+
 
                         runScript();
                     }
@@ -163,16 +255,30 @@
                             _method: "DELETE",
                             id: id
                         },
-                        beforeSend: function() {
+                        beforeSend: function(data) {
+                            console.log(data);
                             that.attr('disabled', true).prepend(
                                 "<i class='fa fa-spinner fa-spin'></i> ");
                         },
                         success: function(data) {
+
+                            console.log(data);
+
+
+
+
+
+
+
+
+
+
                             setAlert(data);
                             dataTable.draw('page');
                             that.removeAttr('disabled').html("<i class='fa fa-trash'></i>")
                         },
                         error: function(data) {
+                            console.log(data);
                             toast("error", "Something went wrong.", "Error");
                             that.removeAttr('disabled').html("<i class='fa fa-trash'></i>");
                         }

@@ -15,6 +15,11 @@ class DocumentTypeController extends Controller
   public function __construct()
   {
     $this->middleware('auth:admin');
+    $this->middleware('userspermission:mandatory_document_view',['only'=>['index']]);
+    $this->middleware('userspermission:mandatory_document_add',['only'=>['create','store']]);
+    $this->middleware('userspermission:mandatory_document_edit',['only'=>['edit','update']]);
+    $this->middleware('userspermission:mandatory_document_delete',['only'=>['destroy']]);
+
   }
   /**
    * Display a listing of the resource.
@@ -25,6 +30,16 @@ class DocumentTypeController extends Controller
   {
     $documentTyps = DocumentType::all();
     if (request()->ajax()) {
+
+      if((session('permissionerror'))){
+               
+           
+        return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
+      
+
+
+    }
+
 
       return Datatables::of($documentTyps)
         ->editColumn('is_required', function ($row) {
@@ -40,7 +55,7 @@ class DocumentTypeController extends Controller
       $breadcrumbs = [
         ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Document Type"]
       ];
-      return view('dashboard.document_type.index', [
+      return view('dashboard.document_type.index', [ 
         'breadcrumbs' => $breadcrumbs
       ]);
     }
@@ -118,7 +133,7 @@ class DocumentTypeController extends Controller
    * @param  \App\DocumentType  $documentType
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $id)
+  public function update(Request $request, $id)   
   {
 
     $documentType = DocumentType::find($id);
