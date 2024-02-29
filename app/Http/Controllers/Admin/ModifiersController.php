@@ -44,8 +44,9 @@ class ModifiersController extends Controller
                 $users=Admin::role($rolename)->get();
 
                 
-
+ 
             }else{
+                
                 $users = Admin::all();
             }
           

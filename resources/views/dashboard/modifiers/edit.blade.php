@@ -12,6 +12,7 @@
                 'input_attribute' => [
                     'type' => 'text',
                     'value' => old('first_name', $user->first_name),
+                    'readonly' => $user->is_super == 1 ? 'true' : '',
                 ],
                 'classes' => '',
             ])
@@ -24,6 +25,7 @@
                 'input_attribute' => [
                     'type' => 'text',
                     'value' => old('last_name', $user->last_name),
+                    'readonly' => $user->is_super == 1 ? 'true' : '',
                 ],
                 'classes' => '',
             ])
@@ -36,43 +38,49 @@
                 'input_attribute' => [
                     'type' => 'email',
                     'value' => old('email', $user->email),
+                    'readonly' => $user->is_super == 1 ? 'true' : '',
                 ],
                 'classes' => '',
             ])
 
-            @include('dashboard.common.fields.text', [
-                'label_name' => 'Password',
-                'id' => 'password',
-                'name' => 'password',
-                'placeholder' => 'Enter Password',
-                'input_attribute' => [
-                    'type' => 'password',
-                    'value' => '',
-                ],
-                'classes' => '',
-                'help_text' => 'Leave blank to use existing password',
-            ])
+            @if ($user->is_super != 1)
 
-            @include('dashboard.common.fields.text', [
-                'label_name' => 'Confirm Password',
-                'id' => 'confirm-password',
-                'name' => 'password_confirmation',
-                'placeholder' => 'Enter Confirm Password',
-                'input_attribute' => [
-                    'type' => 'password',
-                    'value' => '',
-                ],
-                'classes' => '',
-            ])
 
-            {{-- @php
+                @include('dashboard.common.fields.text', [
+                    'label_name' => 'Password',
+                    'id' => 'password',
+                    'name' => 'password',
+                    'placeholder' => 'Enter Password',
+                    'input_attribute' => [
+                        'type' => 'password',
+                        'value' => '',
+                        'readonly' => $user->is_super == 1 ? 'true' : '',
+                    ],
+                    'classes' => '',
+                    'help_text' => 'Leave blank to use existing password',
+                ])
+
+                @include('dashboard.common.fields.text', [
+                    'label_name' => 'Confirm Password',
+                    'id' => 'confirm-password',
+                    'name' => 'password_confirmation',
+                    'placeholder' => 'Enter Confirm Password',
+                    'readonly' => $user->is_super == 1 ? 'true' : '',
+                    'input_attribute' => [
+                        'type' => 'password',
+                        'value' => '',
+                    ],
+                    'classes' => '',
+                ])
+
+                {{-- @php
                 $role_options = [
                     '' => '--Select Role--',
                 ];
                 foreach ($roles as $role) {
                     $role_options[$role] = strtoupper($role);
                 }
-            @endphp --}}
+            @endphp 
             {{-- @include('dashboard.common.fields.select', [
               'label_name' => 'Role',
               'id' => 'role',
@@ -83,36 +91,41 @@
             ]) --}}
 
 
-            <div class="col-md-12 col-12">
-                <div class="form-group">
-                    <label for="rolename">Role</label>
-                    <select id="rolename" name="rolename[]" data-live-search="true" multiple
-                        class=" select form-control">
-                        <option value="" disabled>Please Select Roles</option>
+                <div class="col-md-12 col-12">
+                    <div class="form-group">
+                        <label for="rolename">Role</label>
+                        <select id="rolename" name="rolename[]" data-live-search="true" multiple
+                            class=" select form-control">
+                            <option value="" disabled>Please Select Roles</option>
 
 
 
-                        @foreach ($roles as $k => $role)
-                            <option value="{{ $role->name }}" @if (in_array($role->name, json_decode($user->role))) selected @endif>
-                                {{ strtoupper($role->name) }}</option>
-                        @endforeach
+                            @foreach ($roles as $k => $role)
+                                <option value="{{ $role->name }}" @if (in_array($role->name, json_decode($user->role))) selected @endif>
+                                    {{ strtoupper($role->name) }}</option>
+                            @endforeach
 
-                    </select>
+                        </select>
+                    </div>
                 </div>
-            </div>
 
 
 
 
 
-            <div class="form-group">
-                <button type="submit" id="submit-btn" class="btn btn-primary">Update Modefiers</button>
-            </div>
+                <div class="form-group">
+                    <button type="submit" id="submit-btn" class="btn btn-primary">Update Modefiers</button>
+                </div>
+            @endif
     </div>
     </form>
 
     @php
         $usermoderatorcount = \App\Models\User::where('moderator_id', $user->id)->count();
+
+        if ($user->is_super == 1) {
+            $usermoderatorcount = 1;
+        }
 
     @endphp
 
@@ -124,13 +137,14 @@
                 <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
             </form>
         @else
-            <p>{{ config('setting.delete_notice') }}</p>
-
             @php session()->put('used_modifier',$user->id); @endphp
-
-
-            <a href="{{ url('admin/students') }}">
-                <p> click Here to Show Uses</p><a>
+            @if ($user->is_super == 1)
+                <p>This User Is Super Admin</p><a>
+                @else
+                    <p>{{ config('setting.delete_notice') }}</p>
+                    <a href="{{ url('admin/students') }}">
+                        <p> click Here to Show Uses</p><a>
+            @endif
         @endif
     </div>
 </div>

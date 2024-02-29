@@ -218,10 +218,12 @@ if (!function_exists('hasPermissionForRoles')) {
             ->whereIn('role_id', $roleIds)
             ->where('permission_id', $permissionId)
             ->count();
- 
+          
+        
             
 
         if($count > 0){
+         
             return true;
         }else{
             return false;

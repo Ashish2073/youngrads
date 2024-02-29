@@ -23,7 +23,7 @@ class AdminController extends Controller
     public function index()
     {
         if(request()->ajax()) { 
-            $users = Admin::all();
+            $users = Admin::role('Admin')->get();
             return Datatables::of($users)
                 ->editColumn('last_name', function($row) {
                     return $row->last_name ?? "N/A";

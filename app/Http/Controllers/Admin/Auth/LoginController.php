@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Auth;
 use Auth; 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Spatie\Activitylog\Models\Activity;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 
 class LoginController extends Controller 
@@ -54,8 +55,12 @@ class LoginController extends Controller
         }
 
         //attempt login.
-        if (Auth::guard('admin')->attempt($request->only('email', 'password'), $request->filled('remember'))|| (auth()->guard('modifier')->user())) {
+        if (Auth::guard('admin')->attempt($request->only('email', 'password'), $request->filled('remember'))) {
             //Authenticated
+            activity('login')
+            ->causedBy(Auth::guard('admin')->user())
+            ->withProperties(['ip' => $request->ip()])
+            ->log('Admin Login');
             
 
             return redirect()
@@ -75,8 +80,15 @@ class LoginController extends Controller
      * 
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function logout()
+    public function logout(Request $request)
     {
+      
+        activity('logout')
+        ->causedBy(Auth::guard('admin')->user())
+        ->withProperties(['ip' => $request->ip()])
+        ->log('Admin Logout');
+
+
 
         Auth::guard('admin')->logout();
         return redirect()
@@ -101,6 +113,7 @@ class LoginController extends Controller
         //custom validation error messages.
         $messages = [
             'email.exists' => 'These credentials do not match our records.',
+            
         ];
 
         //validate the request.
@@ -123,7 +136,7 @@ class LoginController extends Controller
     /**
      * Username used in ThrottlesLogins trait
      * 
-     * @return string
+     * @return string 
      */
     public function username()
     {

@@ -25,6 +25,13 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
     public $response;
     public function collection(Collection $records)
     {
+
+        $userrole=json_decode(auth('admin')->user()->getRoleNames(),true);
+
+
+
+        if ((hasPermissionForRoles('import_data_add',$userrole)) || auth('admin')->user()->getRoleNames()[0]=="Admin") {
+
         $univsNameIdArr = University::getNameIdIndexedArray();
        
         $univIdCampusNameArr = Campus::getUnivIdCampusNameArr(); 
@@ -366,6 +373,28 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
            
             
         }
+
+    }else{
+
+        $sheetError[] = [
+            'message' => 'You Have Not Permission!',
+          
+        ];
+        
+        
+        $this->response = [
+            'success' => false,
+            'title' => 'Authrization',
+            'code' => 'fail',
+            'message' => 'You Have Not Permission',
+            'sheetError' => $sheetError,
+            
+        ];
+       
+      
+        return $this->response;
+
+    }
     }
 
     public function chunkSize(): int

@@ -19,7 +19,7 @@
     .role-card-1 {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
         transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-        width: 100px;
+        width: 135px;
         height: 35px;
         background-color: #ff8510;
         display: flex;
@@ -120,8 +120,8 @@
                                             multiple class=" select form-control apply-filter-role">
                                             @foreach ($roles as $role)
                                                 <option
-                                                    @if (session()->has("used_role_$role->name")) @if (session()->get("used_role_$role->name") == $role->name)
-                                                    @php session()->forget("used_role_$role->name") @endphp
+                                                    @if (request('role') != null) @if (request('role') == $role->name)
+                                                   
                                                  selected @endif
                                                     @endif
                                                     value="{{ $role->name }}">
@@ -433,7 +433,7 @@
                     let userRoleHTML = "";
                     for (let i = 0; i < roleLength; i++) {
                         userRoleHTML = userRoleHTML + `<div class="role-card-1">
-                                    <div class="close-button">✖</div>
+                                   
                                     <h5>${data[i]}</h5>
                                 </div>`;
 

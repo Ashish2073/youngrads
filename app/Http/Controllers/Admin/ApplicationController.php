@@ -27,12 +27,13 @@ use App\Models\University;
 use App\Models\User; 
 use App\Models\AddDataLimit;
 use App\Models\Admin;
-
+ 
 class ApplicationController extends Controller
 {
 	public function __construct()
 	{
 		$this->middleware('auth:admin');
+		$this->middleware('userspermission:applications_view',['only'=>['index']]);
 	}
 
 	public function index(Request $request)
@@ -64,6 +65,9 @@ class ApplicationController extends Controller
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
+			}else{
+				$userid=0;
+				$message_status_type="moderator_message_status";
 			}
 			
 		} elseif(auth('web')->check()) {
@@ -94,8 +98,8 @@ class ApplicationController extends Controller
 			->join('programs', 'campus_programs.program_id', "=", 'programs.id')
 			->join('universities', 'campus.university_id', '=', 'universities.id')
 			->select('intakes.name as intake','admins.username as moderator_username','users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
-			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "'  && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='0')) as count"),
-			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1' )) as moderatortoadmincount"))
+			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid. "'  && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='0')) as count"),
+			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid  . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1' )) as moderatortoadmincount"))
 			->where('campus.university_id','=',$usedCampusProgramUniversityId)
 			->where('campus_programs.campus_id','=',$usedCampusProgramCampusId)
 			->where('campus_programs.program_id','=',$usedCampusProgramId)
@@ -617,7 +621,8 @@ class ApplicationController extends Controller
 	
 	public function applicationallow(Request $request){
 		// AddDataLimit
-
+		$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? [];
+		if(hasPermissionForRoles('application_apply_limit_add', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
 		$validator = Validator::make($request->all(), [
            
             'count' => ['required','numeric','min:0']
@@ -626,6 +631,8 @@ class ApplicationController extends Controller
 
 		if ($validator->fails()) { 
             $errors = $validator->errors(); 
+
+			
 
          
             return response()->json([
@@ -643,6 +650,18 @@ class ApplicationController extends Controller
 			'Data'=>json_decode($DataLimit,true)
 		]);
 
+	    }else{
+
+		
+			return response()->json([
+				'authorization'=>false,
+				'message' => 'You Have Not Permission',
+				'errors'=>"You have not permission",
+
+
+			],422);
+			
+	      }
 
 		// if ($DataLimit->wasRecentlyCreated) {
 		// 	// The record was just created

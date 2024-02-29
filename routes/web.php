@@ -147,11 +147,11 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
             'edit' => 'user.edit', 
             'update' => 'user.update',
             'store' => 'user.store',
-            'destroy' => 'user.destroy'
+            'destroy' => 'user.destroy' 
         ]
     ]);
   //Moderator Mangment
-  Route::resource('modifiers', '\App\Http\Controllers\Admin\ModifiersController', [
+  Route::resource('modifiers', '\App\Http\Controllers\Admin\ModifiersController',[
     'names' => [
         'index' => 'modifiers', 
         'create' => 'modifier.create',
@@ -429,7 +429,7 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     Route::get('/city/address/{id}', [\App\Http\Controllers\Admin\AddressController::class, 'selectCity'])->name('city');
 
     //application route
-    Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all')->middleware('userspermission:application_view');
+    Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all');
     
      Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
     

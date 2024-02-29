@@ -63,9 +63,9 @@ class RoleController extends Controller
                          if($userrolecount==0){ 
                             return "<button class='btn btn-danger role-delete btn-icon btn-round' data-id=$row->id><i class='fa fa-trash'></i></button>";
                          }else{
-                             session()->put("used_role_$row->name",$row->name);  
-                            return "Cannot delete it'use in <a href='".url('admin/modifiers')."' ><p> click Here to Show Uses</p><a>";
-                         }
+                              
+                            return "Cannot delete it'use in <a href='".url('admin/modifiers').'/'.'?role='.$row->name."' ><p> click Here to Show Uses</p><a>";
+                         } 
                        
                     
                     

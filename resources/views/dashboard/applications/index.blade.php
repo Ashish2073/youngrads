@@ -183,8 +183,16 @@
 
                                 <div class="col-md-4 col-12 text-right">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
-                                    <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit Of
-                                        Aplication</button>
+
+                                    @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
+                                    @if (hasPermissionForRoles('application_apply_limit_view', $userrole) ||
+                                            auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                                        <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit
+                                            Of
+                                            Aplication</button>
+                                    @endif
+
+
                                     <a href="{{ route('admin.students-application-export') }}"
                                         class="btn btn-primary mt-3 export-app-mob">Export Students Application Data In
                                         Excel Form</a>
@@ -329,7 +337,7 @@
 
 
             //    console.log(usedUniversityId);
-            //    console.log(usedCampusId);
+            //    console.log(usedCampusId);  
             //    console.log(usedProgramId); 
 
             //     console.log('hello');
@@ -447,7 +455,7 @@
 
 
                 let applictionIdLatestMessage = "";
-                console.log(typeof($(this).data('id')));
+
                 if ((typeof(($(this).data('id'))) == 'number')) {
                     applictionIdLatestMessage = [parseInt($(this).data('id'))];
                 } else {
@@ -471,8 +479,7 @@
             $("#showadminmoderatorlatestmessage").click(function() {
 
 
-                let applictionIdLatestMessage = "";
-                console.log(typeof($(this).data('id')));
+                let applictionIdLatestMessage = "";;
                 if ((typeof(($(this).data('id'))) == 'number')) {
                     applictionIdLatestMessage = [parseInt($(this).data('id'))];
                 } else {
@@ -694,7 +701,7 @@
             $(document).on('click', '.profile', function() {
                 id = $(this).data('id');
                 var url = `{{ url('student/${id}/viewprofile') }}`;
-                console.log(url);
+
                 window.application = ($(this).data('application'))
                 $('#apply-model').modal('show');
                 $('.apply-title').html('View Profile');
@@ -805,7 +812,7 @@
             $(document).on('click', '.admin-message', function() {
                 $('.dynamic-title').text('');
                 message_scenario = $(this).attr("data-custom");
-                console.log(message_scenario);
+
                 id = $(this).data('id');
                 $.ajax({
                     url: "{{ url('admin/application') }}" + "/" + id + "/" + "message",
@@ -894,6 +901,9 @@
                         },
                         error: function(data) {
 
+
+
+
                             let html = $('.toast-error');
 
 
@@ -901,6 +911,12 @@
 
                                 $(this).hide();
                             });
+
+                            if (data.responseJSON.authorization == false) {
+                                toast("error", data.responseJSON.errors, "Error");
+                                $('#myModal').modal('hide');
+
+                            }
 
 
                             if (data.responseJSON.errors.count[0]) {

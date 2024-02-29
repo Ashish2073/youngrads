@@ -116,13 +116,19 @@
 
 
 
-                            <a href="{{ route('admin.students-data-export') }}" class="btn btn-primary mt-3">Export Students
+
+                            <a href="{{ route('admin.students-data-export') }}" class="btn btn-primary mt-3">Export
+                                Students
                                 Application Data In Excel Form</a>
 
-                            <a href="javascript:void(0)" class="btn btn-primary mt-3" id="assignstudentmoderator">Assign
-                                Students
-                                To Moderator</a>
 
+                            @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
+                            @if (hasPermissionForRoles('assign_students_to_moderator_view', $userrole) ||
+                                    auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                                <a href="javascript:void(0)" class="btn btn-primary mt-3" id="assignstudentmoderator">Assign
+                                    Students
+                                    To Moderator</a>
+                            @endif
 
                             <div class="row application-filter align-items-center" id="studentassigndiv" hidden>
 
@@ -216,8 +222,12 @@
                                             <th>Passport No.</th>
                                             <th>DOB</th>
                                             <th>Shortlisted Programs</th>
-                                            <th>Action</th>
-                                            {{-- <th>Action</th> --}}
+                                            @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
+                                            @if (hasPermissionForRoles('students_delete', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                                                <th>Action</th>
+                                            @else
+                                                <th hidden>Action</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                 </table>
@@ -372,7 +382,7 @@
 
                     $("#assign-all-student").on('change', function() {
                         if ($(this).is(':checked')) {
-                            console.log($(this));
+
 
                             ckeckbox.prop("checked", true);
 
@@ -505,23 +515,34 @@
                             "<i class='fa fa-spinner fa-spin'></i> ");
                     },
                     success: function(data) {
-                        setAlert(data);
-
-                        dataTable.draw();
-
-                        $("#thead-moderator-checkbox").attr('hidden', true);
-                        $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
-                        $("#studentassigndiv").attr("hidden", true);
 
 
+                        if (data.error) {
+                            toast("error", data.message, "Error");
+                            that.removeAttr('disabled').html(
+                                "Save"
+                            );
+                        } else {
 
-                        that.removeAttr('disabled').html(
-                            "Save"
-                        );
+                            setAlert(data);
 
+                            dataTable.draw();
+
+                            $("#thead-moderator-checkbox").attr('hidden', true);
+                            $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
+                            $("#studentassigndiv").attr("hidden", true);
+
+
+
+                            that.removeAttr('disabled').html(
+                                "Save"
+                            );
+                        }
 
                     },
                     error: function(data) {
+
+
                         toast("error", "Something went wrong.", "Error");
                     }
                 });
@@ -577,7 +598,7 @@
                         $('.dynamic-body').html("Loading...");
                     },
                     success: function(data) {
-                        console.log(data);
+
                         $('.dynamic-body').html(data);
                         $("#shortlist-table").dataTable();
                     }

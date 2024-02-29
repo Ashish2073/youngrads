@@ -11,14 +11,21 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Role;
 
 
 class Admin extends Authenticatable
 {
 
-    use LogsActivity; 
+    use LogsActivity,Notifiable;  
+
      protected static $logOnlyDirty = true;
     protected static $logFillable = true;
+
+  
+
+    protected static $logAttributes=['username','email'];
+   
 
     use HasRoles;
     use Notifiable;
@@ -40,9 +47,16 @@ class Admin extends Authenticatable
      *
      * @return void
      */
+
+   
+
+
+
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+        
     }
     public function sendPasswordResetNotification($token)
     {
@@ -69,6 +83,9 @@ class Admin extends Authenticatable
     {
         return $this->name . " " . $this->last_name;
     }
+
+
+
 
     public static  function getunreadmessage()
     {

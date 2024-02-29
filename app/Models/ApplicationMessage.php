@@ -15,7 +15,7 @@ class ApplicationMessage extends Model
     use LogsActivity;
     protected static $logOnlyDirty = true;
     protected static $logFillable = true;
-    protected $guarded = [];
+    protected $guarded = []; 
 
     // public function adminName(){
     //      if($this->guard == 'admin'){
@@ -29,4 +29,5 @@ class ApplicationMessage extends Model
         return LogOptions::defaults();
     }
 
+ 
 }

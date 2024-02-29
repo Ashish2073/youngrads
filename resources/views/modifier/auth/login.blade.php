@@ -19,6 +19,11 @@
                         <div class="card rounded-0 mb-0 px-2">
                             <div class="card-header pb-1">
                                 <div class="card-title">
+                                    @if (session('error'))
+                                        <div class="alert alert-danger">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
                                     <h4 class="mb-0">Modifier Login</h4>
                                 </div>
                             </div>

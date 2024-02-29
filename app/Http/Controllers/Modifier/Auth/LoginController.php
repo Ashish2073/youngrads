@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Modifier\Auth;
 use Auth; 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Spatie\Activitylog\Models\Activity;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 
 
@@ -50,10 +51,15 @@ class LoginController extends Controller
         if (Auth::guard('admin')->attempt($request->only('username', 'password'), $request->filled('remember'))) {
             //Authenticated
             
-        
+            activity('login')
+            ->causedBy(Auth::guard('admin')->user())
+            ->withProperties(['ip' => $request->ip()])
+            ->log('USER Login');
+            
+         
             return redirect()
                 ->intended(route('admin.home'))
-                ->with('status', 'You are Logged in as admin!');
+                ->with('status', 'You are Logged in as Modifer!');
         }
 
         //keep track of login attempts from the user.
@@ -65,10 +71,19 @@ class LoginController extends Controller
 
 
 
-    public function logout()
+    public function logout(Request $request)
     {
+  
+        activity('logout')
+        ->causedBy(Auth::guard('admin')->user())
+        ->withProperties(['ip' => $request->ip()])
+        ->log('USer logout');
+
 
         Auth::guard('admin')->logout();
+      
+
+
         return redirect()
             ->route('modifier.login')
             ->with('status', 'Modifier has been logged out!');
@@ -87,7 +102,7 @@ class LoginController extends Controller
             'username.exists' => 'These credentials do not match our records.',
         ];
 
-        //validate the request.
+        //validate the request. 
         $request->validate($rules, $messages);
     }
 

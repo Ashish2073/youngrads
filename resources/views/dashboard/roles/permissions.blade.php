@@ -8,13 +8,15 @@
         'admin_users' => $crud,
         'roles_and_permissions' => $crud,
         'students' => ['view', 'N/A', 'N/A', 'delete'],
+        'assign_students_to_moderator' => ['view', 'add', 'N/A', 'N/A'],
         'universities' => $crud,
         'campus' => $crud,
         'campus_details' => ['view', 'add', 'N/A', 'N/A'],
         'campus_program' => $crud,
         'program' => $crud,
         'universities' => $crud,
-        'application' => $crud,
+        'applications' => $crud,
+        'application_apply_limit' => ['view', 'add', 'N/A', 'N/A'],
         'program_level' => $crud,
         // 'pages' => $crud,
         'study' => $crud,
@@ -141,6 +143,7 @@
                             <label for="{{ ucfirst($key) }}">
 
                                 <input name="permissions[]" value="" data-parent="{{ $key }}"
+                                    @if ($key == 'dashboard') checked @endif
                                     {{ havePermission($role ?? '', $key) ? 'checked' : '' }} class="parent-item"
                                     id="{{ $key }}" type="checkbox">
                                 {{ ucfirst($key) }}

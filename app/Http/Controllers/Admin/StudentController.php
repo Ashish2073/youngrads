@@ -32,12 +32,12 @@ class StudentController extends Controller
 	public function __construct()
 	{
 		$this->middleware('auth:admin')->except('profileResume');
-		$this->middleware('userspermission:students_view',['only'=>['index']]);
+		$this->middleware('userspermission:students_view',['only'=>['index']]);  
 	}
 
 	public function index(Request $request)
 	{
-	
+	 
 		if (request()->ajax()) {
 			
 			
@@ -153,7 +153,10 @@ class StudentController extends Controller
 					return $row->dob ? date("d M Y", strtotime($row->dob)) : "N/A";
 				})
 				->addColumn('action', function ($row) {
+					$userrole=json_decode(auth('admin')->user()->getRoleNames(),true) ?? [];
+					if(hasPermissionForRoles('students_delete',$userrole)|| auth('admin')->user()->getRoleNames()[0]=="Admin"){
 					return "<button class='btn btn-danger student-delete btn-icon btn-round' data-id={$row->id}><i class='fa fa-trash'></i></button>";
+					}
 				})
 				//<button class='btn btn-primary student-edit btn-icon btn-round' data-id={$row->id}><i class='fa fa-edit'></i></button>";
 				// ->addColumn('edit', function ($row) {
@@ -290,6 +293,17 @@ class StudentController extends Controller
 	}
 
 	public function moderator_assign_to_students(Request $request){
+
+
+
+
+
+
+		 $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
+		if(hasPermissionForRoles('assign_students_to_moderator_add', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
+
+		
+
     
 		if($request->moderatorid==0){
 		$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>null]);
@@ -315,7 +329,15 @@ class StudentController extends Controller
 
 		}
 
-		
+	}else{
+		return response()->json([
+			'error' => true,
+			'code' => 'fail',
+			'title' => 'Not Permission',
+			'message' => 'You have not permisson'
+		]);
+
+	}
 
 	}
 

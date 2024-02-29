@@ -120,7 +120,7 @@ return [
                 'menu_name' => 'Program Levels',
                 'route' => 'admin.programlevels',
                 'icon_class' => 'fa fa-tasks',
-                'permission' => 'program_view'
+                'permission' => 'program_level_view'
             ],
             [
                 'menu_name' => 'Study Areas',
