@@ -61,7 +61,7 @@ class LoginController extends Controller
             ->causedBy(Auth::guard('admin')->user())
             ->withProperties(['ip' => $request->ip()])
             ->log('Admin Login');
-            
+             
 
             return redirect()
                 ->intended(route('admin.home'))

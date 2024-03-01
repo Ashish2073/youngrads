@@ -62,7 +62,7 @@
 
                 @include('dashboard.common.fields.text', [
                     'label_name' => 'Confirm Password',
-                    'id' => 'confirm-password',
+                    'id' => 'confirm_password',
                     'name' => 'password_confirmation',
                     'placeholder' => 'Enter Confirm Password',
                     'readonly' => $user->is_super == 1 ? 'true' : '',

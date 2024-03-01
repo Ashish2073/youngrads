@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Facades\Auth;
+
 use App\Models\Files;
 use App\Models\ApplicationMessage;
 use App\Models\MessageAttachment;
@@ -28,17 +30,73 @@ class ApplicationMessageController extends Controller
 	 */
 	public function index(Request $request)
 	{
+
+		
+
+
+
+ 
 		if (auth('admin')->check()) {
 			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
                $userid=auth('admin')->user()->username;
 			   $message_status_type="admin_message_status";
 			   $role="admin" ;
+			 
+			 
 			   $messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['admin_message_status' => 'read']);
+			   
+			//    if($messageStatis){
+
+			
+
+			// 	$usersActivity=['log_name'=>'Read ApplicationMessage',
+			// 	'description'=>'Read Application Message',
+			// 	'event'=>'Read Messages',
+			// 	'subject_type'=>'App\Models\ApplicationMessage',
+			// 	'causer_id'=>auth('admin')->user()->id,
+			// 	'ip_address'=>$request->ip(),
+			// 	'created_at' => now(),
+			// 	'updated_at' => now(),
+				
+			//    ];
+                 
+			//    createActiveLog($usersActivity);
+
+
+
+
+				// activity('Read ApplicationMessage')  
+				// ->causedBy(Auth::guard('admin')->user())
+				// ->withProperties(['ip' => $request->ip()])
+				// ->log('Read ApplicationMessage');
+ 
+			//    }
+
+
+			activity('Read ApplicationMessage')  
+			->causedBy(Auth::guard('admin')->user())
+			->withProperties(['ip' => $request->ip()])
+			->log('Read ApplicationMessage');
+			
+			 
+			
+			
+			 
+			
 			}else{
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['moderator_message_status' => 'read']);
 				$role="moderator";
+
+				activity('Read ApplicationMessage')  
+				->causedBy(Auth::guard('admin')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Read ApplicationMessage');
+
+
+
+
 			}
 			
 		} elseif(auth('web')->check()) {
@@ -47,6 +105,17 @@ class ApplicationMessageController extends Controller
 			$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['user_message_status' => 'read']);
 			
 			$role="user";
+
+			activity('Read ApplicationMessage')  
+			->causedBy(Auth::guard('web')->user())
+			->withProperties(['ip' => $request->ip()])
+			->log('Read ApplicationMessage');
+
+
+
+
+
+
 		}
 
 		
@@ -97,6 +166,14 @@ class ApplicationMessageController extends Controller
 		$applicationMessage->message_scenario = $request->message_scenario;
 		
 		$applicationMessage->save();
+
+		activity('Created ApplicationMessages')
+		->causedBy(Auth::guard('admin')->user())
+		->withProperties(['ip' => $request->ip()])
+		->log('Created ApplicationMessages');
+		
+
+
 	
 
 		if (isset($request->document)) {

@@ -358,7 +358,7 @@ class ApplicationController extends Controller
 		}
 	}
 
-	public function applicationMessage($id)
+	public function applicationMessage(Request $request,$id)
 	{
 		if (auth('admin')->check()) {
 			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
@@ -366,11 +366,33 @@ class ApplicationController extends Controller
 			   $message_status_type="admin_message_status";
 			   $role="admin" ;
 			   $messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['admin_message_status' => 'read']);
+			
+			   activity('Read ApplicationMessage')  
+				->causedBy(Auth::guard('admin')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Read ApplicationMessage');
+			
+			
+			
+			
+			
+			
+			
 			}else{
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
 				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['moderator_message_status' => 'read']);
+			
+				
+				activity('Read ApplicationMessage')  
+				->causedBy(Auth::guard('admin')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Read ApplicationMessage');
+			
+			
+			
+			
 			}
 			
 		} elseif(auth('web')->check()) {
@@ -378,6 +400,11 @@ class ApplicationController extends Controller
 			$message_status_type="user_message_status";
 			
 			$role="user";
+
+			activity('Read ApplicationMessage')  
+				->causedBy(Auth::guard('web')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Read ApplicationMessage');
 			$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['user_message_status' => 'read']);
 		}
 		
@@ -400,7 +427,9 @@ class ApplicationController extends Controller
 		$userApplication = UserApplication::find($request->id);
 		$old_status = $userApplication->status;
 		$userApplication->status = $request->status;
-		if ($userApplication->save()) {
+		if ($userApplication->save()) { 
+
+		
 
 			if ($request->status != $old_status) {
 				$userApplication->createActivity();

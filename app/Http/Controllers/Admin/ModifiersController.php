@@ -86,11 +86,12 @@ class ModifiersController extends Controller
 
           
      
-        $validations_arr = [
+        $validations_arr = [ 
             'first_name' => 'required|max:255',
              'last_name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:admins,email',
             'password' => 'required|min:6|confirmed',
+            'rolename'=>'required',
            
         ];
 
@@ -112,7 +113,7 @@ class ModifiersController extends Controller
         // ]);
        
 
-        
+         
             $user = Admin::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
@@ -120,13 +121,15 @@ class ModifiersController extends Controller
                 'password' => Hash::make($request->password)
             ]);
         
-            // Update the 'username' field after creating the user
+             // Update the 'username' field after creating the user
            
         
         if($user) {
             $user->update([
                 'username' => strtoupper('YGMOD'.$user->id)
+
             ]);
+
             
             $user->assignRole($request->rolename);
         

@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Admin;
+
 
 class ActivityController extends Controller
 {
@@ -21,6 +23,12 @@ class ActivityController extends Controller
         config([
             'users' => User::orderBy('name', 'asc')->get()
         ]);
+
+        
+
+
+
+
     }
     /**
      * Display a listing of the resource.
@@ -38,15 +46,51 @@ class ActivityController extends Controller
             //'contentLayout' => "content-left-sidebar",
         ];
 
-        $records = Activity::where('id', '!=', 0);
+      $moderator= Admin::join('users','users.moderator_id','=','admins.id')
+      ->join('model_has_roles','model_has_roles.model_id','=','admins.id')
+      ->join('roles','model_has_roles.role_id','=','roles.id')
+      ->select('admins.id as moderatorid','admins.email as email','roles.name as role_name',DB::raw("CONCAT(admins.first_name, ' ', admins.last_name) as full_name"))
+      ->where('roles.name','moderator')
+      ->where('model_has_roles.model_type','App\Models\Admin')
+      ->distinct()
+      ->get();
+
+    
+   
+    
+
+
+        $records = Activity::where('id', '!=', 0)->whereNotNull('causer_id')->orderBy('id','desc')->get();
+
+      
         if (request()->ajax()) {
 
+         
+
             if (request()->has('user_id') && !empty(request()->get('user_id'))) {
-                $records->where('activity_log.causer_id', request()->get('user_id'));
+
+                $records=Activity::where('id', '!=', 0)->whereNotNull('causer_id')->whereIn('causer_id', request()->get('user_id'))->orderBy('id','desc')->get();
+               
+
+               
             }
 
+            
+            if (request()->has('moderator_id') && !empty(request()->get('moderator_id'))) {
+  
+
+                $records=Activity::where('id', '!=', 0)->whereNotNull('causer_id')->whereIn('causer_id', request()->get('moderator_id'))->where('causer_type','=','App\Models\Admin')->orderBy('id','desc')->get();
+               
+
+               
+            }
+
+      
+
             return Datatables::of($records)
+          
                 ->editColumn('created_at', function ($row) {
+                    
                     return date("d M Y h:i A", strtotime($row->created_at));
                 })
                 ->editColumn('description', function ($row) {
@@ -87,7 +131,7 @@ class ActivityController extends Controller
                 ->rawColumns(['user'])
                 ->make(true);
         } else {
-            return view('dashboard.activities.index', compact('breadcrumbs', 'pageConfigs'));
+            return view('dashboard.activities.index', compact('breadcrumbs', 'pageConfigs','moderator'));
         }
     }
 

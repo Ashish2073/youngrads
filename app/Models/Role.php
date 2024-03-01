@@ -13,10 +13,10 @@ class Role extends \Spatie\Permission\Models\Role
    use SoftDeletes,LogsActivity;
    protected $softDelete = "true";
 
-   
+     
 
    protected static $logOnlyDirty = true;
-  protected static $logFillable = true;
+  protected static $logFillable = true; 
 
   protected static $logAttributes=['name'];
  

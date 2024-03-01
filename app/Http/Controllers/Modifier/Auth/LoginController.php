@@ -54,7 +54,7 @@ class LoginController extends Controller
             activity('login')
             ->causedBy(Auth::guard('admin')->user())
             ->withProperties(['ip' => $request->ip()])
-            ->log('USER Login');
+            ->log('modifier Login');
             
          
             return redirect()
@@ -77,7 +77,7 @@ class LoginController extends Controller
         activity('logout')
         ->causedBy(Auth::guard('admin')->user())
         ->withProperties(['ip' => $request->ip()])
-        ->log('USer logout');
+        ->log('Modifier logout');
 
 
         Auth::guard('admin')->logout();

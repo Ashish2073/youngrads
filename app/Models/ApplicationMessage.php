@@ -12,10 +12,12 @@ class ApplicationMessage extends Model
 {
     protected $table = "application_message";
 
-    use LogsActivity;
-    protected static $logOnlyDirty = true;
+    use LogsActivity; 
+    protected static $logOnlyDirty = true; 
     protected static $logFillable = true;
     protected $guarded = []; 
+
+    // protected static $logAttributes=['message','admin_message_status'];
 
     // public function adminName(){
     //      if($this->guard == 'admin'){

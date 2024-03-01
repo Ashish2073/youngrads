@@ -14,7 +14,7 @@ if(!function_exists('errMsg')) {
 if(!function_exists('errCls')) {
     function errCls()
     {
-        return 'is-invalid';
+        return 'is-invalid'; 
     }
 }
 
@@ -230,6 +230,9 @@ if (!function_exists('hasPermissionForRoles')) {
         }
     }
 }
+
+
+
 
 
 

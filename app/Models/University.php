@@ -10,7 +10,7 @@ use Spatie\Activitylog\LogOptions;
 class University extends Model
 {
   protected $table = "universities";
-  use SoftDeletes;
+  use SoftDeletes; 
   use LogsActivity;
   protected static $logOnlyDirty = true;
   protected static $logFillable = true;

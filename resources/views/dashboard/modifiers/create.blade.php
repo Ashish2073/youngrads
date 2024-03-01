@@ -55,7 +55,7 @@
 
             @include('dashboard.common.fields.text', [
                 'label_name' => 'Confirm Password',
-                'id' => 'confirm-password',
+                'id' => 'password_confirmation',
                 'name' => 'password_confirmation',
                 'placeholder' => 'Enter Confirm Password',
                 'input_attribute' => [
@@ -85,8 +85,7 @@
             <div class="col-md-12 col-12">
                 <div class="form-group">
                     <label for="rolename">Role</label>
-                    <select id="rolename" name="rolename[]" data-live-search="true" multiple
-                        class=" select form-control">
+                    <select id="rolename" name="rolename" data-live-search="true" multiple class=" select form-control">
                         <option value="" disabled>Please Select Roles</option>
                         @foreach ($roles as $role)
                             <option value="{{ $role->name }}">{{ strtoupper($role->name) }}</option>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UnivCampusImport;
+use Illuminate\Support\Facades\Auth;
 use App\Imports\CampusProgramImport;
 
 use App\Models\Program;
@@ -26,11 +27,15 @@ class ImportController extends Controller
             'breadcrumbs' => $breadcrumbs
         ]); 
     }
- 
-    public function importUnivCampus()
+  
+    public function importUnivCampus(Request $request)
     {
+       
         $import = new  UnivCampusImport();
         Excel::import($import, request()->file('univ_campus_file'));
+
+       
+  
         
         return response()->json($import->response); 
     }

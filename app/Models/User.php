@@ -46,7 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return LogOptions::defaults();
     }
-    protected $hidden = [
+    protected $hidden = [ 
         'password', 'remember_token',
     ];
 

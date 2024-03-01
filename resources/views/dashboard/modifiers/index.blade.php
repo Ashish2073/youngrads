@@ -326,6 +326,45 @@
             // $(".select").select2();
             $(".select").selectpicker();
 
+            validateForm($('#modifier-create-form'), {
+                rules: {
+                    first_name: {
+                        required: true,
+                    },
+                    last_name: {
+                        required: true
+                    },
+                    email: {
+                        required: true
+                    },
+                    password: {
+                        required: true,
+                        number: true,
+                    },
+                    password_confirmation: {
+                        required: true,
+                        number: true,
+                    },
+                    rolename: {
+                        required: true,
+
+                    }
+
+                },
+                messages: {
+                    // duration: {
+                    //     number: 'Enter duration in months.'
+                    // }
+
+                }
+            });
+
+
+
+
+
+
+
 
             submitForm($("#modifier-create-form"), {
                 beforeSubmit: function() {

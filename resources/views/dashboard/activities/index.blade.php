@@ -14,44 +14,101 @@
     </style>
 @endsection
 
-@section('content')
-    <section id="basic-datatable">
-        <div class="row align-items-center mb-2">
-            <div class="col-3">
-                <div class="form-group">
-                    <label for="intake">Users</label>
-                    <select data-live-search='true' data-style="bg-white border-light" class="select form-control"
-                        name="user" id="user">
-                        <option value="">All Users</option>
-                        @foreach (config('users') as $user)
-                            <option {{ request()->get('user_id') == $user->id ? 'selected' : '' }}
-                                value="{{ $user->id }}">{{ \Str::limit($user->name . ' - ' . $user->email, 40, '...') }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
 
-            {{-- <div class="col-3 text-right">
-                <button class="btn  btn-outline-primary clear-filter">Clear</button>
-            </div> --}}
-        </div>
+
+
+{{-- <select data-live-search='true' data-style="bg-white border-light" class="select form-control"
+name="user" id="user">
+<option value="">All Users</option>
+@foreach (config('users') as $user)
+    <option {{ request()->get('user_id') == $user->id ? 'selected' : '' }}
+        value="{{ $user->id }}">
+        {{ \Str::limit($user->name . ' - ' . $user->email, 40, '...') }}
+    </option>
+@endforeach
+</select> --}}
+
+@section('content')
+
+    <section id="basic-datatable">
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    {{-- <div class="card-header">
-
-                    </div> --}}
+                    <div class="card-header">
+                        {{-- <h4 class="card-title">Students</h4> --}}
+                    </div>
                     <div class="card-content">
                         <div class="card-body card-dashboard">
+
+
+
+                            <div class="row application-filter align-items-center">
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="users">Users</label>
+                                        <select data-live-search='true' data-style="bg-white border-light" multiple
+                                            class="select form-control" name="user" id="user">
+
+                                            @foreach (config('users') as $user)
+                                                <option {{ request()->get('user_id') == $user->id ? 'selected' : '' }}
+                                                    value="{{ $user->id }}">
+                                                    {{ \Str::limit($user->name . ' - ' . $user->email, 40, '...') }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="moderator">Moderators</label>
+                                        <select data-live-search='true' data-style="bg-white border-light" multiple
+                                            class="select form-control" name="moderator" id="moderator">
+
+                                            @foreach ($moderator as $user)
+                                                <option value="{{ $user->moderatorid }}">
+                                                    {{ \Str::limit($user->full_name . ' - ' . $user->email, 40, '...') }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+
+
+
+                                <div class="col-md-2 col-12 text-right">
+                                    <button class="btn btn-primary" id="reset-filter">Reset</button>
+
+                                </div>
+
+
+
+
+                            </div>
+
+
                             <div class="table-responsive">
-                                <table id="application-table" class="table table-hover w-100 zero-configuration">
+                                <table id="table" class="table table-hover w-100 zero-configuration">
                                     <thead>
+                                        <tr>
                                         <tr>
                                             <th>Action Date</th>
                                             <th>Action</th>
                                             <th>IP Address</th>
                                             <th>User</th>
+                                        </tr>
                                         </tr>
                                     </thead>
                                 </table>
@@ -62,7 +119,15 @@
             </div>
         </div>
     </section>
+
+
 @endsection
+
+
+
+
+
+
 
 @section('vendor-script')
 
@@ -74,6 +139,26 @@
     <script>
         $(document).ready(function() {
             $(".select").selectpicker();
+
+            $('#reset-filter').on('click', function() {
+                $(".select").selectpicker('deselectAll');
+                $(".select").val("");
+                $(".select").selectpicker('refresh');
+                dataTable.draw();
+            });
+
+
+            $(".application-filter").find("select").on("change", function(e) {
+
+                console.log('hello');
+
+                dataTable.draw();
+            });
+
+
+
+
+
             $(".clear-filter").click(function() {
                 $("select[name='intake'], select[name='year'],select[name='program']").val("");
                 $(".select").selectpicker('refresh');
@@ -81,18 +166,19 @@
             })
             var messgeTable;
             let dataTable;
-            dataTable = $("#application-table").DataTable({
+            dataTable = $("#table").DataTable({
                 "processing": true,
                 "serverSide": true,
                 ajax: {
                     url: "{{ route('admin.activities') }}",
                     data: function(d) {
                         d.user_id = $("#user").val();
+                        d.moderator_id = $("#moderator").val();
                     }
                 },
                 //dom: "tps",
                 "order": [
-                    [0, "desc"]
+                    [3, "desc"]
                 ],
                 columns: [{
                         name: 'created_at',
@@ -168,7 +254,7 @@
                 $('.dynamic-title').text('Chat With Admin');
                 id = $(this).data('id');
                 $.ajax({
-                    url: "{{url('applicaton-message-user')}}"+"/"+id,
+                    url: "{{ url('applicaton-message-user') }}" + "/" + id,
                     success: function(data) {
                         $('.dynamic-body').html(data);
                         runScript(id);
