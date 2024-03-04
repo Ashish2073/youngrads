@@ -79,7 +79,7 @@
                                         <label for="moderator-filter-id">Moderator Id</label>
                                         <select id="moderator-filter-id" name="moderatorid[]" data-live-search="true"
                                             multiple class="select form-control apply-filter-student">
-                                            <option value="0">N/A(Non Assign Student)</option>
+
 
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
@@ -88,9 +88,6 @@
                                                           @php  session()->forget('used_modifier') @endphp
                                                         selected @endif
                                                         @endif
-
-
-
 
 
                                                         >
@@ -138,7 +135,7 @@
                                         <select id="moderatorid" name="moderatorid" data-live-search="true"
                                             class=" select form-control">
                                             <option value="" selected disabled>Please Select Moderator</option>
-                                            <option value="0">N/A(Remove Moderator)</option>
+
 
 
 
@@ -178,10 +175,25 @@
                                     <div class="form-group">
                                         <input class="form-check-input " type="checkbox" value=""
                                             id="assign-all-student">
-                                        <label for="assignstudent form-check-label">Assign To All Students</label>
+                                        <label for="assignstudent form-check-label">Select/Deselect To All Students</label>
 
                                     </div>
                                 </div>
+
+
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <input class="form-check-input " type="checkbox" value="0"
+                                            id="non-assign-student">
+                                        <label for="assignstudent form-check-label">Non Assign Students</label>
+
+                                    </div>
+                                </div>
+
+
+
+
+
                                 {{-- <div class="col-md-3 col-12 ">
                                     <div class="form-group ">
                                         <input class="form-check-input " type="checkbox" value=""
@@ -195,11 +207,22 @@
 
 
 
+                                <div class="row" style="gap:20px">
 
-                                <div class="col-md-3 col-12 text-center">
-                                    <button class="btn btn-primary" id="moderator-save">Save</button>
+                                    <div class="form-group mb-2">
+                                        <button class="btn btn-primary btn-block" id="moderator-assign">Assign</button>
+                                    </div>
+
+
+                                    <div class="form-group mb-2">
+                                        <button class="btn btn-danger btn-block"
+                                            id="moderator-dissociate">Dissociate</button>
+                                    </div>
 
                                 </div>
+
+
+
 
 
 
@@ -259,14 +282,21 @@
         var dataTable;
         jQuery(document).ready(function() {
 
+            let moderators_fileter_id = "";
+
 
             $("#assignstudentmoderator").on('click', function() {
 
                 if ($("#studentassigndiv").is(":hidden")) {
                     $("#studentassigndiv").removeAttr("hidden");
                     $(".moderator-checkbox").removeAttr("hidden");
+                    $("#moderator-assign").val('');
+                    $("#non-assign-student").val('');
+
                     $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
                     $("#thead-moderator-checkbox").removeAttr("hidden");
+
+
 
                 } else {
                     $("#studentassigndiv").attr("hidden", true);
@@ -280,10 +310,27 @@
 
             $(".select").selectpicker();
             $(".application-filter").find(".apply-filter-student").on("change", function() {
-
+                moderators_fileter_id = $('#moderator-filter-id').val();
 
                 dataTable.draw();
             });
+
+
+            $("#non-assign-student").change(function() {
+                if (this.checked) {
+                    let checkedvalue = this.value;
+                    console.log(checkedvalue);
+                    moderators_fileter_id = [checkedvalue];
+                    dataTable.draw();
+
+
+                } else {
+                    moderators_fileter_id = '';
+
+                    dataTable.draw();
+
+                }
+            })
 
 
 
@@ -304,7 +351,7 @@
                         d.id = $("#userid").val();
                         d.email = $('#useremail').val();
                         d.personal_number = $('#userphone').val();
-                        d.moderator_filter_id = $('#moderator-filter-id').val();
+                        d.moderator_filter_id = moderators_fileter_id;
                     }
                 },
                 "order": [
@@ -491,8 +538,8 @@
             $(document).on('click', '.moderator-checkbox', function(e) {
                 e.stopPropagation();
             })
-            /////////////////////////Moderator value save/////////////////////////////////
-            $("#moderator-save").on('click', function(e) {
+            /////////////////////////Moderator assign to staudent value save/////////////////////////////////
+            $("#moderator-assign").on('click', function(e) {
                 e.preventDefault();
                 that = $(this);
                 var checkedValues = $(".moderator-checkbox:checked").map(function() {
@@ -520,11 +567,16 @@
                         if (data.error) {
                             toast("error", data.message, "Error");
                             that.removeAttr('disabled').html(
-                                "Save"
+                                "Assign"
                             );
                         } else {
 
                             setAlert(data);
+
+                            $("#non-assign-student").prop("checked", false);
+                            $('#assign-all-student').prop("checked", false);
+
+                            moderators_fileter_id = '';
 
                             dataTable.draw();
 
@@ -535,7 +587,7 @@
 
 
                             that.removeAttr('disabled').html(
-                                "Save"
+                                "Assign"
                             );
                         }
 
@@ -543,7 +595,109 @@
                     error: function(data) {
 
 
-                        toast("error", "Something went wrong.", "Error");
+                        if (data.responseJSON.errors.checkedValues) {
+                            message = data.responseJSON.errors.checkedValues[0];
+
+                            toast("error", message, "Error");
+                        } else if (data.responseJSON.errors.moderatorid) {
+                            message = data.responseJSON.errors.moderatorid[0];
+                            toast("error", message, "Error");
+
+
+                        } else {
+                            toast("error", "Something went wrong.", "Error");
+                        }
+
+
+
+
+
+                        // moderatorid
+
+                    }
+
+
+                })
+
+
+
+
+            });
+
+
+
+
+
+
+            ////////////////////////////Modeartor dissociate to student////////////
+
+
+
+
+            $("#moderator-dissociate").on('click', function(e) {
+                e.preventDefault();
+                that = $(this);
+                var checkedValues = $(".moderator-checkbox:checked").map(function() {
+                    return $(this).val();
+                }).get();
+                var moderatorid = $('#moderatorid').val();
+
+                $.ajax({
+                    url: "{{ url('admin/moderator-dissociate-students') }}",
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        _method: "POST",
+                        moderatorid: moderatorid,
+                        checkedValues: checkedValues
+                    },
+                    beforeSend: function() {
+
+                        that.attr('disabled', true).prepend(
+                            "<i class='fa fa-spinner fa-spin'></i> ");
+                    },
+                    success: function(data) {
+
+
+                        if (data.error) {
+                            toast("error", data.message, "Error");
+                            that.removeAttr('disabled').html(
+                                "Dissociate"
+                            );
+                        } else {
+
+                            setAlert(data);
+                            $("#non-assign-student").prop("checked", false);
+                            $('#assign-all-student').prop("checked", false);
+                            moderators_fileter_id = '';
+
+                            dataTable.draw();
+
+
+                            $("#thead-moderator-checkbox").attr('hidden', true);
+                            $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
+                            $("#studentassigndiv").attr("hidden", true);
+
+
+
+                            that.removeAttr('disabled').html(
+                                "Dissociate"
+                            );
+                        }
+
+                    },
+                    error: function(data) {
+
+                        if (data.responseJSON.errors.checkedValues[0]) {
+                            message = data.responseJSON.errors.checkedValues[0];
+
+                            toast("error", message, "Error");
+                        } else {
+                            toast("error", "Something went wrong.", "Error");
+                        }
+
+
+
                     }
                 });
 
@@ -551,6 +705,10 @@
 
 
             })
+
+
+
+
 
 
             //delete///////////////////////////////////////////

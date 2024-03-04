@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-12">
         @include('dashboard.inc.message')
-        <form id="modifier-update-form" action="{{ route('admin.modifier.update', $user->id) }}" method="post">
+        <form id="moderator-update-form" action="{{ route('admin.moderator.update', $user->id) }}" method="post">
             @csrf
             @method('PUT')
             @include('dashboard.common.fields.text', [
@@ -44,8 +44,6 @@
             ])
 
             @if ($user->is_super != 1)
-
-
                 @include('dashboard.common.fields.text', [
                     'label_name' => 'Password',
                     'id' => 'password',
@@ -73,43 +71,8 @@
                     'classes' => '',
                 ])
 
-                {{-- @php
-                $role_options = [
-                    '' => '--Select Role--',
-                ];
-                foreach ($roles as $role) {
-                    $role_options[$role] = strtoupper($role);
-                }
-            @endphp 
-            {{-- @include('dashboard.common.fields.select', [
-              'label_name' => 'Role',
-              'id' => 'role',
-              'name' => 'role',
-              'options' => $role_options, 
-              'attributes' => [],
-              'value' => old('role', $user->role)
-            ]) --}}
 
 
-
-
-                <div class="col-md-12 col-12">
-                    <div class="form-group">
-                        <label for="rolename">Role</label>
-                        <select id="rolename" name="rolename[]" data-live-search="true" multiple
-                            class=" select form-control">
-                            <option value="" disabled>Please Select Roles</option>
-
-
-
-                            @foreach ($roles as $k => $role)
-                                <option value="{{ $role->name }}" @if (in_array($role->name, json_decode($user->role))) selected @endif>
-                                    {{ strtoupper($role->name) }}</option>
-                            @endforeach
-
-                        </select>
-                    </div>
-                </div>
 
 
 
@@ -133,13 +96,13 @@
 
     <div class="form-group delete mx-1" style="margin-top:1%">
         @if ($usermoderatorcount == 0)
-            <form id="delete-form" method="POST" action="{{ route('admin.modifier.destroy', $user->id) }}">
+            <form id="delete-form" method="POST" action="{{ route('admin.moderator.destroy', $user->id) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
             </form>
         @else
-            @php session()->put('used_modifier',$user->id); @endphp
+            @php session()->put('used_moderator',$user->id); @endphp
             @if ($user->is_super == 1)
                 <p>This User Is Super Admin</p><a>
                 @else

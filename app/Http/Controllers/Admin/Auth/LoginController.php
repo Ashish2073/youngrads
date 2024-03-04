@@ -49,7 +49,7 @@ class LoginController extends Controller
         if ($this->hasTooManyLoginAttempts($request)) {
             //Fire the lockout event.
             $this->fireLockoutEvent($request);
-
+ 
             //redirect the user back after lockout.
             return $this->sendLockoutResponse($request);
         }
@@ -57,12 +57,24 @@ class LoginController extends Controller
         //attempt login.
         if (Auth::guard('admin')->attempt($request->only('email', 'password'), $request->filled('remember'))) {
             //Authenticated
+            
+            if($request->filled('remember')){
+            
+                setcookie("email",$request->email,time()+3600);
+                setcookie('password',$request->password,time()+3600);
+
+            }else{
+                setcookie("email","");
+                setcookie('password',"");
+            }
+
+
             activity('login')
             ->causedBy(Auth::guard('admin')->user())
             ->withProperties(['ip' => $request->ip()])
             ->log('Admin Login');
              
-
+ 
             return redirect()
                 ->intended(route('admin.home'))
                 ->with('status', 'You are Logged in as Admin!');

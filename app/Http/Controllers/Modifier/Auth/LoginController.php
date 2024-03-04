@@ -50,7 +50,20 @@ class LoginController extends Controller
       
         if (Auth::guard('admin')->attempt($request->only('username', 'password'), $request->filled('remember'))) {
             //Authenticated
+              
+            if($request->filled('remember')){
             
+                setcookie("username",$request->username,time()+3600);
+                setcookie('password',$request->password,time()+3600);
+
+            }else{ 
+                setcookie("email","");
+                setcookie('password',"");
+            }
+            
+
+
+
             activity('login')
             ->causedBy(Auth::guard('admin')->user())
             ->withProperties(['ip' => $request->ip()])

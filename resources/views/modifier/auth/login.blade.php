@@ -35,6 +35,7 @@
                                         <fieldset class="form-label-group form-group position-relative has-icon-left">
 
                                             <input id="username" type="text"
+                                                @if (isset($_COOKIE['username'])) value="{{ $_COOKIE['username'] }}" @else value="{{ old('username') }}" @endif
                                                 class="form-control @error('username') is-invalid @enderror" name="username"
                                                 placeholder="Modifer Username" value="{{ old('username') }}" required
                                                 autocomplete="username" autofocus>
@@ -53,6 +54,7 @@
                                         <fieldset class="form-label-group position-relative has-icon-left">
 
                                             <input id="password" type="password"
+                                                @if (isset($_COOKIE['password'])) value="{{ $_COOKIE['password'] }}" @else value="{{ old('password') }}" @endif
                                                 class="form-control @error('password') is-invalid @enderror" name="password"
                                                 placeholder="Password" required autocomplete="current-password">
 
@@ -70,7 +72,9 @@
                                             <div class="text-left">
                                                 <fieldset class="checkbox">
                                                     <div class="vs-checkbox-con vs-checkbox-primary">
-                                                        <input type="checkbox" {{ old('remember') ? 'checked' : '' }}>
+                                                        <input type="checkbox" name="remember"
+                                                            @if (isset($_COOKIE['password'])) checked @endif
+                                                            value={{ old('remember', 1) }}>
                                                         <span class="vs-checkbox">
                                                             <span class="vs-checkbox--check">
                                                                 <i class="vs-icon feather icon-check"></i>

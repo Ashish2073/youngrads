@@ -24,14 +24,15 @@ use App\Models\UserDocument;
 use App\Models\UserShortlistProgram;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentData;
+use Auth; 
 
 class StudentController extends Controller
 {
-	// use Authorizable;
+	// use Authorizable; 
 
 	public function __construct()
 	{
-		$this->middleware('auth:admin')->except('profileResume');
+		$this->middleware('auth:admin')->except('profileResume');  
 		$this->middleware('userspermission:students_view',['only'=>['index']]);  
 	}
 
@@ -40,7 +41,7 @@ class StudentController extends Controller
 	 
 		if (request()->ajax()) {
 			
-			
+			   
 		  
 				// if((($request->get('id')!=null) && $request->get('email')==null && $request->get('personal_number')==null)){
 				// 	$users=User::whereIn('id',$request->get('id'))->get();
@@ -294,7 +295,7 @@ class StudentController extends Controller
 
 	public function moderator_assign_to_students(Request $request){
 
-
+	
 
 
 
@@ -302,32 +303,45 @@ class StudentController extends Controller
 		 $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
 		if(hasPermissionForRoles('assign_students_to_moderator_add', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
 
+
+
+			$validator = Validator::make($request->all(), [
+				'checkedValues' => 'required',
+				'moderatorid'=>'required'
+			
+				
+			],['checkedValues.required'=>'Please Select Student','moderatorid.required'=>'Please Select Moderator']);
+	
+			// Check if validation fails
+			if ($validator->fails()) {
+				// Return a JSON response with validation errors
+				return response()->json(['errors' => $validator->errors()], 422);
+			}
+	
+		
+			
 		
 
     
-		if($request->moderatorid==0){
-		$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>null]);
-		if($user){
-			return response()->json([
-				'success' => true,
-				'code' => 'success',
-				'title' => 'Congratulations',
-				'message' => 'Moderator Removed Successfully'
-			]);
-		}
-
-		}else{
+	
 			$user=User::whereIn('id',$request->checkedValues)->update(['moderator_id'=>$request->moderatorid]);
 		    if($user){
+
+				activity('Assign')
+				->causedBy(Auth::guard('admin')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Moderator assign to students');
+
+
 			   return response()->json([
 				'success' => true,
 				'code' => 'success',
 				'title' => 'Congratulations',
-				'message' => 'Moderator assign  successfully'
+				'message' => 'Moderator assign to student successfully'
 			 ]);
 		}
 
-		}
+		
 
 	}else{
 		return response()->json([
@@ -340,6 +354,67 @@ class StudentController extends Controller
 	}
 
 	}
+
+
+
+	public function moderator_dissociate_to_students(Request $request){
+
+		$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
+	   if(hasPermissionForRoles('dissociate_students_to_moderator_remove', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
+
+
+		$validator = Validator::make($request->all(), [
+			'checkedValues' => 'required',
+		
+			
+		],['checkedValues.required'=>'Please Select Student']);
+
+		// Check if validation fails
+		if ($validator->fails()) {
+			// Return a JSON response with validation errors
+			return response()->json(['errors' => $validator->errors()], 422);
+		}
+
+
+
+
+	   
+
+   
+	  
+		   $user=User::whereIn('id',$request->checkedValues)->orWhere('moderator_id',$request->moderatorid)->update(['moderator_id'=>null]);
+		   if($user){
+
+			activity('Dissociate')
+            ->causedBy(Auth::guard('admin')->user())
+            ->withProperties(['ip' => $request->ip()])
+            ->log('Dissociate moderator to students');
+
+
+
+
+			  return response()->json([
+			   'success' => true,
+			   'code' => 'success',
+			   'title' => 'Congratulations',
+			   'message' => 'Moderator Dissociate To students successfully'
+			]);
+	   }
+
+	
+
+   }else{
+	   return response()->json([
+		   'error' => true,
+		   'code' => 'fail',
+		   'title' => 'Not Permission',
+		   'message' => 'You have not permisson'
+	   ]);
+
+   }
+
+   }
+
 
 
 

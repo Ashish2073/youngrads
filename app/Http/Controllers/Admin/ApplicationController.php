@@ -157,7 +157,7 @@ class ApplicationController extends Controller
 		if ($request->has('moderator_id') || in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))) {
 			 
 			if(isset($request->moderator_id)){ 
-				
+				 
 				$userApplications->whereIn('admins.id',$request->moderator_id );
 			}else{
 			

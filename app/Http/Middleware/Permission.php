@@ -24,7 +24,7 @@ class Permission
             // } 
             $userrole=json_decode(auth('admin')->user()->getRoleNames(),true);
 
-           
+             
 
             if (hasPermissionForRoles($permission,$userrole) || auth('admin')->user()->getRoleNames()[0]=="Admin") {
                 return $next($request);

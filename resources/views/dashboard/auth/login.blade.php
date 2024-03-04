@@ -36,8 +36,9 @@
 
                                             <input id="email" type="email"
                                                 class="form-control @error('email') is-invalid @enderror" name="email"
-                                                placeholder="E-Mail Address" value="{{ old('email') }}" required
-                                                autocomplete="email" autofocus>
+                                                placeholder="E-Mail Address"
+                                                @if (isset($_COOKIE['email'])) value="{{ $_COOKIE['email'] }}" @else value="{{ old('email') }}" @endif
+                                                required autocomplete="email" autofocus>
 
                                             <div class="form-control-position">
                                                 <i class="feather icon-user"></i>
@@ -53,6 +54,7 @@
                                         <fieldset class="form-label-group position-relative has-icon-left">
 
                                             <input id="password" type="password"
+                                                @if (isset($_COOKIE['password'])) value="{{ $_COOKIE['password'] }}" @else value="{{ old('password') }}" @endif
                                                 class="form-control @error('password') is-invalid @enderror" name="password"
                                                 placeholder="Password" required autocomplete="current-password">
 
@@ -70,7 +72,9 @@
                                             <div class="text-left">
                                                 <fieldset class="checkbox">
                                                     <div class="vs-checkbox-con vs-checkbox-primary">
-                                                        <input type="checkbox" {{ old('remember') ? 'checked' : '' }}>
+                                                        <input type="checkbox" name="remember"
+                                                            @if (isset($_COOKIE['password'])) checked @endif
+                                                            value={{ old('remember', 1) }}>
                                                         <span class="vs-checkbox">
                                                             <span class="vs-checkbox--check">
                                                                 <i class="vs-icon feather icon-check"></i>

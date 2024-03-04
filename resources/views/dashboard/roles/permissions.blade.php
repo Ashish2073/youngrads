@@ -23,6 +23,7 @@
         'application_document' => $crud,
         'user_activity' => ['view', 'N/A', 'N/A', 'N/A'],
         'modifiers' => $crud,
+        'moderators' => $crud,
 
         // 'fee' =>$crud,
         // 'intake' =>$crud,
@@ -143,7 +144,6 @@
                             <label for="{{ ucfirst($key) }}">
 
                                 <input name="permissions[]" value="" data-parent="{{ $key }}"
-                                    @if ($key == 'dashboard') checked @endif
                                     {{ havePermission($role ?? '', $key) ? 'checked' : '' }} class="parent-item"
                                     id="{{ $key }}" type="checkbox">
                                 {{ ucfirst($key) }}

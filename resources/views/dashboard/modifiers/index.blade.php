@@ -13,7 +13,7 @@
         display: flex;
         gap: 10px;
         /* text-align: center; */
-        justify-content: center;
+        /* justify-content: center; */
     }
 
     .role-card-1 {
@@ -345,18 +345,19 @@
                         required: true,
                         number: true,
                     },
-                    rolename: {
-                        required: true,
+                    // 'rolename[]': {
+                    //     required: true,
+                    //     minlength: 1,
 
-                    }
-
-                },
-                messages: {
-                    // duration: {
-                    //     number: 'Enter duration in months.'
                     // }
 
-                }
+                },
+                // messages: {
+                //     rolename: {
+                //         minlength: 'Enter duration in months.'
+                //     }
+
+                // }
             });
 
 
@@ -381,6 +382,47 @@
                     }
                 }
             });
+
+
+            validateForm($('#modifier-update-form'), {
+                rules: {
+                    first_name: {
+                        required: true,
+                    },
+                    last_name: {
+                        required: true
+                    },
+                    email: {
+                        required: true
+                    },
+                    // password: {
+                    //     required: true,
+                    //     number: true,
+                    // },
+                    // password_confirmation: {
+                    //     required: true,
+                    //     number: true,
+                    // },
+                    // 'rolename[]': {
+                    //     required: true,
+                    //     minlength: 1,
+
+                    // }
+
+                },
+                messages: {
+                    // duration: {
+                    //     number: 'Enter duration in months.'
+                    // }
+
+                }
+            });
+
+
+
+
+
+
 
             submitForm($("#modifier-update-form"), {
                 beforeSubmit: function() {

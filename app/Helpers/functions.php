@@ -214,6 +214,8 @@ if (!function_exists('hasPermissionForRoles')) {
         $roleIds = DB::table('roles')->whereIn('name', $roleNames)->pluck('id');
         $permissionId = DB::table('permissions')->where('name', $permissionName)->value('id');
 
+         
+
         $count = DB::table('role_has_permissions')
             ->whereIn('role_id', $roleIds)
             ->where('permission_id', $permissionId)

@@ -3,35 +3,41 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Role;
 use App\Models\Admin;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Auth;
 
-class ModifiersController extends Controller
+class ModeratorController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:admin');
-        $this->middleware('userspermission:modifiers_view',['only'=>['index']]);
-        $this->middleware('userspermission:modifiers_add',['only'=>['create','store']]);
-        $this->middleware('userspermission:modifiers_edit',['only'=>['edit','update']]);
-        $this->middleware('userspermission:modifiers_delete',['only'=>['destroy']]); 
-    } 
+        $this->middleware('auth:admin'); 
+
+        $this->middleware('userspermission:moderators_view',['only'=>['index']]);
+        $this->middleware('userspermission:moderators_add',['only'=>['create','store']]);
+        $this->middleware('userspermission:moderators_edit',['only'=>['edit','update']]);
+        $this->middleware('userspermission:moderators_delete',['only'=>['destroy']]); 
+     
+    }  
+     
 
     public function index(Request $request){
 
         // $users = Admin::find(10);
 
         // dd( $users->getRoleNames());
+        $moderator=Admin::role('moderator')->with(['supermoderator','student'])->get();
+   
+        
+
     
         if(request()->ajax()) { 
 
-            if((session('permissionerror'))){
+            if((session('permissionerror'))){ 
                
            
                 return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
@@ -40,81 +46,135 @@ class ModifiersController extends Controller
 
             }
 
-            if($request->get('rolename')!=null){
-                $rolename=$request->get('rolename');
-                $users=Admin::role($rolename)->get();
+            $moderators=Admin::role('moderator')->with(['supermoderator','student'])->get();
+
+
+
+            if(isset($request->moderators) && !isset($request->supermoderators)){
+                $moderators=Admin::role('moderator')->with(['supermoderator','student'])
+                ->whereIn('id', ($request->moderators))->get();
+               
+            }
+            if(!isset($request->moderators) && isset($request->supermoderators)){
+                $moderators=Admin::role('moderator')->with(['supermoderator','student'])
+                ->whereHas('supermoderator', function ($query) use ($request) {
+                     $query->whereIn('id', $request->supermoderators);
+                 })->get();
+
+            }
+            
+            if(isset($request->moderators) && ($request->supermoderators)){
+
+                 
+                $moderators=Admin::role('moderator')->with(['supermoderator','student'])
+                ->whereIn('id', ($request->moderators))
+                ->whereHas('supermoderator', function ($query) use ($request) {
+                     $query->whereIn('id', $request->supermoderators);
+                 })->get();
+    
+
+            }
+            
+            if(isset($request->supermoderators) && $request->supermoderators[0]=="0" ){
+                 
+                
+                $moderators=Admin::role('moderator')->with(['supermoderator','student'])
+                ->where('parent_id', null)->get();
+
+
+            }
+               
 
                 
-  
-            }else{
-                
-                $users = Admin::where('is_super','!=','1')->get();
-            }
+        
+           
+           
+               
+            
           
-            return Datatables::of($users)
-                ->editColumn('last_name', function($row) {
+             return Datatables::of($moderators)
+
+            ->addColumn('moderator_checkbox',function ($row){
+                return "<input class='moderator-checkbox' hidden name='moderatorid[]' type='checkbox' value='$row->id' />";
+
+            })
+            
+                ->editColumn('moderator_username', function($row) {
                     
  
-                    return $row->last_name ?? "N/A";
-                })->addColumn('role',function($row){
+                    return $row->username ?? "N/A";
+                })->editColumn('supermoderator',function($row){
                     // return $row->getRoleNames();  <button class='btn btn-danger role-view btn-icon btn-round'  onclick='userRole($row->id)' ><i class='feather icon-eye'></i></button>";
                    
-                    $modifersrole=json_decode($row->getRoleNames(),true);
+                  return $row->supermoderator->username ?? "N/A";
 
-                    $rolesHtml="<label for='positiveNumber' id='userrole'>";
-
-                    foreach($modifersrole as $role){
-                        $rolesHtml=$rolesHtml."
-                        <div class='role-card-1'>
-                        <h5>$role</h5>
-                        </div>";
-
-                    }
-
-                    $rolesHtml=$rolesHtml.'</label>';
-
-                    return  $rolesHtml;
-
-                   
-                //     return "<label for='positiveNumber' id='userrole'><div class='role-card-1'>
-                               
-                //     <h5>moderator</h5>
-                // </div><div class='role-card-1'>
-                   
-                //     <h5>creater</h5>
-                // </div><div class='role-card-1'>
-                   
-                //     <h5>viewer</h5>
-                // </div><div class='role-card-1'>
-                   
-                //     <h5>watcher</h5> 
-                // </div></label>";
-                  
+                
  
 
+                })->editColumn('moderator_name',function($row){
+                    return ($row->first_name." ".$row->last_name)?? "N/A";
+
+                })->editColumn('supermoderator_name',function($row){
+                    if(isset($row->supermoderator->first_name) && isset($row->supermoderator->last_name)){
+   
+                        return $row->supermoderator->first_name." ".$row->supermoderator->last_name;
+
+
+                    }else{
+                       return  "N/A";
+                    }
+
                 })
-                ->rawColumns(['email','role'])
+                
+                ->editColumn('email',function($row){
+                return ($row->email)?? "N/A";
+
+            })->editColumn('studentcount',function($row){
+                return ($row->student->count())?? "N/A";
+
+            })
+                ->rawColumns(['moderator_checkbox','moderator_username','supermoderator','moderator_name','supermoderator_name','email','studentcount'])
                 ->make(true);
         } else {
 
             $roles = Role::where('name','!=','Admin')->select('name', 'id')->get();
         $breadcrumbs = [
-            ['link'=>"admin.home",'name'=>"Dashboard"], ['name'=>"Modifiers"]
+            ['link'=>"admin.home",'name'=>"Dashboard"], ['name'=>"Moderators"]
         ];
-        return view('dashboard.modifiers.index', compact('breadcrumbs','roles'));
+
+        $supermoderator=Admin::role('supermoderator')->get();
+
+        $moderator=Admin::role('moderator')->get();
+
+
+        return view('dashboard.moderator.index', compact('breadcrumbs','supermoderator','moderator'));
     }
     }
 
+
     public function create(){
-        $roles = Role::where('name','!=','Admin')->get();
+      
     
       
-        return view('dashboard.modifiers.create', compact('roles'));
+        return view('dashboard.moderator.create');
+    }
+
+
+    
+    public function edit($id)
+    {
+
+        $user = Admin::find($id);
+        // $roles = Role::pluck('name', 'id');
+       
+        return view('dashboard.moderator.edit', compact('user'));
+
+    
     }
 
 
     public function store(Request $request)
-    {
+    { 
 
           
      
@@ -123,7 +183,7 @@ class ModifiersController extends Controller
              'last_name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:admins,email',
             'password' => 'required|min:6|confirmed',
-            'rolename'=>'required',
+           
            
         ];
 
@@ -132,8 +192,8 @@ class ModifiersController extends Controller
         if ($validator->fails()) {
             $validator->errors()->add('form_error', 'Error! Please check below');
             $request->flash();
-            $roles = Role::pluck('name', 'id');
-            return view('dashboard.modifiers.create', compact('roles'))->withErrors($validator);
+           
+            return view('dashboard.moderator.create')->withErrors($validator);
         }
 
         // $user = Admin::create([
@@ -163,7 +223,13 @@ class ModifiersController extends Controller
             ]);
 
             
-            $user->assignRole($request->rolename);
+            $user->assignRole('moderator');
+
+            activity('Moderator Created')  
+            ->causedBy(Auth::guard('admin')->user())
+            ->withProperties(['ip' => $request->ip()])
+            ->log('Moderator Created');
+
         
            
          
@@ -188,35 +254,6 @@ class ModifiersController extends Controller
 
     }
 
-    public function edit($id)
-    {
-        $user = Admin::find($id);
-        // $roles = Role::pluck('name', 'id');
-        $roles = Role::where('name','!=','Admin')->get();
-
-         $user->role =($user->getRoleNames());
-
-        
-
-       
-       
-    
-
-  
-
-       
-        return view('dashboard.modifiers.edit', compact('user', 'roles'));
-
-        // if(auth('admin')->user()->id == $user->id){
-        //     $edit_link = route('admin.profile', $user->id);
-        //     return view('dashboard.inc.info', [
-        //         'message' => "Please <a href='$edit_link'>click</a> here to edit your own profile"
-        //     ]);
-        // }else{
-        // return view('dashboard.users.edit', compact('user', 'roles'));
-        // }
-    }
-
 
     public function update(Request $request, $id)
     {
@@ -224,7 +261,7 @@ class ModifiersController extends Controller
        
  
         $user =  Admin::findOrFail($id);
-        $roles = Role::where('name','!=','Admin')->get();
+     
         // $user->role = $user->getRoleNames()[0];
 
         $validations_arr = [
@@ -241,12 +278,8 @@ class ModifiersController extends Controller
         if ($validator->fails()) {
             $validator->errors()->add('form_error', 'Error! Please check below');
             $request->flash();
-            if(is_array($user->getRoleNames()) && !empty($user->getRoleNames())) {
-                $user->role = $user->getRoleNames()[0]['name'];
-            } else {
-                $user->role = "";
-            }
-            return view('dashboard.modifiers.edit', compact('user', 'roles'))->withErrors($validator);
+          
+            return view('dashboard.moderator.edit', compact('user'))->withErrors($validator);
         }
 
         $user->first_name = $request->first_name;
@@ -258,7 +291,7 @@ class ModifiersController extends Controller
         if($user->save()) {
             // $user->syncRoles([$request->role]);
               
-            $user->syncRoles($request->rolename);
+            $user->syncRoles('moderator');
 
 
             return response()->json([
@@ -276,6 +309,8 @@ class ModifiersController extends Controller
             ]);
         }
     }
+
+
 
     public function destroy($id)
     {
@@ -304,14 +339,7 @@ class ModifiersController extends Controller
           }
     }
 
-    public function userRoles(Request $request){
-        $user=Admin::find($request->id);
-       
-        return $user->getRoleNames();
-
-
-    }
 
 
 
-} 
+}

@@ -37,6 +37,7 @@ use App\Http\Controllers\Admin\IntakeController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\Admin\ModifiersController;
+use App\Http\Controllers\Admin\ModeratorController;
 
 
 
@@ -113,10 +114,13 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         Route::post('/email/update', [App\Http\Controllers\Admin\Auth\ChangeEmailController::class, 'changeEmail'])->name('changeemail')->middleware('auth:admin');
     });
     // Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
-  Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin');
+    Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth:admin')->middleware('checkrole');
+  Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin')->middleware('checkrole');
 
     // Activities
+    Route::middleware(['checkrole'])->group(function(){
+        
+    
     Route::resource('/activity', '\App\Http\Controllers\Admin\ActivityController', [
         'names' => [
             'index' => 'activities',
@@ -125,7 +129,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     ]);
 
     // Import Routes
-    Route::get('import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index')->middleware('userspermission:import_data_view');
+    Route::get('import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index')->middleware('userspermission:import_data_view')->middleware('checkrole');
     Route::post('import/univ-campus', [App\Http\Controllers\Admin\ImportController::class, 'importUnivCampus'])->name('import.univ_campus');
     Route::post('import/programs', [App\Http\Controllers\Admin\ImportController::class, 'importPrograms'])->name('import.programs');
   
@@ -150,7 +154,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
             'destroy' => 'user.destroy' 
         ]
     ]);
-  //Moderator Mangment
+  //Modifiers Mangment
   Route::resource('modifiers', '\App\Http\Controllers\Admin\ModifiersController',[
     'names' => [
         'index' => 'modifiers', 
@@ -165,7 +169,19 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
 Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class,'userRoles'])->name('user-roles');
 
 
-  //////
+  ////// Moderator -supermoderator
+
+  Route::resource('moderators', '\App\Http\Controllers\Admin\ModeratorController',[
+    'names' => [
+        'index' => 'moderators', 
+        'create' => 'moderator.create',
+        'edit' => 'moderator.edit',
+        'update' => 'moderator.update',
+        'store' => 'moderator.store',
+        'destroy' => 'moderator.destroy'
+    ]
+]);
+
 
 
 
@@ -196,6 +212,8 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     ]);
 
     Route::post('moderator-assign-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_assign_to_students'])->name('moderator-assign-students');
+    Route::post('moderator-dissociate-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_dissociate_to_students'])->name('moderator-dissociate-students');
+
 
     Route::post('students-data-filter',[\App\Http\Controllers\Admin\StudentController::class,'filterstudentdata'])->name('students-data-filter');
 
@@ -469,7 +487,7 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     });
 });
 
-
+});
 
 // Auth::routes(['verify' => true]);
 

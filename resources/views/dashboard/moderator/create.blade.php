@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-12">
         @include('dashboard.inc.message')
-        <form id="modifier-create-form" action="{{ route('admin.modifier.store') }}" method="post">
+        <form id="moderator-create-form" action="{{ route('admin.moderator.store') }}" method="post">
             @csrf
 
             @include('dashboard.common.fields.text', [
@@ -65,40 +65,12 @@
                 'classes' => '',
             ])
 
-            {{-- @php
-                $role_options = [
-                    '' => '--Select Role--',
-                ];
-                foreach ($roles as $role) {
-                    $role_options[$role] = strtoupper($role);
-                }
-            @endphp --}}
-            {{-- @include('dashboard.common.fields.select', [
-                'label_name' => 'Role',
-                'id' => 'role',
-                'name' => 'role',
-                'options' => $role_options,
-                'attributes' => [],
-                'value' => old('role'),
-            ]) --}}
 
-            <div class="col-md-12 col-12">
-                <div class="form-group">
-                    <label for="rolename">Role</label>
-                    <select id="rolename" name="rolename[]" data-live-search="true" multiple
-                        class=" select form-control">
-                        <option value="" disabled>Please Select Roles</option>
-                        @foreach ($roles as $role)
-                            <option value="{{ $role->name }}">{{ strtoupper($role->name) }}</option>
-                        @endforeach
 
-                    </select>
-                </div>
-            </div>
 
 
             <div class="form-group">
-                <button type="submit" id="submit-btn" class="btn btn-primary">Add modifier</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Add moderator</button>
             </div>
     </div>
     </form>

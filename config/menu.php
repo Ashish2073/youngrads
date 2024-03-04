@@ -26,24 +26,24 @@ return [
     [
         'menu_name' => 'User Management',
         'route' => 'admin.users',
-        'icon_class' => 'fa fa-users',
+        'icon_class' => 'fas fa-user-shield',
         'sub_menu' => [ 
-            [
-                'menu_name' => 'Admin Users',
-                'route' => 'admin.users',
-                'icon_class' => '',
-                'permission' => 'admin_users_view'
-            ],
+            // [
+            //     'menu_name' => 'Admin Users',
+            //     'route' => 'admin.users',
+            //     'icon_class' => 'fas fa-user-shield',
+            //     'permission' => 'admin_users_view'
+            // ],
             [
                 'menu_name' => 'Modifiers Users',
                 'route' => 'admin.modifiers',
-                'icon_class' => 'fa-solid fa-people-arrows',
+                'icon_class' => 'fas fa-user-cog',
                 'permission' => 'modifiers_view'
             ],
             [
                 'menu_name' => 'Roles & Permission',
                 'route' => 'admin.roles',
-                'icon_class' => '',
+                'icon_class' => 'fa-solid fa-shield-blank',
                 'permission' => 'roles_and_permissions_view'
             ],
           
@@ -54,7 +54,14 @@ return [
         'route' => 'admin.students',
         'icon_class' => 'fa fa-users',
         'permission' => 'students_view'
-    ],   
+    ], 
+    
+    [    
+        'menu_name' => 'Moderators',
+        'route' => 'admin.moderators',
+        'icon_class' => 'fa-solid fa-people-arrows',
+        'permission' => 'moderators_view'
+    ], 
     [
         'menu_name' => 'Applications', 
        

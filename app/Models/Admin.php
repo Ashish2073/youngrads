@@ -11,6 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Models\Role;
 
 
@@ -84,6 +85,18 @@ class Admin extends Authenticatable
         return $this->name . " " . $this->last_name;
     }
 
+
+
+    public function supermoderator()
+    {
+        return $this->belongsTo(Admin::class, 'parent_id');
+    }
+
+
+    public function student()
+    {
+        return $this->hasMany(User::class, 'moderator_id');
+    }
 
 
 
