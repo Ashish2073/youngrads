@@ -162,11 +162,20 @@
                                             @endif
 
 
+                                            {{-- application_supermoderator_admin_id_message --}}
+
+                                            @if (session()->has('application_supermoderator_admin_id_message '))
+                                                @php $application_moderator_admin_id_message=session()->get('application_supermoderator_admin_id_message '); @endphp
+                                            @else
+                                                @php $application_moderator_admin_id_message = [] ;@endphp
+                                            @endif
+
+
 
 
                                             @foreach ($application_numbers as $application_number)
                                                 <option
-                                                    {{ request()->get('application_id') == $application_number->id || in_array($application_number->id, $application_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) ? 'selected' : '' }}
+                                                    {{ request()->get('application_id') == $application_number->id || in_array($application_number->id, $application_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) ? 'selected' : '' }}
                                                     value="{{ $application_number->id }}">
                                                     {{ $application_number->application_number }}</option>
                                             @endforeach
@@ -288,8 +297,13 @@
                                                 {{-- <th>Count</th> --}}
                                                 {{-- <th>Count</th>
                                             --}}
-                                                <th>Message(Moderator & Admin & User)</th>
-                                                <th>Message(Moderator & Admin)</th>
+                                                <th>Message(Admin & SuperModerator & Moderator & User)</th>
+                                                <th>Message(Admin & SuperModerator & Moderator)</th>
+                                                @if (in_array('supermoderator', json_decode(auth('admin')->user()->getRoleNames())))
+                                                    <th>Message(Admin & SuperModerator )</th>
+                                                @else
+                                                    <th></th>
+                                                @endif
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -604,11 +618,22 @@
                         // "visible":false, moderatortoadmincount
                     },
                     {
-                        name: 'moderatortoadmincount',
-                        data: 'moderatortoadmincount',
+                        name: 'supermoderatortomoderatortoadmincount',
+                        data: 'supermoderatortomoderatortoadmincount',
                         searchable: false
-                        // "visible":false, moderatortoadmincount
+                        // "visible":false, moderatortoadmincount supermoderatortoadmincount
                     },
+
+                    {
+                        name: 'supermoderatortoadmincount',
+                        data: 'supermoderatortoadmincount',
+                        searchable: false
+                        // "visible":false, moderatortoadmincount supermoderatortoadmincount
+                    },
+
+
+
+
                     {
                         //   name: 'toggle-admin-status',
                         data: 'toggle_status'

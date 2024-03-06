@@ -85,7 +85,7 @@
                                                 @if (isset($moderatoruser->username))
                                                     <option value="{{ $moderatoruser->id }}"
                                                         @if (session()->has('used_modifier')) @if (session()->get('used_modifier') == $moderatoruser->id)
-                                                          @php  session()->forget('used_modifier') @endphp
+                                                         
                                                         selected @endif
                                                         @endif
 
@@ -122,7 +122,8 @@
                             @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
                             @if (hasPermissionForRoles('assign_students_to_moderator_view', $userrole) ||
                                     auth('admin')->user()->getRoleNames()[0] == 'Admin')
-                                <a href="javascript:void(0)" class="btn btn-primary mt-3" id="assignstudentmoderator">Assign
+                                <a href="javascript:void(0)" class="btn btn-primary mt-3"
+                                    id="assignstudentmoderator">Assign/Dissociate
                                     Students
                                     To Moderator</a>
                             @endif

@@ -119,7 +119,7 @@ class Admin extends Authenticatable
 
 
 
-			}else{
+			}elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
@@ -138,7 +138,27 @@ class Admin extends Authenticatable
 
 
 
-			}
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+
+                $userid=auth('admin')->user()->username;
+				$message_status_type="supermoderator_message_status";
+				$role="supermoderator";
+                $moderatorsid=Admin::where('parent_id',Auth::id())->pluck('id')->toArray();
+
+                $userss_id=User::whereIn('moderator_id',$moderatorsid)->pluck('id')->toArray();
+
+                $userunreadMessage=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+                ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.moderator_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='0')) as count"))  
+                ->whereIn('users_applications.user_id',$userss_id)
+                
+                ->where('application_message.supermoderator_message_status','unread')
+                ->where('application_message.user_id','!=',$userid)
+                ->where('application_message.message_scenario','0')->get();
+
+
+
+
+            }
 			
 		} elseif(auth('web')->check()) {
 			$userid=Auth::id();
@@ -171,7 +191,7 @@ class Admin extends Authenticatable
 			   $role="admin" ;
 
                $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
-               ->select('users_applications.id as application_id','application_message.admin_message_status','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.admin_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='0')) as count"),
+               ->select('users_applications.id as application_id','application_message.admin_message_status','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.admin_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='1')) as count"),
                )->where('application_message.admin_message_status','unread')
                ->where('application_message.user_id','!=',$userid)
                ->where('application_message.message_scenario','1')->get();
@@ -181,14 +201,15 @@ class Admin extends Authenticatable
 
 
 
-			}else{
+            }elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
                 $userss_id=User::where('moderator_id',Auth::id())->pluck('id')->toArray();
+               
                 
                 $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
-                ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.moderator_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='0')) as count"))  
+                ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.moderator_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='1')) as count"))  
                 ->whereIn('users_applications.user_id',$userss_id)
                 
                 ->where('application_message.moderator_message_status','unread')
@@ -199,7 +220,27 @@ class Admin extends Authenticatable
 
 
 
-			}
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+
+                $userid=auth('admin')->user()->username;
+				$message_status_type="supermoderator_message_status";
+				$role="supermoderator";
+                $moderatorsid=Admin::where('parent_id',Auth::id())->pluck('id')->toArray();
+
+                $userss_id=User::whereIn('moderator_id',$moderatorsid)->pluck('id')->toArray();
+
+                $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+                ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.moderator_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='1')) as count"))  
+                ->whereIn('users_applications.user_id',$userss_id)
+                
+                ->where('application_message.supermoderator_message_status','unread')
+                ->where('application_message.user_id','!=',$userid)
+                ->where('application_message.message_scenario','1')->get();
+
+
+
+
+            }
 			
 		} elseif(auth('web')->check()) {
 			$userid=Auth::id();
@@ -207,7 +248,7 @@ class Admin extends Authenticatable
 			
 			$role="user";
             $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
-            ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.user_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='0')) as count"))  
+            ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.user_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='1')) as count"))  
             ->where('users_applications.user_id',$userid)
             
             ->where('application_message.user_message_status','unread')
@@ -228,5 +269,100 @@ class Admin extends Authenticatable
         
         return $userunreadMessageadminmoderator;
     }
+
+
+    public static  function getadmintomoderatorunreadmessage()
+    {
+
+        if (auth('admin')->check()) {
+			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
+               $userid=auth('admin')->user()->username;
+			   $message_status_type="admin_message_status";
+			   $role="admin" ;
+
+               $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+               ->select('users_applications.id as application_id','application_message.admin_message_status','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.admin_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='2')) as count"),
+               )->where('application_message.admin_message_status','unread')
+               ->where('application_message.user_id','!=',$userid)
+               ->where('application_message.message_scenario','2')->get();
+
+
+
+
+
+
+            }elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
+				$userid=auth('admin')->user()->username;
+				$message_status_type="moderator_message_status";
+				$role="moderator";
+                $userss_id=User::where('moderator_id',Auth::id())->pluck('id')->toArray();
+               
+                
+                $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+                ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.moderator_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='2')) as count"))  
+                ->whereIn('users_applications.user_id',$userss_id)
+                
+                ->where('application_message.moderator_message_status','unread')
+                ->where('application_message.user_id','!=',$userid)
+                ->where('application_message.message_scenario','2')->get();
+
+
+
+
+
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+
+                $userid=auth('admin')->user()->username;
+				$message_status_type="supermoderator_message_status";
+				$role="supermoderator";
+                $moderatorsid=Admin::where('parent_id',Auth::id())->pluck('id')->toArray();
+
+                $userss_id=User::whereIn('moderator_id',$moderatorsid)->pluck('id')->toArray();
+
+                $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+                ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.moderator_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='2')) as count"))  
+                ->whereIn('users_applications.user_id',$userss_id)
+                
+                ->where('application_message.supermoderator_message_status','unread')
+                ->where('application_message.user_id','!=',$userid)
+                ->where('application_message.message_scenario','2')->get();
+
+
+
+
+            }
+			
+		} elseif(auth('web')->check()) {
+			$userid=Auth::id();
+			$message_status_type="user_message_status";
+			
+			$role="user";
+            $userunreadMessageadminmoderator=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
+            ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.user_message_status = 'unread' && application_id = users_applications.id && application_message.message_scenario='2')) as count"))  
+            ->where('users_applications.user_id',$userid)
+            
+            ->where('application_message.user_message_status','unread')
+            ->where('application_message.user_id','!=',$userid)
+            ->where('application_message.message_scenario','2')->get();
+		}
+
+       
+
+
+
+			
+		
+       
+    
+       
+    
+        
+        return $userunreadMessageadminmoderator;
+    }
+
+
+
+
+
 
 }

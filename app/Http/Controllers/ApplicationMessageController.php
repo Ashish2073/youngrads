@@ -43,47 +43,24 @@ class ApplicationMessageController extends Controller
 			   $role="admin" ;
 			 
 			 
-			   $messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['admin_message_status' => 'read']);
 			   
-			//    if($messageStatis){
+			$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['admin_message_status' => 'read']);
+			   
+		
 
-			
-
-			// 	$usersActivity=['log_name'=>'Read ApplicationMessage',
-			// 	'description'=>'Read Application Message',
-			// 	'event'=>'Read Messages',
-			// 	'subject_type'=>'App\Models\ApplicationMessage',
-			// 	'causer_id'=>auth('admin')->user()->id,
-			// 	'ip_address'=>$request->ip(),
-			// 	'created_at' => now(),
-			// 	'updated_at' => now(),
-				
-			//    ];
-                 
-			//    createActiveLog($usersActivity);
-
-
-
-
-				// activity('Read ApplicationMessage')  
-				// ->causedBy(Auth::guard('admin')->user())
-				// ->withProperties(['ip' => $request->ip()])
-				// ->log('Read ApplicationMessage');
- 
-			//    }
-
+		
 
 			activity('Read ApplicationMessage')  
 			->causedBy(Auth::guard('admin')->user())
 			->withProperties(['ip' => $request->ip()])
-			->log('Read ApplicationMessage');
+			->log('Read ApplicationMessage By Admin ');
 			
 			 
 			
 			
 			 
 			
-			}else{
+			}elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['moderator_message_status' => 'read']);
@@ -92,7 +69,21 @@ class ApplicationMessageController extends Controller
 				activity('Read ApplicationMessage')  
 				->causedBy(Auth::guard('admin')->user())
 				->withProperties(['ip' => $request->ip()])
-				->log('Read ApplicationMessage');
+				->log('Read ApplicationMessage By moderator');
+
+
+
+
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+				$userid=auth('admin')->user()->username;
+				$message_status_type="supermoderator_message_status";
+				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $request->id)->update(['supermoderator_message_status' => 'read']);
+				$role="supermoderator";
+
+				activity('Read ApplicationMessage')  
+				->causedBy(Auth::guard('admin')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Read ApplicationMessage BY SuperModerator');
 
 
 
@@ -109,7 +100,7 @@ class ApplicationMessageController extends Controller
 			activity('Read ApplicationMessage')  
 			->causedBy(Auth::guard('web')->user())
 			->withProperties(['ip' => $request->ip()])
-			->log('Read ApplicationMessage');
+			->log('Read ApplicationMessage By Student');
 
 
 
@@ -145,8 +136,10 @@ class ApplicationMessageController extends Controller
 		if (auth('admin')->check()) {
 			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
                $role="admin"; 
-			}else{
+			}elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
 				$role="moderator";
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+				$role="supermoderator";
 			}
 			
 		} elseif(auth('web')->check()) {

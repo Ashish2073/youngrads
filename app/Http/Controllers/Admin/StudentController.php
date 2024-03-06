@@ -63,7 +63,7 @@ class StudentController extends Controller
 				// 	$users=User::all();
 				// }
 				     
-			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)){
+			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)||session()->has('used_modifier')){
 
 				
 				
@@ -86,11 +86,20 @@ class StudentController extends Controller
 								}
 
                               })->where(function ($query) use ($request) {
-								if(($request->has('moderator_filter_id'))){
+								
+								if(($request->has('moderator_filter_id')) || session()->has('used_modifier') ){ 
 
-									if($request->get('moderator_filter_id')!=[0]){
 									
-										$query->whereIn('users.moderator_id', $request->get('moderator_filter_id'))->orWhereNull('users.moderator_id');
+
+									if($request->get('moderator_filter_id')!=[0] || session()->has('used_modifier') ){
+                                          
+										$id=$request->get('moderator_filter_id')??[session()->get('used_modifier')];
+
+										session()->forget('used_modifier');
+									
+										
+									
+										$query->whereIn('users.moderator_id', $id)->orWhereNull('users.moderator_id');
 								  }else{
 								
 									 $query->whereNull('users.moderator_id');
@@ -108,6 +117,8 @@ class StudentController extends Controller
 
 
 				  }else{
+
+				
 					
 					$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
 					->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')->get();

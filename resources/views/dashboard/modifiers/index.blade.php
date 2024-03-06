@@ -292,10 +292,10 @@
                         if (data.errorpermissionmessage) {
 
                             let html = `<div class="alert alert-danger mt-2 py-2" role="alert" style="font-size: 20px">
-        <button type="button" id="permission_error" class="close" data-dismiss="alert"
-          aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <strong>Fail!</strong> ${data.errorpermissionmessage}
-             </div>`;
+                                          <button type="button" id="permission_error" class="close" data-dismiss="alert"
+                                            aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                             <strong>Fail!</strong> ${data.errorpermissionmessage}
+                                              </div>`;
 
 
 
@@ -312,9 +312,14 @@
 
                         } else {
                             $('.dynamic-body').html(data);
+
+
+
                         }
 
                         runScript();
+
+
                     }
                 });
             });
@@ -325,6 +330,8 @@
         function runScript() {
             // $(".select").select2();
             $(".select").selectpicker();
+
+
 
             validateForm($('#modifier-create-form'), {
                 rules: {
@@ -403,11 +410,14 @@
                     //     required: true,
                     //     number: true,
                     // },
-                    // 'rolename[]': {
-                    //     required: true,
-                    //     minlength: 1,
+                    'rolename[]': {
+                        checkModeratorRole: {
+                            depends: function() {
+                                return ($('#studentscount').val() > 0 || $('#supermoderatoraasign').val() == 1);
+                            }
+                        }
 
-                    // }
+                    }
 
                 },
                 messages: {
@@ -417,6 +427,24 @@
 
                 }
             });
+
+
+
+
+
+            $.validator.addMethod('checkModeratorRole', function(value,
+                    element) {
+
+                    var roles = $('#rolenameedit').val();
+
+
+
+                    return ($('#studentscount').val() > 0 || $('#supermoderatoraasign').val() == 1) && roles && roles
+                        .includes('moderator');
+                },
+                'You donot  remove the role of moderaror from this users becausse  this user assign as role of moderator to students. or it assign under any supermoderator'
+            );
+
 
 
 

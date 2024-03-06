@@ -84,7 +84,12 @@
                                         <select data-colum="0" id="moderatorid" name="moderatorid[]" data-live-search="true"
                                             multiple class=" select form-control apply-filter-moderator">
                                             @foreach ($moderator as $user)
-                                                <option value="{{ $user->id }}">{{ $user->username }}
+                                                <option value="{{ $user->id }}"
+                                                    @if (session()->has('used_moderators_under_supermoderator')) @if (session()->get('used_moderators_under_supermoderator') == $user->id)
+
+                                                         selected @endif
+                                                    @endif>
+                                                    {{ $user->username }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -98,7 +103,14 @@
                                             data-live-search="true" multiple
                                             class=" select form-control apply-filter-moderator">
                                             @foreach ($supermoderator as $user)
-                                                <option value="{{ $user->id }}">{{ $user->username }}
+                                                <option value="{{ $user->id }}"
+                                                    @if (session()->has('used_supermoderators')) @if (session()->get('used_supermoderators') == $user->id)
+
+                                                     selected @endif
+                                                    @endif
+
+
+                                                    >{{ $user->username }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -118,18 +130,17 @@
                             @if (hasPermissionForRoles('assign_moderators_to_moderator_view', $userrole) ||
                                     auth('admin')->user()->getRoleNames()[0] == 'Admin')
                                 <a href="javascript:void(0)" class="btn btn-primary mt-3"
-                                    id="assignmoderatorsupermoderator">Assign
+                                    id="assignmoderatorsupermoderator">(Assign/Dissociate)
                                     Moderators
                                     To Supermoderator</a>
                             @endif
-
                             <div class="row application-filter align-items-center" id="moderatorassigndiv" hidden>
 
                                 <div class="col-md-3 col-12">
                                     <div class="form-group">
-                                        <label for="supersupermoderatorid">Super Moderator Id</label>
-                                        <select id="supermoderatorid" name="supermoderatorid" data-live-search="true"
-                                            class=" select form-control">
+                                        <label for="aasignsupermoderatorid">Super Moderator Id</label>
+                                        <select id="assignsupermoderatorid" name="assignsupermoderatorid"
+                                            data-live-search="true" class=" select form-control">
                                             <option value="" selected disabled>Please Select
                                             </option>
 
@@ -172,7 +183,8 @@
                                     <div class="form-group">
                                         <input class="form-check-input " type="checkbox" value=""
                                             id="assign-all-moderator">
-                                        <label for="assignmoderator form-check-label">Select/Deselect To All
+                                        <label for="assignmoderator form-check-label">Select/Deselect To
+                                            All
                                             moderators</label>
 
                                     </div>
@@ -183,7 +195,8 @@
                                     <div class="form-group">
                                         <input class="form-check-input " type="checkbox" value="0"
                                             id="non-assign-moderator">
-                                        <label for="assignmoderator form-check-label">Non Assign moderators</label>
+                                        <label for="assignmoderator form-check-label">Non Assign
+                                            moderators</label>
 
                                     </div>
                                 </div>
@@ -214,7 +227,7 @@
 
                                     <div class="form-group mb-2">
                                         <button class="btn btn-danger btn-block"
-                                            id="moderator-dissociate">Dissociate</button>
+                                            id="supermoderator-dissociate">Dissociate</button>
                                     </div>
 
                                 </div>
@@ -242,7 +255,7 @@
                                             <th>Moderator Name</th>
                                             <th>Assign SuperModerator (Name)</th>
                                             <th>Moderators Email</th>
-                                            <th>Number Of moderators Assign to moderator</th>
+                                            <th>Number Of students Assign to moderator</th>
                                         </tr>
                                         </tr>
                                     </thead>
@@ -276,7 +289,7 @@
                 if ($("#moderatorassigndiv").is(":hidden")) {
                     $("#moderatorassigndiv").removeAttr("hidden");
                     $(".moderator-checkbox").removeAttr("hidden");
-                    $("#supermoderator-assign").val('');
+
                     $("#non-assign-moderator").val('0');
 
                     $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
@@ -683,26 +696,32 @@
                 }
             });
         }
+        /////////////////////checkBox to select to student //////////// 
+
+        $(document).on('click', '.moderator-checkbox', function(e) {
+            e.stopPropagation();
+        })
 
         //////////////////////Assign Super Moderators to Moderators ///////////////////
 
 
 
-        $("#moderator-assign").on('click', function(e) {
+        $("#supermoderator-assign").on('click', function(e) {
             e.preventDefault();
+
             that = $(this);
             var checkedValues = $(".moderator-checkbox:checked").map(function() {
                 return $(this).val();
             }).get();
-            var moderatorid = $('#moderatorid').val();
+            var supermoderatorid = $('#assignsupermoderatorid').val();
 
             $.ajax({
-                url: "{{ url('admin/moderator-assign-students') }}",
+                url: "{{ url('admin/supermoderator-assign-moderators') }}",
                 type: 'POST',
                 data: {
                     _token: "{{ csrf_token() }}",
                     _method: "POST",
-                    moderatorid: moderatorid,
+                    supermoderatorid: supermoderatorid,
                     checkedValues: checkedValues
                 },
                 beforeSend: function() {
@@ -725,13 +744,14 @@
                         $("#non-assign-moderator").prop("checked", false);
                         $('#assign-all-moderator').prop("checked", false);
 
-                        moderators_fileter_id = '';
+                        let moderators_fileter_id = '';
+                        let supermoderators_fileter_id = "";
 
                         dataTable.draw();
 
                         $("#thead-moderator-checkbox").attr('hidden', true);
                         $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
-                        $("#studentassigndiv").attr("hidden", true);
+                        $("#moderatorassigndiv").attr("hidden", true);
 
 
 
@@ -748,7 +768,7 @@
                         message = data.responseJSON.errors.checkedValues[0];
 
                         toast("error", message, "Error");
-                    } else if (data.responseJSON.errors.moderatorid) {
+                    } else if (data.responseJSON.errors.supermoderatorid) {
                         message = data.responseJSON.errors.moderatorid[0];
                         toast("error", message, "Error");
 
@@ -777,6 +797,88 @@
 
 
         ////////////////////////////////////////////////////////////////////
+        ////////////////////////Dissociate/////////////////
+
+        $("#supermoderator-dissociate").on('click', function(e) {
+
+
+            e.preventDefault();
+            that = $(this);
+            var checkedValues = $(".moderator-checkbox:checked").map(function() {
+                return $(this).val();
+            }).get();
+            var supermoderatorid = $('#assignsupermoderatorid').val();
+
+            $.ajax({
+                url: "{{ url('admin/supermoderator-dissociate-moderators') }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    _method: "POST",
+                    supermoderatorid: supermoderatorid,
+                    checkedValues: checkedValues
+                },
+                beforeSend: function() {
+
+                    that.attr('disabled', true).prepend(
+                        "<i class='fa fa-spinner fa-spin'></i> ");
+                },
+                success: function(data) {
+
+
+                    if (data.error) {
+                        toast("error", data.message, "Error");
+                        that.removeAttr('disabled').html(
+                            "Dissociate"
+                        );
+                    } else {
+
+                        setAlert(data);
+                        $("#non-assign-student").prop("checked", false);
+                        $('#assign-all-student').prop("checked", false);
+                        moderators_fileter_id = '';
+
+                        dataTable.draw();
+
+
+                        $("#thead-moderator-checkbox").attr('hidden', true);
+                        $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
+                        $("#moderatorassigndiv").attr("hidden", true);
+
+
+
+                        that.removeAttr('disabled').html(
+                            "Dissociate"
+                        );
+                    }
+
+                },
+                error: function(data) {
+
+                    if (data.responseJSON.errors.checkedValues[0]) {
+                        message = data.responseJSON.errors.checkedValues[0];
+
+                        toast("error", message, "Error");
+                    } else {
+                        toast("error", "Something went wrong.", "Error");
+                    }
+
+
+
+                }
+            });
+
+
+
+
+        })
+
+
+
+
+
+        //////////////////////////////////////////////////////////////////
+
 
 
         $('#reset-filter').on('click', function() {

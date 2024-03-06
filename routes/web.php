@@ -212,8 +212,12 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     ]);
 
     Route::post('moderator-assign-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_assign_to_students'])->name('moderator-assign-students');
+    Route::post('supermoderator-assign-moderators',[\App\Http\Controllers\Admin\ModeratorController::class,'supermoderator_assign_to_moderators'])->name('supermoderator-assign-moderators');
+    
+    
     Route::post('moderator-dissociate-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_dissociate_to_students'])->name('moderator-dissociate-students');
-
+ 
+    Route::post('supermoderator-dissociate-moderators',[\App\Http\Controllers\Admin\ModeratorController::class,'supermoderator_dissociate_to_moderators'])->name('supermoderator-dissociate-moderators');
 
     Route::post('students-data-filter',[\App\Http\Controllers\Admin\StudentController::class,'filterstudentdata'])->name('students-data-filter');
 

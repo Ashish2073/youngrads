@@ -44,21 +44,39 @@ class ModeratorController extends Controller
               
 
 
-            }
+            } 
 
             $moderators=Admin::role('moderator')->with(['supermoderator','student'])->get();
 
+           
 
+            if((isset($request->moderators) && !isset($request->supermoderators)) || session()->has('used_moderators_under_supermoderator')){
 
-            if(isset($request->moderators) && !isset($request->supermoderators)){
+              
+         
+               
+                 
+                $id=($request->moderators)?? [session()->get('used_moderators_under_supermoderator')];  
+               
+                 session()->forget('used_moderators_under_supermoderator');
+
                 $moderators=Admin::role('moderator')->with(['supermoderator','student'])
-                ->whereIn('id', ($request->moderators))->get();
+
+                ->whereIn('id', $id)->get();
+
+
                
             }
-            if(!isset($request->moderators) && isset($request->supermoderators)){
+            if(!isset($request->moderators) && isset($request->supermoderators) || session()->has('used_supermoderators')){
+
+
+                $id=($request->supermoderators)?? [session()->get('used_supermoderators')];
+
+                session()->forget('used_supermoderators');
+
                 $moderators=Admin::role('moderator')->with(['supermoderator','student'])
-                ->whereHas('supermoderator', function ($query) use ($request) {
-                     $query->whereIn('id', $request->supermoderators);
+                ->whereHas('supermoderator', function ($query) use ($request,$id) {
+                     $query->whereIn('id', $id);
                  })->get();
 
             }
@@ -337,7 +355,132 @@ class ModeratorController extends Controller
                   'success' => true
               ]);
           }
+    } 
+
+
+    public function supermoderator_assign_to_moderators(Request $request){
+        
+        $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
+		if(hasPermissionForRoles('assign_students_to_moderator_add', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
+        $validator = Validator::make($request->all(), [
+            'checkedValues' => 'required',
+            'supermoderatorid'=>'required'
+        
+            
+        ],['checkedValues.required'=>'Please Select Student','moderatorid.required'=>'Please Select Moderator']);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            // Return a JSON response with validation errors
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+    
+        
+
+
+        $assignsupermoderatortomeoderator=Admin::whereIn('id',$request->checkedValues)->update([
+            'parent_id'=>$request->supermoderatorid
+        ]);
+
+
+        if($assignsupermoderatortomeoderator){
+
+            activity('Assign Supermoderator')
+            ->causedBy(Auth::guard('admin')->user())
+            ->withProperties(['ip' => $request->ip()])
+            ->log('assign supermoderator to moderators');
+
+
+           return response()->json([
+            'success' => true,
+            'code' => 'success',
+            'title' => 'Congratulations',
+            'message' => 'Supermoderator assign to moderator successfully'
+         ]);
+
+        }
+    
+        }else{
+            return response()->json([
+                'error' => true,
+                'code' => 'fail',
+                'title' => 'Not Permission',
+                'message' => 'You have not permisson'
+            ]);
+        }
+    
+      
+
+
+
+         
+
+
     }
+
+   
+    public function supermoderator_dissociate_to_moderators(Request $request){
+
+		$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
+	   if(hasPermissionForRoles('dissociate_students_to_moderator_remove', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
+
+
+		$validator = Validator::make($request->all(), [
+			'checkedValues' => 'required',
+		
+			
+		],['checkedValues.required'=>'Please Select Student']);
+
+		// Check if validation fails
+		if ($validator->fails()) {
+			// Return a JSON response with validation errors
+			return response()->json(['errors' => $validator->errors()], 422);
+		}
+
+
+
+
+	   
+
+   
+	  
+		   $dissociatesuoermoderatortomoderators=Admin::whereIn('id',$request->checkedValues)->update(['parent_id'=>null]);
+		   if($dissociatesuoermoderatortomoderators){
+
+			activity('Dissociate')
+            ->causedBy(Auth::guard('admin')->user())
+            ->withProperties(['ip' => $request->ip()])
+            ->log('Dissociate supermoderator to moderators');
+
+
+
+
+			  return response()->json([
+			   'success' => true,
+			   'code' => 'success',
+			   'title' => 'Congratulations',
+			   'message' => 'Moderator Dissociate To students successfully'
+			]);
+	   }
+
+	
+
+   }else{
+	   return response()->json([
+		   'error' => true,
+		   'code' => 'fail',
+		   'title' => 'Not Permission',
+		   'message' => 'You have not permisson'
+	   ]);
+
+   }
+
+   }
+
+
+
+
 
 
 

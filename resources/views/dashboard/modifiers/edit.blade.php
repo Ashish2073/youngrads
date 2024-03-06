@@ -95,8 +95,8 @@
 
                 <div class="col-md-12 col-12">
                     <div class="form-group">
-                        <label for="rolename">Role</label>
-                        <select id="rolename" name="rolename[]" data-live-search="true" multiple
+                        <label for="rolenameedit">Role</label>
+                        <select id="rolenameedit" name="rolename[]" data-live-search="true" multiple
                             class=" select form-control">
                             <option value="" disabled>Please Select Roles</option>
 
@@ -110,8 +110,29 @@
                         </select>
                     </div>
                 </div>
+                @php
+                    $usermoderatorcount = \App\Models\User::where('moderator_id', $user->id)->count();
+                    $checkassigntosupermoderator = \App\Models\Admin::role('moderator')
+                        ->where('id', $user->id)
+                        ->whereNotNull('parent_id')
+                        ->exists();
+
+                    if ($user->is_super == 1) {
+                        $usermoderatorcount = 1;
+                    }
+
+                @endphp
+
+                @php
+
+                    $userassigntomodeartorassupermoderator = \App\Models\Admin::where('parent_id', $user->id)->count();
+
+                @endphp
 
 
+                <input type="hidden" id="studentscount" value="{{ $usermoderatorcount }}" />
+
+                <input type="hidden" id="supermoderatoraasign" value="{{ $checkassigntosupermoderator }}" />
 
 
 
@@ -122,31 +143,45 @@
     </div>
     </form>
 
-    @php
-        $usermoderatorcount = \App\Models\User::where('moderator_id', $user->id)->count();
 
-        if ($user->is_super == 1) {
-            $usermoderatorcount = 1;
-        }
 
-    @endphp
 
     <div class="form-group delete mx-1" style="margin-top:1%">
-        @if ($usermoderatorcount == 0)
+        @if (count(json_decode($user->role)) == 0 ||
+                (!in_array('moderator', json_decode($user->role)) && !in_array('supermoderator', json_decode($user->role))) ||
+                ($usermoderatorcount == 0 &&
+                    in_array('moderator', json_decode($user->role)) &&
+                    $checkassigntosupermoderator != 1) ||
+                ($userassigntomodeartorassupermoderator == 0 && in_array('supermoderator', json_decode($user->role))))
             <form id="delete-form" method="POST" action="{{ route('admin.modifier.destroy', $user->id) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
             </form>
         @else
-            @php session()->put('used_modifier',$user->id); @endphp
             @if ($user->is_super == 1)
                 <p>This User Is Super Admin</p><a>
                 @else
-                    <p>{{ config('setting.delete_notice') }}</p>
-                    <a href="{{ url('admin/students') }}">
-                        <p> click Here to Show Uses</p><a>
+                    @if (in_array('moderator', json_decode($user->role)))
+                        @php session()->put('used_modifier',$user->id); @endphp
+                        <p>{{ config('setting.delete_notice') }}</p>
+                        @if ($usermoderatorcount > 0)
+                            <a href="{{ url('admin/students') }}">
+                                <p> click Here to Show Uses as Student's Moderator</p><a>
+                        @endif
+                        @if ($checkassigntosupermoderator == 1)
+                            @php session()->put('used_moderators_under_supermoderator',$user->id); @endphp
+                            <a href="{{ url('admin/moderators') }}">
+                                <p> click Here to Show Uses as Moderators's assign under Supermoderator</p><a>
+                        @endif
+                    @elseif(in_array('supermoderator', json_decode($user->role)))
+                        @php session()->put('used_supermoderators',$user->id); @endphp
+                        <p>{{ config('setting.delete_notice') }}</p>
+                        <a href="{{ url('admin/moderators') }}">
+                            <p> click Here to Show Uses</p><a>
+                    @endif
             @endif
+
         @endif
     </div>
 </div>

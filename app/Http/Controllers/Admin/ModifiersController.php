@@ -60,10 +60,21 @@ class ModifiersController extends Controller
                     // return $row->getRoleNames();  <button class='btn btn-danger role-view btn-icon btn-round'  onclick='userRole($row->id)' ><i class='feather icon-eye'></i></button>";
                    
                     $modifersrole=json_decode($row->getRoleNames(),true);
+                    if(count($modifersrole)==0){
+                        $rolesHtml="<label for='positiveNumber' id='userrole'><div  class='role-card-1 btn btn-danger'>
+                        <h5>No Role</h5>
+                        </div>";
+
+                        return $rolesHtml;
+
+ 
+                    }
 
                     $rolesHtml="<label for='positiveNumber' id='userrole'>";
 
                     foreach($modifersrole as $role){
+                       
+                     
                         $rolesHtml=$rolesHtml."
                         <div class='role-card-1'>
                         <h5>$role</h5>

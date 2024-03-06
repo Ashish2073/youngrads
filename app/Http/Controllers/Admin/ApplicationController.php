@@ -65,9 +65,19 @@ class ApplicationController extends Controller
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
+
+
+				
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+				$userid=auth('admin')->user()->username;
+				$message_status_type="supermoderator_message_status";
+				$role="supermoderator";
+
 			}else{
-				$userid=0;
-				$message_status_type="moderator_message_status";
+
+				
+				$userid="N/A";
+				$message_status_type="N/A";
 			}
 			
 		} elseif(auth('web')->check()) {
@@ -78,6 +88,9 @@ class ApplicationController extends Controller
 		}
 
 
+
+	
+		   
 		   
 
 
@@ -99,7 +112,9 @@ class ApplicationController extends Controller
 			->join('universities', 'campus.university_id', '=', 'universities.id')
 			->select('intakes.name as intake','admins.username as moderator_username','users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
 			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid. "'  && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='0')) as count"),
-			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid  . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1' )) as moderatortoadmincount"))
+			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1')) as supermoderatortomoderatortoadmincount"),
+			DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='2')) as supermoderatortoadmincount"))
+			
 			->where('campus.university_id','=',$usedCampusProgramUniversityId)
 			->where('campus_programs.campus_id','=',$usedCampusProgramCampusId)
 			->where('campus_programs.program_id','=',$usedCampusProgramId)
@@ -108,6 +123,8 @@ class ApplicationController extends Controller
 		    
 
 			}else{
+
+				
 
 			
 				$userApplications = UserApplication::join('users', 'users_applications.user_id', '=', 'users.id')
@@ -119,8 +136,8 @@ class ApplicationController extends Controller
 				->join('universities', 'campus.university_id', '=', 'universities.id')
 				->select('intakes.name as intake','admins.username as moderator_username', 'users_applications.admin_status', 'status', 'users_applications.application_number', 'users_applications.year', 'users_applications.created_at as apply_date', 'users.name as first', 'users.last_name as last_name', 'campus.name as campus', 'universities.name as university', 'users_applications.id as application_id', 'programs.name as program', 'users_applications.user_id as user_id', 'users_applications.is_favorite as favorite',
 				 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='0')) as count"),
-				 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1')) as moderatortoadmincount"))
-				 
+				 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='1')) as supermoderatortomoderatortoadmincount"),
+				 DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "' && application_message.$message_status_type = 'unread' && application_id = users_applications.id && message_scenario='2')) as supermoderatortoadmincount"))
 				 
 			    ->groupBy('users_applications.id');
 
@@ -154,17 +171,44 @@ class ApplicationController extends Controller
 			$userApplications->whereIn('users_applications.status', $request->status);
 		}
 
-		if ($request->has('moderator_id') || in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))) {
+		// if ($request->has('moderator_id') || in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))) {
 			 
-			if(isset($request->moderator_id)){ 
+		// 	if(isset($request->moderator_id)){ 
 				 
-				$userApplications->whereIn('admins.id',$request->moderator_id );
-			}else{
+		// 		$userApplications->whereIn('admins.id',$request->moderator_id );
+		// 	}else{
 			
-				$userApplications->whereIn('admins.id',[auth('admin')->user()->id] );
-			}
+		// 		$userApplications->whereIn('admins.id',[auth('admin')->user()->id] );
+		// 	}
 		
+		// }
+
+		if($request->has('moderator_id')){
+            if(isset($request->moderator_id)){
+				$userApplications->whereIn('admins.id',$request->moderator_id );
+
+			}
+			
+
+ 
+
+		}elseif(!$request->has('moderator_id') && in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
+			
+			
+			$userApplications->whereIn('admins.id',[auth('admin')->user()->id] );
+		}elseif(!$request->has('moderator_id') && in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+
+			
+			$moderatorsid=Admin::where('parent_id',auth('admin')->user()->id)->pluck('id');
+
+	        $userApplications->whereIn('admins.id',$moderatorsid);
+
 		}
+
+
+
+
+
 
 		if(isset($request->application_id)){
            $userApplications->whereIn('users_applications.id',$request->application_id);
@@ -284,22 +328,22 @@ class ApplicationController extends Controller
 
 				//  })
 
-				->editColumn('moderatortoadmincount', function ($row) {
-
+				->editColumn('supermoderatortomoderatortoadmincount', function ($row) {
+                   
 					$html = "<button class='btn btn-icon btn-outline-primary admin-message' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#dynamic-modal' >";
 					// $html .= "<i class='ficon feather icon-bell'></i><span
 					// class='badge badge-pill badge-primary badge-up'>5</span>";
 	
 					$html .= "<i class='ficon feather icon-message-circle'></i>";
 					// $row->count = 5;
-					if ($row->moderatortoadmincount > 0) {
+					if ($row->supermoderatortomoderatortoadmincount> 0) {
 						$html .= "<span class=
-            badge badge-pill badge-default badge-up'>$row->moderatortoadmincount</span>";
+            badge badge-pill badge-default badge-up'>$row->supermoderatortomoderatortoadmincount</span>";
 					}
 					$html .= "</button>";
 					// return $html;
-					if ($row->moderatortoadmincount > 0) {
-						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->moderatortoadmincount . '</span>';
+					if ($row->supermoderatortomoderatortoadmincount> 0) {
+						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->supermoderatortomoderatortoadmincount . '</span>';
 					} else {
 						$count = '';
 					}
@@ -310,7 +354,45 @@ class ApplicationController extends Controller
             </div>
           </div>';
 					return $html;
+
+				
 				})
+
+			   
+
+				
+				->editColumn('supermoderatortoadmincount', function ($row) {
+					if(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames())) || in_array('Admin',json_decode(auth('admin')->user()->getRoleNames())) ){
+					$html = "<button class='btn btn-icon btn-outline-primary admin-message' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#dynamic-modal' >";
+					// $html .= "<i class='ficon feather icon-bell'></i><span
+					// class='badge badge-pill badge-primary badge-up'>5</span>";
+	
+					$html .= "<i class='ficon feather icon-message-circle'></i>";
+					// $row->count = 5;
+					if ($row->supermoderatortoadmincount> 0) {
+						$html .= "<span class=
+                     badge badge-pill badge-default badge-up'>$row->supermoderatortoadmincount</span>";
+					}
+					$html .= "</button>";
+					// return $html;
+					if ($row->supermoderatortoadmincount> 0) {
+						$count = '<span class="badge badge-pill badge-danger badge-sm badge-up">' . $row->supermoderatortoadmincount . '</span>';
+					} else {
+						$count = '';
+					}
+					$html = '<div class="avatar bg-primary admin-message" data-custom="2" data-id="' . $row->application_id . '" data-toggle="modal" data-target="#dynamic-modal">
+            <div class="avatar-content position-relative">
+              <i class="avatar-icon feather icon-message-circle"></i>
+              ' . $count . '
+            </div>
+          </div>';
+					return $html;
+				}else{
+						$html="";
+						return $html;
+					}
+				})
+
 
 
 
@@ -332,7 +414,7 @@ class ApplicationController extends Controller
 					$icon = $status_meta['icon_class'];
 	 				return "<span class='p-50 badge $class font-weight-bold status' data-id='" . $row->application_id . "' data-toggle='modal' data-target='#apply-model'><i class='$icon'></i> " . config('setting.application.status')[$row->status] . "</span>";
 				})
-				->rawColumns(['favorite', 'toggle_status', 'apply_date', 'name', 'message', 'status', 'campus','moderatortoadmincount','university','moderator_username', 'program', 'count', 'delete'])
+				->rawColumns(['favorite', 'toggle_status', 'apply_date', 'name', 'message', 'status', 'campus','supermoderatortomoderatortoadmincount','university','moderator_username', 'program', 'count','supermoderatortoadmincount','delete'])
 				->make(true);
 		} else {
 			$univs = University::all();
@@ -340,14 +422,15 @@ class ApplicationController extends Controller
 			$campuses = Campus::all();
 			$limitApplyApplication=AddDataLimit::where('model_name','App/Model/AddDataLimit')->where('action','create')->select('count')->get();
 			
-			if(!in_array('Admin', json_decode(auth('admin')->user()->getRoleNames()))){
-			$moderator=Admin::select('id','username')->where('username',auth()->guard('admin')->user()->username)->role('moderator')->get();
-
-		}else{
+			if(in_array('Admin', json_decode(auth('admin')->user()->getRoleNames()))){
+			
 			$moderator=Admin::select('id','username')->role('moderator')->get();
+		   }elseif(in_array('moderator', json_decode(auth('admin')->user()->getRoleNames()))){
+			$moderator=Admin::select('id','username')->where('id',auth()->guard('admin')->user()->id)->role('moderator')->get();
+	       }elseif(in_array('supermoderator', json_decode(auth('admin')->user()->getRoleNames()))){
+			$moderator=Admin::where('parent_id',auth('admin')->user()->id)->role('moderator')->get();
 
-
-		}
+		   }
 
 		$application_numbers=UserApplication::select('id','application_number')->get();
 
@@ -370,7 +453,7 @@ class ApplicationController extends Controller
 			   activity('Read ApplicationMessage')  
 				->causedBy(Auth::guard('admin')->user())
 				->withProperties(['ip' => $request->ip()])
-				->log('Read ApplicationMessage');
+				->log('Read ApplicationMessage By Admin');
 			
 			
 			
@@ -378,7 +461,7 @@ class ApplicationController extends Controller
 			
 			
 			
-			}else{
+			}elseif(in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
 				$userid=auth('admin')->user()->username;
 				$message_status_type="moderator_message_status";
 				$role="moderator";
@@ -388,11 +471,24 @@ class ApplicationController extends Controller
 				activity('Read ApplicationMessage')  
 				->causedBy(Auth::guard('admin')->user())
 				->withProperties(['ip' => $request->ip()])
-				->log('Read ApplicationMessage');
+				->log('Read ApplicationMessage By Moderator');
 			
 			
 			
 			
+			}elseif(in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))){
+				$userid=auth('admin')->user()->username;
+				$message_status_type="moderator_message_status";
+				$role="supermoderator";
+				$messageStatis = ApplicationMessage::where('user_id', '!=', $userid)->where('application_id', '=', $id)->update(['supermoderator_message_status' => 'read']);
+			
+				
+				activity('Read ApplicationMessage')  
+				->causedBy(Auth::guard('admin')->user())
+				->withProperties(['ip' => $request->ip()])
+				->log('Read ApplicationMessage BY Supermoderator');
+			
+
 			}
 			
 		} elseif(auth('web')->check()) {
@@ -488,6 +584,7 @@ class ApplicationController extends Controller
 
 	function favoriteApplicatons(Request $request)
 	{
+		
 		$breadcrumbs = [
 			['link' => "admin.applications-all", 'name' => "Applications"], ['name' => 'Favorite Applications']
 		];
