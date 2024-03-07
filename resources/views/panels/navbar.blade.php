@@ -88,7 +88,7 @@
                 @if (in_array('moderator', $userrole) ||
                         auth('admin')->user()->getRoleNames()[0] == 'Admin' ||
                         in_array('supermoderator', $userrole))
-                    @php $messageUnreadData=\App\Models\Admin::getunreadmessage(); @endphp
+                    @php $messageUnreadData=\App\Models\Admin::getunreadmessage(0); @endphp
                     <li class="dropdown dropdown-notification nav-item "><a class="nav-link nav-link-label"
                             href="#" data-toggle="dropdown"><i
                                 class="ficon feather icon-message-square">A&S&M&U</i><span
@@ -164,7 +164,7 @@
                     </li>
 
 
-                    @php $messageadminmoderatorUnreadData=\App\Models\Admin::getadminmoderatorunreadmessage(); @endphp
+                    @php $messageadminmoderatorUnreadData=\App\Models\Admin::getunreadmessage(1); @endphp
                     <li class="dropdown dropdown-notification nav-item "><a class="nav-link nav-link-label"
                             href="#" data-toggle="dropdown"><i
                                 class="ficon feather icon-message-square">A&S&M</i><span
@@ -241,7 +241,7 @@
                     @if (in_array('supermoderator', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin')
 
 
-                        @php $messageUnreadData=\App\Models\Admin::getadmintomoderatorunreadmessage(); @endphp
+                        @php $messageUnreadData=\App\Models\Admin::getunreadmessage(2); @endphp
                         <li class="dropdown dropdown-notification nav-item "><a class="nav-link nav-link-label"
                                 href="#" data-toggle="dropdown"><i
                                     class="ficon feather icon-message-square">A&S</i><span

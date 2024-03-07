@@ -41,7 +41,7 @@ class StudentController extends Controller
 	 
 		if (request()->ajax()) {
 			
-			   
+			$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
 		  
 				// if((($request->get('id')!=null) && $request->get('email')==null && $request->get('personal_number')==null)){
 				// 	$users=User::whereIn('id',$request->get('id'))->get();
@@ -116,13 +116,41 @@ class StudentController extends Controller
 						
 
 
-				  }else{
+				  }else{ 
 
 				
-					
+					if(in_array('Admin',$userrole) || (!in_array('supermoderator',$userrole) && !in_array('moderator',$userrole))){
 					$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
 					->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')->get();
+					}elseif(in_array('supermoderator',$userrole)){
+						$moderatorsid=Admin::where('parent_id',auth('admin')->user()->id)->pluck('id')->toArray();
+						if(count($moderatorsid)>0){
+							$userss_id=User::whereIn('moderator_id',$moderatorsid)->pluck('id')->toArray();
 
+							$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
+					         ->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')
+					          ->whereIn('users.id',$userss_id)
+					           ->orWhere('users.moderator_id',null)
+					          ->get();
+
+						}else{
+
+							$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
+					         ->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')				          
+					           ->where('users.moderator_id',null)
+					          ->get();
+
+						}
+
+					}elseif(in_array('moderator',$userrole)){
+						$moderatorsid=auth('admin')->user()->id;
+						$userss_id=User::where('moderator_id',$moderatorsid)->pluck('id')->toArray();
+						$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
+					         ->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')
+					          ->where('users.id',$userss_id)
+					          ->get();
+
+					}
 
 				
 					
@@ -185,8 +213,18 @@ class StudentController extends Controller
 			$userEmail=User::select('email')->get();
 			$userPhone=User::select('personal_number')->get();
 
-			
+			$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
+
+			if(in_array('Admin',$userrole) || (!in_array('supermoderator',$userrole) && !in_array('moderator',$userrole) )){
 			$moderator=Admin::select('id','username')->role('moderator')->get();
+			}elseif(in_array('supermoderator',$userrole)){
+				$moderator=Admin::select('id','username')->role('moderator')->where('parent_id',auth('admin')->user()->id)->get();
+				
+
+			}elseif(in_array('moderator',$userrole)){
+
+				$moderator=Admin::where('id',auth('admin')->user()->id)->select('id','username')->role('moderator')->get();
+			}
 
 	
 			
@@ -312,7 +350,7 @@ class StudentController extends Controller
 
 
 		 $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
-		if(hasPermissionForRoles('assign_students_to_moderator_add', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
+		if(hasPermissionForRoles('assign_students_to_moderator_assign', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
 
 
 
@@ -371,7 +409,7 @@ class StudentController extends Controller
 	public function moderator_dissociate_to_students(Request $request){
 
 		$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
-	   if(hasPermissionForRoles('dissociate_students_to_moderator_remove', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
+	   if(hasPermissionForRoles('assign_students_to_moderator_dissociate', $userrole) || auth('admin')->user()->getRoleNames()[0] == 'Admin'){
 
 
 		$validator = Validator::make($request->all(), [

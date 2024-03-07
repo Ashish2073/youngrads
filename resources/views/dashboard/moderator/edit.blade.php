@@ -102,7 +102,7 @@
                 <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>
             </form>
         @else
-            @php session()->put('used_moderator',$user->id); @endphp
+            @php session()->put('used_moderator_as_assign_to_student',$user->id); @endphp
             @if ($user->is_super == 1)
                 <p>This User Is Super Admin</p><a>
                 @else

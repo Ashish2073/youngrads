@@ -165,9 +165,9 @@
                                             {{-- application_supermoderator_admin_id_message --}}
 
                                             @if (session()->has('application_supermoderator_admin_id_message '))
-                                                @php $application_moderator_admin_id_message=session()->get('application_supermoderator_admin_id_message '); @endphp
+                                                @php $application_supermoderator_admin_id_message=session()->get('application_supermoderator_admin_id_message '); @endphp
                                             @else
-                                                @php $application_moderator_admin_id_message = [] ;@endphp
+                                                @php $application_supermoderator_admin_id_message = [] ;@endphp
                                             @endif
 
 
@@ -175,7 +175,7 @@
 
                                             @foreach ($application_numbers as $application_number)
                                                 <option
-                                                    {{ request()->get('application_id') == $application_number->id || in_array($application_number->id, $application_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) ? 'selected' : '' }}
+                                                    {{ request()->get('application_id') == $application_number->id || in_array($application_number->id, $application_id_message) || in_array($application_number->id, $application_moderator_admin_id_message) || in_array($application_number->id, $application_supermoderator_admin_id_message) ? 'selected' : '' }}
                                                     value="{{ $application_number->id }}">
                                                     {{ $application_number->application_number }}</option>
                                             @endforeach
@@ -299,7 +299,8 @@
                                             --}}
                                                 <th>Message(Admin & SuperModerator & Moderator & User)</th>
                                                 <th>Message(Admin & SuperModerator & Moderator)</th>
-                                                @if (in_array('supermoderator', json_decode(auth('admin')->user()->getRoleNames())))
+                                                @if (in_array('supermoderator', json_decode(auth('admin')->user()->getRoleNames())) ||
+                                                        in_array('Admin', json_decode(auth('admin')->user()->getRoleNames())))
                                                     <th>Message(Admin & SuperModerator )</th>
                                                 @else
                                                     <th></th>
@@ -460,10 +461,45 @@
             //     }
             // });
 
-            // dataTable.draw();
+            // dataTable.draw(); showlatestmessagesupermoderatoradmin
 
 
             // } showadminmoderatorlatestmessage
+
+
+            $("#showlatestmessagesupermoderatoradmin").click(function() {
+
+
+                let applictionIdLatestMessage = "";;
+                if ((typeof(($(this).data('id'))) == 'number')) {
+                    applictionIdLatestMessage = [parseInt($(this).data('id'))];
+                } else {
+
+                    applictionIdLatestMessage = $(this).data('id').split(',');
+                }
+
+
+
+
+
+                $("#application_id").val(applictionIdLatestMessage);
+                $(".select").selectpicker('refresh');
+                dataTable.draw();
+
+
+
+            });
+
+
+
+
+
+
+
+
+
+
+
 
             $("#showlatestmessage").click(function() {
 

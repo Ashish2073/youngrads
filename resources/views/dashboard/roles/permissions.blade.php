@@ -1,27 +1,30 @@
 @php
     // $uppercasecrud = ['View', 'Add', 'Edit', 'Delete'];
 
-    $crud = ['view', 'add', 'edit', 'delete'];
+    $crud = ['view', 'add', 'edit', 'delete', 'N/A', 'N/A'];
+
+    $allaction = ['view', 'add', 'edit', 'delete', 'assign', 'dissociate'];
 
     $all_permissions = [
-        'dashboard' => ['view', 'N/A', 'N/A', 'N/A'],
-        'admin_users' => $crud,
+        'dashboard' => ['view', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'],
+        // 'admin_users' => $crud,
         'roles_and_permissions' => $crud,
-        'students' => ['view', 'N/A', 'N/A', 'delete'],
-        'assign_students_to_moderator' => ['view', 'add', 'N/A', 'N/A'],
+        'students' => ['view', 'N/A', 'N/A', 'delete', 'N/A', 'N/A'],
+        'assign_students_to_moderator' => ['view', 'N/A', 'N/A', 'N/A', 'assign', 'dissociate'],
+        'assign_moderators_to_supermoderator' => ['view', 'N/A', 'N/A', 'N/A', 'assign', 'dissociate'],
         'universities' => $crud,
         'campus' => $crud,
-        'campus_details' => ['view', 'add', 'N/A', 'N/A'],
+        'campus_details' => ['view', 'add', 'N/A', 'N/A', 'N/A', 'N/A'],
         'campus_program' => $crud,
         'program' => $crud,
         'universities' => $crud,
         'applications' => $crud,
-        'application_apply_limit' => ['view', 'add', 'N/A', 'N/A'],
+        'application_apply_limit' => ['view', 'add', 'N/A', 'N/A', 'N/A', 'N/A'],
         'program_level' => $crud,
         // 'pages' => $crud,
         'study' => $crud,
         'application_document' => $crud,
-        'user_activity' => ['view', 'N/A', 'N/A', 'N/A'],
+        'user_activity' => ['view', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'],
         'modifiers' => $crud,
         'moderators' => $crud,
 
@@ -32,7 +35,7 @@
         // 'test' => $crud,
         'mandatory_document' => $crud,
         'cities' => $crud,
-        'import_data' => ['view', 'add', 'N/A', 'N/A'],
+        'import_data' => ['view', 'add', 'N/A', 'N/A', 'N/A', 'N/A'],
         'states' => $crud,
         'countries' => $crud,
     ];
@@ -123,7 +126,7 @@
                     <td>Website Section</td>
 
                     <td style="padding: 0px 26px;">
-                        @foreach ($crud as $value)
+                        @foreach ($allaction as $value)
                             <div class="form-check form-check-inline px-1">
                                 {{ ucfirst($value) }}
 

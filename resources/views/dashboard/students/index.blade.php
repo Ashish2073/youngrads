@@ -84,15 +84,18 @@
                                             @foreach ($moderator as $moderatoruser)
                                                 @if (isset($moderatoruser->username))
                                                     <option value="{{ $moderatoruser->id }}"
-                                                        @if (session()->has('used_modifier')) @if (session()->get('used_modifier') == $moderatoruser->id)
-                                                         
+                                                        @if (session()->has('used_modifier') || session()->has('used_moderator_as_assign_to_student')) @if (session()->get('used_modifier') == $moderatoruser->id ||
+                                                                session()->get('used_moderator_as_assign_to_student') == $moderatoruser->id) 
+                                                               
+                                                               @if (session()->has('used_moderator_as_assign_to_student'))
+                                                                    @php  session()->forget('used_moderator_as_assign_to_student'); @endphp @endif
                                                         selected @endif
-                                                        @endif
-
-
-                                                        >
-                                                        {{ $moderatoruser->username }}</option>
                                                 @endif
+
+
+                                                >
+                                                {{ $moderatoruser->username }}</option>
+                                            @endif
                                             @endforeach
                                         </select>
                                     </div>
@@ -120,6 +123,10 @@
 
 
                             @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
+
+
+
+
                             @if (hasPermissionForRoles('assign_students_to_moderator_view', $userrole) ||
                                     auth('admin')->user()->getRoleNames()[0] == 'Admin')
                                 <a href="javascript:void(0)" class="btn btn-primary mt-3"
@@ -210,15 +217,23 @@
 
                                 <div class="row" style="gap:20px">
 
-                                    <div class="form-group mb-2">
-                                        <button class="btn btn-primary btn-block" id="moderator-assign">Assign</button>
-                                    </div>
+                                    @if (hasPermissionForRoles('assign_students_to_moderator_assign', $userrole) ||
+                                            auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                                        <div class="form-group mb-2">
+                                            <button class="btn btn-primary btn-block" id="moderator-assign">Assign</button>
+                                        </div>
+                                    @endif
 
 
-                                    <div class="form-group mb-2">
-                                        <button class="btn btn-danger btn-block"
-                                            id="moderator-dissociate">Dissociate</button>
-                                    </div>
+
+
+                                    @if (hasPermissionForRoles('assign_students_to_moderator_dissociate', $userrole) ||
+                                            auth('admin')->user()->getRoleNames()[0] == 'Admin')
+                                        <div class="form-group mb-2">
+                                            <button class="btn btn-danger btn-block"
+                                                id="moderator-dissociate">Dissociate</button>
+                                        </div>
+                                    @endif
 
                                 </div>
 
@@ -286,6 +301,7 @@
             let moderators_fileter_id = "";
 
 
+
             $("#assignstudentmoderator").on('click', function() {
 
                 if ($("#studentassigndiv").is(":hidden")) {
@@ -312,6 +328,7 @@
             $(".select").selectpicker();
             $(".application-filter").find(".apply-filter-student").on("change", function() {
                 moderators_fileter_id = $('#moderator-filter-id').val();
+
 
                 dataTable.draw();
             });
@@ -467,6 +484,10 @@
                 }
             });
 
+            ///////////////////////////////session moderators data//////////////////////////////
+            moderators_fileter_id = $('#moderator-filter-id').val();
+            dataTable.draw();
+            ///////////////////////////////session moderators data//////////////////////////////
 
 
             // $('body').on('click', '.student-edit', function(e) {
