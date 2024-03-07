@@ -76,6 +76,34 @@
                                 </div>
 
 
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="moderator-filter-id">Moderator Id</label>
+                                        <select id="moderator-filter-id" name="moderatorid[]" data-live-search="true"
+                                            multiple class="select form-control apply-filter-student">
+
+
+                                            @foreach ($moderator as $moderatoruser)
+                                                @if (isset($moderatoruser->username))
+                                                    <option value="{{ $moderatoruser->id }}"
+                                                        @if (session()->has('used_modifier')) @if (session()->get('used_modifier') == $moderatoruser->id)
+                                                          @php  session()->forget('used_modifier') @endphp
+                                                        selected @endif
+                                                        @endif
+
+
+
+
+
+                                                        >
+                                                        {{ $moderatoruser->username }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
                                 @if (in_array('Admin', $userrole))
                                     <div class="col-md-3 col-12">
                                         <div class="form-group">

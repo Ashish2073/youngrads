@@ -72,21 +72,41 @@ class StudentController extends Controller
 				//    ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
 				// ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):[(DB::raw('personal_number'))])
 				//    ->get();
+				if(in_array('Admin',$userrole) || (!in_array('supermoderator',$userrole) && !in_array('moderator',$userrole) )){
 
-			 
+			          $usersid=[DB::raw('users.id')];
+					  $usersemail=[DB::raw('users.email')];
+					  $usersmobile=[DB::raw('users.personal_number')];
+					  $usersmoderatorid=[DB::raw('users.moderator_id')];
+
+				}elseif(in_array('supermoderator',$userrole)){
+					$moderatorsid=Admin::where('parent_id',auth('admin')->user()->id)->pluck('id')->toArray();
+					$usersmoderatorid=$moderatorsid;
+					$usersid=User::whereIn('moderator_id',$moderatorsid)->pluck('id')->toArray();
+					$usersemail=User::whereIn('moderator_id',$moderatorsid)->pluck('email')->toArray();
+					$usersmobile=User::whereIn('moderator_id',$moderatorsid)->pluck('personal_number')->toArray();
+
+				}elseif(in_array('moderator',$userrole)){
+					$moderatorsid=auth('admin')->user()->id;
+					$usersmoderatorid=$moderatorsid;
+					$usersid=User::where('moderator_id',$moderatorsid)->pluck('id')->toArray();
+					$usersemail=User::where('moderator_id',$moderatorsid)->pluck('email')->toArray();
+					$usersmobile=User::where('moderator_id',$moderatorsid)->pluck('personal_number')->toArray();
+
+				}
 
 				   $usersdata = User::leftJoin('admins','admins.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username','users.created_at as created_at')
-                             ->whereIn('users.id', ($request->get('id') != null) ? $request->get('id') : [DB::raw('users.id')])
-                             ->whereIn('users.email', ($request->get('email') != null) ? $request->get('email') : [DB::raw('users.email')])
-						     ->where(function ($query) use ($request) {
+                             ->whereIn('users.id', ($request->get('id') != null) ? $request->get('id') : $usersid)
+                             ->whereIn('users.email', ($request->get('email') != null) ? $request->get('email') :  $usersemail)
+						     ->where(function ($query) use ($request,$usersmobile) {
 								if(($request->has('personal_number'))){
 									$query->whereIn('users.personal_number', $request->get('personal_number'));
 								}else{
-									$query->whereIn('users.personal_number', [DB::raw('users.personal_number')])
+									$query->whereIn('users.personal_number',$usersmobile)
 									->orWhereNull('users.personal_number');
 								}
 
-                              })->where(function ($query) use ($request) {
+                              })->where(function ($query) use ($request, $usersmoderatorid) {
 								
 								if(($request->has('moderator_filter_id')) || session()->has('used_modifier') ){ 
 
@@ -96,7 +116,7 @@ class StudentController extends Controller
                                           
 										$id=$request->get('moderator_filter_id')??[session()->get('used_modifier')];
 
-										session()->forget('used_modifier');
+										session()->forget('used_modifier'); 
 									
 										
 									
@@ -104,10 +124,10 @@ class StudentController extends Controller
 								  }else{
 								
 									 $query->whereNull('users.moderator_id');
-								}
+					 			}
 									
 								}else{
-									$query->whereIn('users.moderator_id',[DB::raw('users.moderator_id')])
+									$query->whereIn('users.moderator_id',$usersmoderatorid)
 									->orWhereNull('users.moderator_id');
 								}
 

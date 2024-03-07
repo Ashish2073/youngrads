@@ -33,7 +33,7 @@
 
 @section('content')
 
-
+    @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
     @if (session()->has('used_campus_program'))
         @php $usedCampusProgram=session()->get('used_campus_program'); @endphp
 
@@ -131,8 +131,7 @@
 
                                             @foreach ($moderator as $key => $value)
                                                 <option value="{{ $value->id }}"
-                                                    @if (auth()->guard('admin')->user()->username == $value->username &&
-                                                            in_array('moderator', json_decode(auth('admin')->user()->getRoleNames()))) selected @endif>
+                                                    @if (auth()->guard('admin')->user()->username == $value->username && in_array('moderator', $userrole)) selected @endif>
                                                     {{ $value->username }}
 
                                                 </option>
@@ -182,6 +181,35 @@
                                         </select>
                                     </div>
                                 </div>
+
+
+                                @if (in_array('Admin', $userrole))
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <label for="scenario">Enrolled Application</label>
+                                            <select id="scenario" name="scenario" data-live-search="true"
+                                                class="select form-control apply-filter-student">
+
+
+                                                <option value="" selected disabled>Please Select Moderator</option>
+
+
+
+
+                                                <option @if (request()->get('scenario') == 'dailydata') selected @endif value="dailydata">
+                                                    Daily</option>
+
+                                                <option @if (request('scenario') == 'weeklydata') selected @endif
+                                                    value="weeklydata">
+                                                    Weekly</option>
+                                                <option @if (request('scenario') == 'monthlydata') selected @endif
+                                                    value="monthlydata">
+                                                    Monthly</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                @endif
 
 
 
@@ -592,6 +620,7 @@
                         d.view = $("input[name='view']").val();
                         d.moderator_id = $('#moderator_id').val();
                         d.application_id = $("#application_id").val();
+                        d.scenario = $('#scenario').val();
                     }
                 },
                 // dom: "tps",
@@ -867,6 +896,7 @@
                 $(".select").selectpicker('deselectAll');
                 $(".select").val("");
                 $(".select").selectpicker('refresh');
+                dataTable.draw();
 
             });
 

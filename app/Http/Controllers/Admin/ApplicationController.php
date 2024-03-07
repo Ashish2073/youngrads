@@ -27,6 +27,7 @@ use App\Models\University;
 use App\Models\User; 
 use App\Models\AddDataLimit;
 use App\Models\Admin;
+use Carbon\Carbon;
  
 class ApplicationController extends Controller
 {
@@ -169,6 +170,25 @@ class ApplicationController extends Controller
 
 		if ($request->has('status')) {
 			$userApplications->whereIn('users_applications.status', $request->status);
+		}
+
+		if($request->get('scenario')=="weeklydata"){
+ 
+			$startOfWeek = Carbon::now()->startOfWeek();
+			 $endOfWeek = Carbon::now()->endOfWeek();
+			 $userApplications->whereBetween('users_applications.created_at', [$startOfWeek, $endOfWeek])->get();
+
+
+		}
+		if($request->get('scenario')=="monthlydata"){
+			$startOfMonth = Carbon::now()->startOfMonth();
+			$endOfMonth = Carbon::now()->endOfMonth();
+			$userApplications->whereBetween('users_applications.created_at', [$startOfMonth, $endOfMonth])->get();
+		}
+
+		if($request->get('scenario')=="dailydata"){
+			$currentDate = Carbon::now()->toDateString();
+			$userApplications->whereDate('users_applications.created_at', $currentDate )->get();
 		}
 
 		// if ($request->has('moderator_id') || in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))) {
