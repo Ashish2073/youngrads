@@ -15,6 +15,7 @@
 </style>
 
 @section('content')
+    @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
 
     <section id="basic-datatable">
         <div class="row">
@@ -74,32 +75,34 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-3 col-12">
-                                    <div class="form-group">
-                                        <label for="moderator-filter-id">Moderator Id</label>
-                                        <select id="moderator-filter-id" name="moderatorid[]" data-live-search="true"
-                                            multiple class="select form-control apply-filter-student">
+
+                                @if (in_array('Admin', $userrole))
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <label for="scenario">Enrolled Student</label>
+                                            <select id="scenario" name="scenario" data-live-search="true"
+                                                class="select form-control apply-filter-student">
 
 
-                                            @foreach ($moderator as $moderatoruser)
-                                                @if (isset($moderatoruser->username))
-                                                    <option value="{{ $moderatoruser->id }}"
-                                                        @if (session()->has('used_modifier') || session()->has('used_moderator_as_assign_to_student')) @if (session()->get('used_modifier') == $moderatoruser->id ||
-                                                                session()->get('used_moderator_as_assign_to_student') == $moderatoruser->id) 
-                                                               
-                                                               @if (session()->has('used_moderator_as_assign_to_student'))
-                                                                    @php  session()->forget('used_moderator_as_assign_to_student'); @endphp @endif
-                                                        selected @endif
-                                                @endif
+                                                <option value="" selected disabled>Please Select Moderator</option>
 
 
-                                                >
-                                                {{ $moderatoruser->username }}</option>
-                                            @endif
-                                            @endforeach
-                                        </select>
+
+
+                                                <option @if (request()->get('scenario') == 'dailydata') selected @endif value="dailydata">
+                                                    Daily</option>
+
+                                                <option @if (request('scenario') == 'weeklydata') selected @endif
+                                                    value="weeklydata">
+                                                    Weekly</option>
+                                                <option @if (request('scenario') == 'monthlydata') selected @endif
+                                                    value="monthlydata">
+                                                    Monthly</option>
+
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
 
 
 
@@ -122,7 +125,7 @@
                                 Application Data In Excel Form</a>
 
 
-                            @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
+
 
 
 
@@ -161,6 +164,9 @@
                                         </select>
                                     </div>
                                 </div>
+
+
+
 
 
 
@@ -370,6 +376,7 @@
                         d.email = $('#useremail').val();
                         d.personal_number = $('#userphone').val();
                         d.moderator_filter_id = moderators_fileter_id;
+                        d.scenario = $('#scenario').val();
                     }
                 },
                 "order": [
@@ -860,6 +867,7 @@
             $(".select").selectpicker('deselectAll');
             $(".select").val("");
             $(".select").selectpicker('refresh');
+            dataTable.draw();
 
         });
     </script>

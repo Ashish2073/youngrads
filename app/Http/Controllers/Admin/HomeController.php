@@ -15,6 +15,8 @@ use App\Models\University;
 use App\Models\User;
 use App\Models\UserApplication;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class HomeController extends Controller
 {
@@ -39,12 +41,53 @@ class HomeController extends Controller
     $systemUsers = Admin::count();
     $students = User::count();
     $applications = UserApplication::count();
+
+    $startOfWeek = Carbon::now()->startOfWeek();
+    $endOfWeek = Carbon::now()->endOfWeek();
+
+    $weeklyenrolledstudents= User::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count();
+    $weeklyenrolledapplication=UserApplication::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count();
+
+    $startOfMonth = Carbon::now()->startOfMonth();
+    $endOfMonth = Carbon::now()->endOfMonth();
+
+    $monthlyData = User::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
+    $monthlyenrolledapplication=UserApplication::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
+
+    $currentDate = Carbon::now()->toDateString();
+
+// Retrieve data for the current day
+     
+    $dailyData =  User::whereDate('created_at', $currentDate)->count();
+    $dailyenrolledapplication=UserApplication::whereDate('created_at', $currentDate)->count();
+
+
+
+   
+
+
+
+    $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
+    if(in_array('Admin',$userrole)){
+    $moderators=Admin::role('moderator')->count();
+     }elseif(in_array('supermoderator',$userrole)){
+      $moderators=Admin::role('moderator')->where('parent_id',auth('admin')->user()->id)->count();
+      $moderatorid=Admin::role('moderator')->where('parent_id',auth('admin')->user()->id)->pluck('id')->toArray();
+      $students = User::whereIn('moderator_id',$moderatorid)->count();
+
+
+     }elseif(in_array('moderator',$userrole)){
+     
+      $students = User::where('moderator_id',auth('admin')->user()->id)->count();
+      $moderators=0;
+     }
+   
     $pageConfigs = [
       'pageHeader' => false
     ];
 
     // return $campusProgram;
-    return view('dashboard.home', compact('unversities', 'campus', 'campusPrograms', 'programs', 'pageConfigs', 'students', 'applications', 'systemUsers'));
+    return view('dashboard.home', compact('weeklyenrolledapplication','monthlyenrolledapplication','dailyenrolledapplication','dailyData','monthlyData','weeklyenrolledstudents','unversities','moderators','campus', 'campusPrograms', 'programs', 'pageConfigs', 'students', 'applications', 'systemUsers'));
   }
 
   public function excelForm()

@@ -24,6 +24,7 @@ use App\Models\UserDocument;
 use App\Models\UserShortlistProgram;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentData;
+use Carbon\Carbon;
 use Auth; 
 
 class StudentController extends Controller
@@ -56,25 +57,25 @@ class StudentController extends Controller
 				// }elseif((($request->get('personal_number')==null) && $request->get('id')!=null && $request->get('email')!=null)){
 				// 	$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get();
 				// }elseif((($request->get('personal_number')!=null) && $request->get('id')==null && $request->get('email')!=null)){
-				// 	$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get();
+				// 	$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get(); 
 				// }
 				
 				// else{
 				// 	$users=User::all();
 				// }
 				     
-			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)||session()->has('used_modifier')){
+			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)||session()->has('used_modifier') || $request->get('scenario')){
 
-				
-				
+			
+				 
 			    //    $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
 				//    ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
 				// ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):[(DB::raw('personal_number'))])
 				//    ->get();
 
-			
+			 
 
-				   $users = User::leftJoin('admins','admins.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')
+				   $usersdata = User::leftJoin('admins','admins.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username','users.created_at as created_at')
                              ->whereIn('users.id', ($request->get('id') != null) ? $request->get('id') : [DB::raw('users.id')])
                              ->whereIn('users.email', ($request->get('email') != null) ? $request->get('email') : [DB::raw('users.email')])
 						     ->where(function ($query) use ($request) {
@@ -110,8 +111,34 @@ class StudentController extends Controller
 									->orWhereNull('users.moderator_id');
 								}
 
-                              })
-                            ->get();
+                              });
+                          
+
+				if($request->get('scenario')=="weeklydata"){
+
+					$startOfWeek = Carbon::now()->startOfWeek();
+                     $endOfWeek = Carbon::now()->endOfWeek();
+					 $users =   $usersdata->whereBetween('users.created_at', [$startOfWeek, $endOfWeek])->get();
+
+
+				}elseif($request->get('scenario')=="monthlydata"){
+					$startOfMonth = Carbon::now()->startOfMonth();
+					$endOfMonth = Carbon::now()->endOfMonth();
+					 $users =   $usersdata->whereBetween('users.created_at', [$startOfMonth, $endOfMonth])->get();
+				}elseif($request->get('scenario')=="dailydata"){
+
+					$currentDate = Carbon::now()->toDateString();
+					$users =   $usersdata->whereDate('users.created_at', $currentDate )->get();
+				}else{
+					$users =   $usersdata->get();
+				}	  
+
+
+
+
+							
+
+
 
 						
 
@@ -144,10 +171,10 @@ class StudentController extends Controller
 
 					}elseif(in_array('moderator',$userrole)){
 						$moderatorsid=auth('admin')->user()->id;
-						$userss_id=User::where('moderator_id',$moderatorsid)->pluck('id')->toArray();
+					
 						$users=User::leftJoin('admins','admins.id','=','users.moderator_id')
 					         ->select('users.id as id', 'users.name as name', 'users.last_name as last_name', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username')
-					          ->where('users.id',$userss_id)
+					          ->where('users.moderator_id',$moderatorsid)
 					          ->get();
 
 					}
@@ -209,21 +236,36 @@ class StudentController extends Controller
 				->rawColumns(['email', 'action', 'shortlist','moderator_checkbox'])
 				->make(true); 
 		} else {
-			$userId=User::select('id')->get();
-			$userEmail=User::select('email')->get();
-			$userPhone=User::select('personal_number')->get();
+		
 
 			$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
 
 			if(in_array('Admin',$userrole) || (!in_array('supermoderator',$userrole) && !in_array('moderator',$userrole) )){
 			$moderator=Admin::select('id','username')->role('moderator')->get();
-			}elseif(in_array('supermoderator',$userrole)){
+			$userId=User::select('id')->get();
+			$userEmail=User::select('email')->get();
+			$userPhone=User::select('personal_number')->get();
+			
+		
+		}elseif(in_array('supermoderator',$userrole)){
 				$moderator=Admin::select('id','username')->role('moderator')->where('parent_id',auth('admin')->user()->id)->get();
-				
+				$moderatorid=Admin::role('moderator')->where('parent_id',auth('admin')->user()->id)->pluck('id')->toArray();
+
+
+
+				$userId=User::select('id')->whereIn('moderator_id',$moderatorid)->get();
+			$userEmail=User::select('email')->whereIn('moderator_id',$moderatorid)->get();
+			$userPhone=User::select('personal_number')->whereIn('moderator_id',$moderatorid)->get();
 
 			}elseif(in_array('moderator',$userrole)){
 
 				$moderator=Admin::where('id',auth('admin')->user()->id)->select('id','username')->role('moderator')->get();
+				$moderatorid=auth('admin')->user()->id;
+				
+				$userId=User::select('id')->where('moderator_id',$moderatorid)->get();
+				$userEmail=User::select('email')->where('moderator_id',$moderatorid)->get();
+				$userPhone=User::select('personal_number')->where('moderator_id',$moderatorid)->get();
+
 			}
 
 	
