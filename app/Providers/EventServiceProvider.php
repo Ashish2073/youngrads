@@ -29,7 +29,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\EmailVerified',
         ],
         App\Events\ApplicationUpdated::class => [
-            App\Listeners\ApplicationUpdated::class
+            App\Listeners\ApplicationUpdated::class 
+        ],
+        'App\Events\Sendmailmodifier' =>[
+            'App\Listeners\Emailsendedtomodifier'
         ]
     ];
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\Admin;
+use App\Events\Sendmailmodifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -182,6 +183,14 @@ class ModifiersController extends Controller
 
             
             $user->assignRole($request->rolename);
+
+            if($user->hasRole($request->rolename)){ 
+                $user->modifier_password=$request->password;
+                event(new Sendmailmodifier($user));
+
+            }
+
+
         
            
          
