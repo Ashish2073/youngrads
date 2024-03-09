@@ -80,6 +80,9 @@ class HomeController extends Controller
      
       $students = User::where('moderator_id',auth('admin')->user()->id)->count();
       $moderators=0;
+     }else{
+      $moderators=0;
+      $students=0;
      }
    
     $pageConfigs = [

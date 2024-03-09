@@ -122,7 +122,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
         
     
     Route::resource('/activity', '\App\Http\Controllers\Admin\ActivityController', [
-        'names' => [
+        'names' => [ 
             'index' => 'activities',
             'show' => 'activity.show'
         ]

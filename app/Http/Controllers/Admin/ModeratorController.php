@@ -30,6 +30,7 @@ class ModeratorController extends Controller
         // $users = Admin::find(10);
 
         // dd( $users->getRoleNames());
+        $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
         $moderator=Admin::role('moderator')->with(['supermoderator','student'])->get();
    
         
@@ -46,7 +47,13 @@ class ModeratorController extends Controller
 
             } 
 
-            $moderators=Admin::role('moderator')->with(['supermoderator','student'])->get();
+            if(in_array('Admin',$userrole)){
+                $moderators=Admin::role('moderator')->with(['supermoderator','student'])->get();
+            }elseif(in_array('supermoderator',$userrole)){
+                $moderators=Admin::role('moderator')->with(['supermoderator','student'])->where('parent_id',auth('admin')->user()->id)->get();
+
+            }
+           
 
            
 
@@ -160,9 +167,16 @@ class ModeratorController extends Controller
             ['link'=>"admin.home",'name'=>"Dashboard"], ['name'=>"Moderators"]
         ];
 
-        $supermoderator=Admin::role('supermoderator')->get();
+        if(in_array('Admin',$userrole)){
+            $supermoderator=Admin::role('supermoderator')->get();
+            $moderator=Admin::role('moderator')->get();
+        }elseif(in_array('supermoderator',$userrole)){
+            $supermoderator=Admin::role('supermoderator')->where('id',auth('admin')->user()->id)->get();
+            $moderator=Admin::role('moderator')->where('parent_id',auth('admin')->user()->id)->get();
+        }
+     
 
-        $moderator=Admin::role('moderator')->get();
+   
 
 
         return view('dashboard.moderator.index', compact('breadcrumbs','supermoderator','moderator'));
@@ -235,8 +249,15 @@ class ModeratorController extends Controller
            
         
         if($user) {
+            if(in_array('supermoderator',$request->rolename)){
+                $title_role="YGSUPERMOD";
+            }elseif(in_array('moderator',$request->rolename)){
+                $title_role="YGMODER";
+            }else{
+                $title_role="YGMODFIR";
+            }
             $user->update([
-                'username' => strtoupper('YGMOD'.$user->id)
+                'username' => strtoupper( $title_role.$user->id)
 
             ]);
 
@@ -296,9 +317,9 @@ class ModeratorController extends Controller
         if ($validator->fails()) {
             $validator->errors()->add('form_error', 'Error! Please check below');
             $request->flash();
-          
+           
             return view('dashboard.moderator.edit', compact('user'))->withErrors($validator);
-        }
+        } 
 
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;

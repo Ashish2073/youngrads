@@ -15,6 +15,7 @@ class StudentData implements FromCollection,WithHeadings,WithChunkReading
     public function headings():array{
         return[
             'Id',
+            'ModeratorId',
             'Name',
             'Email',
             'Phone_No',
@@ -33,12 +34,12 @@ class StudentData implements FromCollection,WithHeadings,WithChunkReading
     {
         $user = User::
                leftjoin('users_shortlist_programs', 'users_shortlist_programs.user_id', '=', 'users.id')
-               
+               ->leftJoin('admins','users.moderator_id','=','admins.id')
 			    ->leftjoin('campus_programs', 'users_shortlist_programs.campus_program_id', '=', 'campus_programs.id')
 			   ->leftjoin('campus', 'campus_programs.campus_id', '=', 'campus.id')
 			   ->leftjoin('programs', 'campus_programs.program_id', "=", 'programs.id')
 			   ->leftjoin('universities', 'campus.university_id', '=', 'universities.id')
-			->select(\DB::raw("CONCAT('young_stu','_', users.id) AS StudentId"),\DB::raw("CONCAT(COALESCE(users.name,''), ' ', COALESCE(users.last_name,'')) AS student_name"),'users.email as email','users.personal_number as Phone_No','users.passport as Passport_No','users.dob as DOB','universities.name as university','campus.name as campus','programs.name as program')
+			->select(\DB::raw("CONCAT('young_stu','_', users.id) AS StudentId"),'admins.username as moderator_id',\DB::raw("CONCAT(COALESCE(users.name,''), ' ', COALESCE(users.last_name,'')) AS student_name"),'users.email as email','users.personal_number as Phone_No','users.passport as Passport_No','users.dob as DOB','universities.name as university','campus.name as campus','programs.name as program')
             
             ->get();
 

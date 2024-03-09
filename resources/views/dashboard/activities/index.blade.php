@@ -52,7 +52,7 @@ name="user" id="user">
                                             @foreach (config('users') as $user)
                                                 <option {{ request()->get('user_id') == $user->id ? 'selected' : '' }}
                                                     value="{{ $user->id }}">
-                                                    {{ \Str::limit($user->name . ' - ' . $user->email, 40, '...') }}
+                                                    {{ \Str::limit($user->name . ' - ' . $user->email, 50, '...') }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -64,13 +64,30 @@ name="user" id="user">
 
                                 <div class="col-md-3 col-12">
                                     <div class="form-group">
-                                        <label for="moderator">Moderators</label>
+                                        <label for="supermoderator">Moderators</label>
                                         <select data-live-search='true' data-style="bg-white border-light" multiple
-                                            class="select form-control" name="moderator" id="moderator">
+                                            class="select form-control" name="supermoderator" id="supermoderator">
 
                                             @foreach ($moderator as $user)
                                                 <option value="{{ $user->moderatorid }}">
                                                     {{ \Str::limit($user->full_name . ' - ' . $user->email, 40, '...') }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-3 col-12">
+                                    <div class="form-group">
+                                        <label for="moderator">SuperModerators</label>
+                                        <select data-live-search='true' data-style="bg-white border-light" multiple
+                                            class="select form-control" name="moderator" id="moderator">
+
+                                            @foreach ($supermoderator as $user)
+                                                <option value="{{ $user->id }}">
+                                                    {{ \Str::limit($user->first_name . ' ' . $user->first_name . ' - ' . $user->email, 50, '...') }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -174,6 +191,7 @@ name="user" id="user">
                     data: function(d) {
                         d.user_id = $("#user").val();
                         d.moderator_id = $("#moderator").val();
+                        d.supermoderator_id = $("#supermoderator").val();
                     }
                 },
                 //dom: "tps",

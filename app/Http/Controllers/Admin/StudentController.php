@@ -44,66 +44,35 @@ class StudentController extends Controller
 			
 			$userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; 
 		  
-				// if((($request->get('id')!=null) && $request->get('email')==null && $request->get('personal_number')==null)){
-				// 	$users=User::whereIn('id',$request->get('id'))->get();
 
-				// }elseif((($request->get('email')!=null) && $request->get('id')==null && $request->get('personal_number')==null)){
-				// 	$users=User::whereIn('email',$request->get('email'))->get();
-				// }elseif((($request->get('personal_number')!=null) && $request->get('id')==null && $request->get('email')==null)){
-				// 	$users=User::whereIn('personal_number',$request->get('personal_number'))->get();
-					
-				// }elseif((($request->get('personal_number')!=null) && $request->get('id')!=null && $request->get('email')==null)){
-				// 	$users=User::whereIn('personal_number',$request->get('personal_number'))->whereIn('id',$request->get('id'))->get();
-				// }elseif((($request->get('personal_number')==null) && $request->get('id')!=null && $request->get('email')!=null)){
-				// 	$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get();
-				// }elseif((($request->get('personal_number')!=null) && $request->get('id')==null && $request->get('email')!=null)){
-				// 	$users=User::whereIn('email',$request->get('email'))->whereIn('id',$request->get('id'))->get(); 
-				// }
 				
-				// else{
-				// 	$users=User::all();
-				// }
 				     
 			      if(($request->get('email')!=null)||($request->get('id')!=null)||($request->get('personal_number')!=null)||($request->get('moderator_filter_id')!=null)||session()->has('used_modifier') || $request->get('scenario')){
 
 			
 				 
-			    //    $users=User::select('id','name','last_name','email','personal_number','passport','dob')->whereIn('id',($request->get('id')!=null)?($request->get('id')):[DB::raw('id')])
-				//    ->whereIn('email',($request->get('email')!=null)?($request->get('email')):[DB::raw('email')])
-				// ->whereIn('personal_number',($request->get('personal_number')!=null)?($request->personal_number):[(DB::raw('personal_number'))])
-				//    ->get();
-				if(in_array('Admin',$userrole) || (!in_array('supermoderator',$userrole) && !in_array('moderator',$userrole) )){
+			 
 
 			          $usersid=[DB::raw('users.id')];
 					  $usersemail=[DB::raw('users.email')];
 					  $usersmobile=[DB::raw('users.personal_number')];
 					  $usersmoderatorid=[DB::raw('users.moderator_id')];
 
-				}elseif(in_array('supermoderator',$userrole)){
-					$moderatorsid=Admin::where('parent_id',auth('admin')->user()->id)->pluck('id')->toArray();
-					$usersmoderatorid=$moderatorsid;
-					$usersid=User::whereIn('moderator_id',$moderatorsid)->pluck('id')->toArray();
-					$usersemail=User::whereIn('moderator_id',$moderatorsid)->pluck('email')->toArray();
-					$usersmobile=User::whereIn('moderator_id',$moderatorsid)->pluck('personal_number')->toArray();
+			
 
-				}elseif(in_array('moderator',$userrole)){
-					$moderatorsid=auth('admin')->user()->id;
-					$usersmoderatorid=$moderatorsid;
-					$usersid=User::where('moderator_id',$moderatorsid)->pluck('id')->toArray();
-					$usersemail=User::where('moderator_id',$moderatorsid)->pluck('email')->toArray();
-					$usersmobile=User::where('moderator_id',$moderatorsid)->pluck('personal_number')->toArray();
-
-				}
+				
 
 				   $usersdata = User::leftJoin('admins','admins.id','=','users.moderator_id')->select('users.id as id', 'users.name as name', 'users.last_name as last_name','users.moderator_id as moderator_id', 'users.email as email', 'users.personal_number as personal_number', 'users.passport as passport', 'users.dob as dob','admins.username as moderator_username','users.created_at as created_at')
                              ->whereIn('users.id', ($request->get('id') != null) ? $request->get('id') : $usersid)
+							
                              ->whereIn('users.email', ($request->get('email') != null) ? $request->get('email') :  $usersemail)
 						     ->where(function ($query) use ($request,$usersmobile) {
+							
 								if(($request->has('personal_number'))){
 									$query->whereIn('users.personal_number', $request->get('personal_number'));
 								}else{
 									$query->whereIn('users.personal_number',$usersmobile)
-									->orWhereNull('users.personal_number');
+									->orWhereNull('users.personal_number'); 
 								}
 
                               })->where(function ($query) use ($request, $usersmoderatorid) {
@@ -112,7 +81,7 @@ class StudentController extends Controller
 
 									
 
-									if($request->get('moderator_filter_id')!=[0] || session()->has('used_modifier') ){
+									if(($request->get('moderator_filter_id')!=0) || session()->has('used_modifier') ){
                                           
 										$id=$request->get('moderator_filter_id')??[session()->get('used_modifier')];
 
@@ -122,18 +91,29 @@ class StudentController extends Controller
 									
 										$query->whereIn('users.moderator_id', $id)->orWhereNull('users.moderator_id');
 								  }else{
+									
 								
-									 $query->whereNull('users.moderator_id');
+									 $query->orWhereNull('users.moderator_id');
+
+									
+
+
+
 					 			}
 									
 								}else{
+									
 									$query->whereIn('users.moderator_id',$usersmoderatorid)
 									->orWhereNull('users.moderator_id');
 								}
 
-                              });
-                          
+								
 
+                              });
+
+                          
+							 
+                if(in_array('Admin',$userrole)){
 				if($request->get('scenario')=="weeklydata"){
 
 					$startOfWeek = Carbon::now()->startOfWeek();
@@ -145,14 +125,91 @@ class StudentController extends Controller
 					$startOfMonth = Carbon::now()->startOfMonth();
 					$endOfMonth = Carbon::now()->endOfMonth();
 					 $users =   $usersdata->whereBetween('users.created_at', [$startOfMonth, $endOfMonth])->get();
+
+
 				}elseif($request->get('scenario')=="dailydata"){
 
 					$currentDate = Carbon::now()->toDateString();
 					$users =   $usersdata->whereDate('users.created_at', $currentDate )->get();
 				}else{
-					$users =   $usersdata->get();
+					if($request->has('moderator_filter_id') && $request->get('moderator_filter_id')[0]!=0 ){ 
+						$moderatorsid=$request->get('moderator_filter_id');
+					     $users =$usersdata->whereIn('users.moderator_id',$moderatorsid)->get();
+				       }elseif($request->has('moderator_filter_id')&& $request->get('moderator_filter_id')==0 ){
+						$users =$usersdata->where('users.moderator_id',null)->get();
+					   }else{
+					    $users =   $usersdata->get();
+				}
 				}	  
 
+			}elseif(in_array('supermoderator',$userrole)){
+				$moderatorsid=Admin::where('parent_id',auth('admin')->user()->id)->pluck('id')->toArray();
+				if($request->get('scenario')=="weeklydata"){
+
+					$startOfWeek = Carbon::now()->startOfWeek();
+                     $endOfWeek = Carbon::now()->endOfWeek();
+					 if($request->has('moderator_filter_id') && $request->get('moderator_filter_id')==0 ){
+					 $users =   $usersdata->whereIn('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->whereBetween('users.created_at', [$startOfWeek, $endOfWeek])->get();
+					 }else{
+						$users = $usersdata->whereIn('users.moderator_id',$moderatorsid)->whereBetween('users.created_at', [$startOfWeek, $endOfWeek])->get();
+					 }
+
+				}elseif($request->get('scenario')=="monthlydata"){
+					$startOfMonth = Carbon::now()->startOfMonth();
+					$endOfMonth = Carbon::now()->endOfMonth();
+					if($request->has('moderator_filter_id') && $request->get('moderator_filter_id')==0 ){
+					 $users =   $usersdata->whereIn('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->whereBetween('users.created_at', [$startOfMonth, $endOfMonth])->get();
+					}else{
+						$users =   $usersdata->whereIn('users.moderator_id',$moderatorsid)->whereBetween('users.created_at', [$startOfMonth, $endOfMonth])->get();
+					}
+
+				}elseif($request->get('scenario')=="dailydata"){
+
+					$currentDate = Carbon::now()->toDateString();
+					if($request->has('moderator_filter_id') && $request->get('moderator_filter_id')==0 ){
+					$users =   $usersdata->whereIn('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->whereDate('users.created_at', $currentDate )->get();
+					}else{
+						$users = $usersdata->whereIn('users.moderator_id',$moderatorsid)->whereDate('users.created_at', $currentDate )->get();
+					}
+				  }else{
+					if($request->has('moderator_filter_id') && $request->get('moderator_filter_id')==0 ){
+					$users =   $usersdata->whereIn('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->get();
+				    }else{
+						$users = $usersdata->whereIn('users.moderator_id',$moderatorsid)->get();
+					}
+				}
+
+
+
+			}elseif(in_array('moderator',$userrole)){
+				$moderatorsid=auth('admin')->user()->id;
+				if($request->get('scenario')=="weeklydata"){
+
+					$startOfWeek = Carbon::now()->startOfWeek();
+                     $endOfWeek = Carbon::now()->endOfWeek();
+					 $users =   $usersdata->where('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->whereBetween('users.created_at', [$startOfWeek, $endOfWeek])->get();
+
+
+				}elseif($request->get('scenario')=="monthlydata"){
+					$startOfMonth = Carbon::now()->startOfMonth();
+					$endOfMonth = Carbon::now()->endOfMonth();
+					 $users =   $usersdata->where('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->whereBetween('users.created_at', [$startOfMonth, $endOfMonth])->get();
+
+
+				}elseif($request->get('scenario')=="dailydata"){
+
+					$currentDate = Carbon::now()->toDateString();
+					$users =   $usersdata->where('users.moderator_id',$moderatorsid)->whereDate('users.created_at', $currentDate )->get();
+				}else{
+					if($request->has('moderator_filter_id') && $request->get('moderator_filter_id')==0 ){
+					$users =   $usersdata->where('users.moderator_id',$moderatorsid)->orWhere('users.moderator_id',null)->get();
+					}else{
+						$users =   $usersdata->where('users.moderator_id',$moderatorsid)->get();
+					}
+				
+				}
+
+			}
 
 
 

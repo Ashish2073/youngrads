@@ -55,6 +55,9 @@ class ActivityController extends Controller
       ->distinct()
       ->get();
 
+      $supermoderator=Admin::where('parent_id',null)->role('supermoderator')->get();
+     
+
     
    
     
@@ -80,6 +83,15 @@ class ActivityController extends Controller
   
 
                 $records=Activity::where('id', '!=', 0)->whereNotNull('causer_id')->whereIn('causer_id', request()->get('moderator_id'))->where('causer_type','=','App\Models\Admin')->orderBy('id','desc')->get();
+               
+
+               
+            }
+
+            if (request()->has('supermoderator_id') && !empty(request()->get('supermoderator_id'))) {
+  
+
+                $records=Activity::where('id', '!=', 0)->whereNotNull('causer_id')->whereIn('causer_id', request()->get('supermoderator_id'))->where('causer_type','=','App\Models\Admin')->orderBy('id','desc')->get();
                
 
                
@@ -131,7 +143,7 @@ class ActivityController extends Controller
                 ->rawColumns(['user'])
                 ->make(true);
         } else {
-            return view('dashboard.activities.index', compact('breadcrumbs', 'pageConfigs','moderator'));
+            return view('dashboard.activities.index', compact('breadcrumbs', 'pageConfigs','moderator','supermoderator'));
         }
     }
 

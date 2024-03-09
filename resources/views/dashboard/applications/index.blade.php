@@ -68,7 +68,7 @@
                     <div class="card-content">
                         <div class="card-body card-dashboard">
                             <div class="row application-filter align-items-center">
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="univ">Universities</label>
                                         <select id="univs" name="univs[]" data-live-search="true" multiple
@@ -81,7 +81,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="campus">Campus</label>
                                         <select id="campus" name="campus[]" data-live-search="true" multiple
@@ -94,7 +94,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="program">Program</label>
                                         <select id="program" name="program[]" data-live-search="true" multiple
@@ -108,7 +108,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="status">Status</label>
                                         <select id="status_filter" name="status[]" data-live-search="true" multiple
@@ -121,7 +121,7 @@
                                 </div>
                                 {{-- application_numbers --}}
 
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="moderator_id">Moderator Id</label>
                                         <select id="moderator_id" name="moderator_id[]" data-live-search="true" multiple
@@ -142,7 +142,7 @@
 
 
 
-                                <div class="col-md-2 col-12">
+                                <div class="col-md-3 col-12">
                                     <div class="form-group">
                                         <label for="application_id">Application Number</label>
                                         <select id="application_id" name="application_id[]" data-live-search="true" multiple
@@ -191,7 +191,7 @@
                                                 class="select form-control apply-filter-student">
 
 
-                                                <option value="" selected disabled>Please Select Moderator</option>
+                                                <option value="" selected disabled>Please Select</option>
 
 
 
@@ -218,13 +218,14 @@
 
 
 
-                                <div class="col-md-4 col-12 text-right">
-                                    <button class="btn btn-primary" id="reset-filter">Reset</button>
+                                <div class="col-md-12 col-12 mb-2" style="text-align: center">
+                                    <button class="btn btn-primary mr-2 mt-1" id="reset-filter">Reset</button>
 
                                     @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
                                     @if (hasPermissionForRoles('application_apply_limit_view', $userrole) ||
                                             auth('admin')->user()->getRoleNames()[0] == 'Admin')
-                                        <button type="button" id="openModalButton" class="btn btn-primary">One Time Limit
+                                        <button type="button" id="openModalButton" class="btn btn-primary mt-1">One Time
+                                            Limit
                                             Of
                                             Aplication</button>
                                     @endif

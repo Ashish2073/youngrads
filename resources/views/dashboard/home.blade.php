@@ -47,7 +47,7 @@
 
 
             @if (in_array('Admin', $userrole))
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.students') }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -66,7 +66,7 @@
                 </div>
 
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.students', ['scenario' => 'weeklydata']) }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -84,7 +84,7 @@
                     </a>
                 </div>
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.students', ['scenario' => 'monthlydata']) }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -102,7 +102,7 @@
                     </a>
                 </div>
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.students', ['scenario' => 'dailydata']) }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -121,7 +121,7 @@
                 </div>
 
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.applications-all') }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -141,7 +141,7 @@
 
 
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.applications-all', ['scenario' => 'weeklydata']) }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -159,7 +159,7 @@
                     </a>
                 </div>
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.applications-all', ['scenario' => 'monthlydata']) }}"
                         class="card text-center">
                         <div class="card text-center">
@@ -178,7 +178,7 @@
                     </a>
                 </div>
 
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.applications-all', ['scenario' => 'dailydata']) }}"
                         class="card text-center">
                         <div class="card text-center">
@@ -200,7 +200,7 @@
 
 
             @if (in_array('Admin', $userrole) || in_array('supermoderator', $userrole))
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.moderators') }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -221,7 +221,7 @@
 
 
             @if (in_array('supermoderator', $userrole))
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.students') }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">
@@ -243,7 +243,7 @@
 
 
             @if (in_array('moderator', $userrole))
-                <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.students') }}" class="card text-center">
                         <div class="card text-center">
                             <div class="card-content">

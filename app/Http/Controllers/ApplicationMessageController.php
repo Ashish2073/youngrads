@@ -234,7 +234,7 @@ class ApplicationMessageController extends Controller
 
 				$html = "";
 				
-
+                $overallrole=($row->user_name) ? 'systeam' : 'youngrads_consultant';
 				$name = ($row->user_name) ? $row->user_name : $row->admin_name;
 				$avtar = $name[0];
 				$userId = ($row->user_id) ? $row->user_id : $row->admin_id;
@@ -252,7 +252,7 @@ class ApplicationMessageController extends Controller
 				// $class =  ($id == $userId) ? '' : 'chat-left';
 				$class = ($id == $row->sent_user_id && $logged_guard == $row->guard) ? '' : 'chat-left';
 				$attchmentClass = ($id == $userId) ? 'badge text-light bg-white' : 'badge text-white bg-primary';
-				return view('application_message.message', compact('row', 'name', 'avtar', 'userId', 'id', 'attchmentClass', 'class'))->render();
+				return view('application_message.message', compact('overallrole','row', 'name', 'avtar', 'userId', 'id', 'attchmentClass', 'class'))->render();
 			})
 
 			->addColumn('time', function ($row) {

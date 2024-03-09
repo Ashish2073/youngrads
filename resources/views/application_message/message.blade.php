@@ -13,11 +13,24 @@
                 @else
                     @php $role="Moderator"; @endphp;
                 @endif --}}
+                @if (auth('web')->check())
+                    @if ($overallrole == 'youngrads_consultant')
+                        <span class="d-block " style="font-size: 11px;">
+                            {{ $name }} {{ '(' }} {{ 'Youngrads Consultant' }} {{ ')' }}
 
-                <span class="d-block " style="font-size: 11px;">
-                    {{ $name }} {{ '(' }} {{ $row->role_name ?? 'N/A' }} {{ ')' }}
-                    {{ '(' }} {{ $row->username ?? 'N/A' }} {{ ')' }}
-                </span>
+                        </span>
+                    @else
+                        <span class="d-block " style="font-size: 11px;">
+                            {{ $name }} {{ '(' }} {{ 'students' }} {{ ')' }}
+
+                        </span>
+                    @endif
+                @else
+                    <span class="d-block " style="font-size: 11px;">
+                        {{ $name }} {{ '(' }} {{ $row->role_name ?? 'N/A' }} {{ ')' }}
+                        {{ '(' }} {{ $row->username ?? 'N/A' }} {{ ')' }}
+                    </span>
+                @endif
                 {{ $row->message }}
                 <span class=" pt-50 ml-1" style="font-size: 11px;">
                     {{ date('d M Y h:i A', strtotime($row->time)) }}

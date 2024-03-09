@@ -134,6 +134,10 @@
 
                 <input type="hidden" id="supermoderatoraasign" value="{{ $checkassigntosupermoderator }}" />
 
+                <input type="hidden" id="userassigntomodeartorassupermoderator"
+                    value="{{ $userassigntomodeartorassupermoderator }}" />
+
+
 
 
                 <div class="form-group">

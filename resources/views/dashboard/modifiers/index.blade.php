@@ -115,8 +115,8 @@
                             <div class="row application-filter align-items-center">
                                 <div class="col-md-3 col-12">
                                     <div class="form-group">
-                                        <label for="rolename">Role Name</label>
-                                        <select data-colum="0" id="rolename" name="rolename[]" data-live-search="true"
+                                        <label for="rolenameshow">Role Name</label>
+                                        <select data-colum="0" id="rolenameshow" name="rolename[]" data-live-search="true"
                                             multiple class=" select form-control apply-filter-role">
                                             @foreach ($roles as $role)
                                                 <option
@@ -193,7 +193,7 @@
                 ajax: {
                     url: "{{ url('admin/modifiers') }}",
                     data: function(d) {
-                        d.rolename = $('#rolename').val();
+                        d.rolename = $('#rolenameshow').val();
                         // d.quiz_id = $('select[name="quiz_id"]').val();
                     }
                 },
@@ -346,17 +346,16 @@
                     },
                     password: {
                         required: true,
-                        number: true,
+                        minlength: 8,
                     },
                     password_confirmation: {
                         required: true,
-                        number: true,
+                        equalTo: '#password',
                     },
-                    // 'rolename[]': {
-                    //     required: true,
-                    //     minlength: 1,
+                    'rolename[]': {
+                        validUserRole: true,
 
-                    // }
+                    }
 
                 },
                 // messages: {
@@ -368,7 +367,15 @@
             });
 
 
+            $.validator.addMethod("validUserRole", function(value, element) {
+                // Get the existing roles from $('#rolenameedit').val()
+                var roles = $('#rolename').val();
 
+
+                // Check if the selected role is 'moderator' or 'supermoderator'
+
+                return ((roles.includes('moderator') && roles.includes('supermoderator')) == false);
+            }, "Please choose either 'moderator' or 'supermoderator' as the role.");
 
 
 
@@ -402,20 +409,40 @@
                     email: {
                         required: true
                     },
-                    // password: {
-                    //     required: true,
-                    //     number: true,
-                    // },
-                    // password_confirmation: {
-                    //     required: true,
-                    //     number: true,
-                    // },
+                    password: {
+
+                        minlength: 8,
+                    },
+                    password_confirmation: {
+
+                        equalTo: '#password',
+                    },
                     'rolename[]': {
                         checkModeratorRole: {
                             depends: function() {
                                 return ($('#studentscount').val() > 0 || $('#supermoderatoraasign').val() == 1);
                             }
-                        }
+                        },
+                        checkSuperModeratorRole: {
+                            depends: function() {
+                                return ($('#userassigntomodeartorassupermoderator').val() > 0);
+                            }
+                        },
+                        parentRole: {
+                            depends: function() {
+                                return ($('#studentscount').val() > 0 || $('#supermoderatoraasign').val() == 1);
+                            }
+
+                        },
+                        childRole: {
+                            depends: function() {
+                                return ($('#userassigntomodeartorassupermoderator').val() > 0);
+                            }
+
+                        },
+                        bothmodorsupmodRole: true,
+
+
 
                     }
 
@@ -446,9 +473,47 @@
             );
 
 
+            $.validator.addMethod('checkSuperModeratorRole', function(value,
+                    element) {
+
+                    var roles = $('#rolenameedit').val();
 
 
 
+                    return $('#userassigntomodeartorassupermoderator').val() > 0 && roles && roles
+                        .includes('supermoderator');
+                },
+                'You donot  remove the role of supermoderaror from this users becausse  this user assign to moderator'
+            );
+
+
+
+
+
+
+            $.validator.addMethod("parentRole", function(value, element) {
+                // Check if the selected role is not 'supermoderator'
+                var roles = $('#rolenameedit').val();
+                return roles && !roles.includes('supermoderator');
+            }, "You cannot assign the 'supermoderator' role. because this role is parent of moderator");
+
+
+            $.validator.addMethod("childRole", function(value, element) {
+                // Check if the selected role is not 'supermoderator'
+                var roles = $('#rolenameedit').val();
+                return roles && !roles.includes('moderator');
+            }, "You cannot assign the 'moderator' role. because this role is child of supermoderator");
+
+
+            $.validator.addMethod("bothmodorsupmodRole", function(value, element) {
+                // Check if the selected role is not 'supermoderator'
+                var roles = $('#rolenameedit').val();
+
+
+                // Check if the selected role is 'moderator' or 'supermoderator'
+
+                return ((roles.includes('moderator') && roles.includes('supermoderator')) == false);
+            }, "Please choose either 'moderator' or 'supermoderator' as the role.");
 
 
 

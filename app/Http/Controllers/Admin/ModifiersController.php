@@ -168,8 +168,15 @@ class ModifiersController extends Controller
            
         
         if($user) {
+            if(in_array('supermoderator',$request->rolename)){
+                $title_role="YGSUPERMOD";
+            }elseif(in_array('moderator',$request->rolename)){
+                $title_role="YGMODER";
+            }else{
+                $title_role="YGMODFIR";
+            }
             $user->update([
-                'username' => strtoupper('YGMOD'.$user->id)
+                'username' => strtoupper( $title_role.$user->id)
 
             ]);
 

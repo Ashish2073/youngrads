@@ -546,11 +546,11 @@
                     },
                     password: {
                         required: true,
-                        number: true,
+                        minlength: 8,
                     },
                     password_confirmation: {
                         required: true,
-                        number: true,
+                        equalTo: '#password',
                     },
                     // 'rolename[]': {
                     //     required: true,
@@ -601,6 +601,14 @@
                     },
                     email: {
                         required: true
+                    },
+                    password: {
+
+                        minlength: 8,
+                    },
+                    password_confirmation: {
+
+                        equalTo: '#password',
                     },
                     // password: {
                     //     required: true,

@@ -30,7 +30,7 @@
 
                             <p class="text-muted">Note: Click/Tap row for viewing profile</p>
                             <div class="row application-filter align-items-center">
-                                <div class="col-md-3 col-12">
+                                <div class="col-md-2 col-12">
                                     <div class="form-group">
                                         <label for="userid">Student Id</label>
                                         <select data-colum="0" id="userid" name="id[]" data-live-search="true"
@@ -44,7 +44,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-12">
+                                <div class="col-md-2 col-12">
                                     <div class="form-group">
                                         <label for="useremail">Email</label>
                                         <select id="useremail" name="email[]" data-live-search="true" multiple
@@ -59,7 +59,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-12">
+                                <div class="col-md-2 col-12">
                                     <div class="form-group">
                                         <label for="userphone">Phone Number</label>
                                         <select id="userphone" name="phone[]" data-live-search="true" multiple
@@ -76,7 +76,7 @@
                                 </div>
 
 
-                                <div class="col-md-3 col-12">
+                                <div class="col-md-2 col-12">
                                     <div class="form-group">
                                         <label for="moderator-filter-id">Moderator Id</label>
                                         <select id="moderator-filter-id" name="moderatorid[]" data-live-search="true"
@@ -91,13 +91,20 @@
                                                         selected @endif
                                                         @endif
 
+                                                        @if (session()->has('used_moderator_as_assign_to_student')) @if (session()->get('used_moderator_as_assign_to_student') == $moderatoruser->id)
+                                                         
+                                                        @php  session()->forget('used_moderator_as_assign_to_student') @endphp
+                                                        
+                                                        selected @endif
 
-
-
-
-                                                        >
-                                                        {{ $moderatoruser->username }}</option>
                                                 @endif
+
+
+
+
+                                                >
+                                                {{ $moderatoruser->username }}</option>
+                                            @endif
                                             @endforeach
                                         </select>
                                     </div>
@@ -105,14 +112,14 @@
 
 
                                 @if (in_array('Admin', $userrole))
-                                    <div class="col-md-3 col-12">
+                                    <div class="col-md-2 col-12">
                                         <div class="form-group">
                                             <label for="scenario">Enrolled Student</label>
                                             <select id="scenario" name="scenario" data-live-search="true"
                                                 class="select form-control apply-filter-student">
 
 
-                                                <option value="" selected disabled>Please Select Moderator</option>
+                                                <option value="" selected disabled>Please Select</option>
 
 
 
@@ -135,7 +142,7 @@
 
 
 
-                                <div class="col-md-3 col-12 text-center">
+                                <div class="col-md-2 col-12 text-center">
                                     <button class="btn btn-primary" id="reset-filter">Reset</button>
 
                                 </div>
@@ -148,7 +155,7 @@
 
 
 
-                            <a href="{{ route('admin.students-data-export') }}" class="btn btn-primary mt-3">Export
+                            <a href="{{ route('admin.students-data-export') }}" class="btn btn-primary mt-2">Export
                                 Students
                                 Application Data In Excel Form</a>
 
@@ -160,7 +167,7 @@
 
                             @if (hasPermissionForRoles('assign_students_to_moderator_view', $userrole) ||
                                     auth('admin')->user()->getRoleNames()[0] == 'Admin')
-                                <a href="javascript:void(0)" class="btn btn-primary mt-3"
+                                <a href="javascript:void(0)" class="btn btn-primary mt-2"
                                     id="assignstudentmoderator">Assign/Dissociate
                                     Students
                                     To Moderator</a>
@@ -287,7 +294,7 @@
                                     <thead>
                                         <tr>
                                             <th id="thead-moderator-checkbox" hidden>Checkbox</th>
-                                            <th>Id</th>
+                                            <th>StudentId</th>
                                             <th>Moderator Id</th>
                                             <th>Name</th>
                                             <th>Email</th>
@@ -342,7 +349,7 @@
                     $("#studentassigndiv").removeAttr("hidden");
                     $(".moderator-checkbox").removeAttr("hidden");
                     $("#moderator-assign").val('');
-                    $("#non-assign-student").val('');
+
 
                     $(".moderator-checkbox").closest("td").removeAttr("hidden", true);
                     $("#thead-moderator-checkbox").removeAttr("hidden");
@@ -353,6 +360,7 @@
                     $("#studentassigndiv").attr("hidden", true);
                     $(".moderator-checkbox").attr("hidden", true);
                     $("#thead-moderator-checkbox").attr("hidden", true);
+
                     $(".moderator-checkbox").closest("td").attr("hidden", true);
                 }
 
@@ -371,8 +379,8 @@
             $("#non-assign-student").change(function() {
                 if (this.checked) {
                     let checkedvalue = this.value;
-                    console.log(checkedvalue);
-                    moderators_fileter_id = [checkedvalue];
+
+                    moderators_fileter_id = 0;
                     dataTable.draw();
 
 
