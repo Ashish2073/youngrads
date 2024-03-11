@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campus;
+use App\Models\State;
 use Illuminate\Http\Request;
 use App\Models\ProgramLevel;
 use App\Models\Study;
 use App\Models\Program;
 use App\Models\Intake;
+use App\Models\City;
 use App\Models\CampusProgram;
 use App\Models\CampusProgramIntake;
 use App\Models\CampusProgramFee;
@@ -258,19 +260,54 @@ class CourseFinderController extends Controller
             $data->where(function ($query) {
                 $query->where('programs.name', 'like', '%' . request()->get('what') . '%');
                 $query->orWhere('study_areas.name', 'like', '%' . request()->get('what') . '%');
+
+                // Perform the search query
+               $programSearchCount = Program::where('programs.name', 'like', '%' . request()->get('what') . '%')->increment('search_count');
+               $studyareaSearchCount = study::where('study_areas.name', 'like', '%' . request()->get('what') . '%')->increment('search_count');
+
+
+
             });
+
+
+
         }
 
 
         // where do you want to study?
         if (isset($request->where)) {
             $data->where(function ($query) {
+
                 $query->where('countries.name', 'like', '%' . request()->get('where') . '%');
+
+                $countrySearchCount = Country::where('countries.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+              
+
+
                 $query->orWhere('states.name', 'like', '%' . request()->get('where') . '%');
+
+                $stateSearchCount = State::where('states.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+
+
                 $query->orWhere('cities.name', 'like', '%' . request()->get('where') . '%');
+
+                $citySearchCount = City::where('cities.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+
                 $query->orWhere('campus.name', 'like', '%' . request()->get('where') . '%');
+
+                $campusSearchCount = Campus::where('campus.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+
+
+
                 $query->orWhere('universities.name', 'like', '%' . request()->get('where') . '%');
+
+                $universitySearchCount = University::where('universities.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+
+
                 $query->orWhere('addresses.address', 'like', '%' . request()->get('where') . '%');
+
+               
+
             });
             // $data->where('countries.name', 'like', '%' . $request->where . '%')
             //     ->orWhere('states.name', 'like', '%' . $request->where . '%')

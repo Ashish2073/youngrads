@@ -17,6 +17,11 @@
 @endsection
 
 @section('content')
+    <style>
+        .box {
+            height: 24vh !important
+        }
+    </style>
     {{-- Dashboard Analytics Start --}}
     @php $userrole=json_decode(auth('admin')->user()->getRoleNames(),true)?? []; @endphp
     <section id="statistics-card">
@@ -48,7 +53,7 @@
 
             @if (in_array('Admin', $userrole))
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.students') }}" class="card text-center">
+                    <a href="{{ route('admin.students') }}" class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -67,7 +72,7 @@
 
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.students', ['scenario' => 'weeklydata']) }}" class="card text-center">
+                    <a href="{{ route('admin.students', ['scenario' => 'weeklydata']) }}" class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -85,7 +90,7 @@
                 </div>
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.students', ['scenario' => 'monthlydata']) }}" class="card text-center">
+                    <a href="{{ route('admin.students', ['scenario' => 'monthlydata']) }}" class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -103,7 +108,7 @@
                 </div>
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.students', ['scenario' => 'dailydata']) }}" class="card text-center">
+                    <a href="{{ route('admin.students', ['scenario' => 'dailydata']) }}" class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -122,7 +127,7 @@
 
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.applications-all') }}" class="card text-center">
+                    <a href="{{ route('admin.applications-all') }}" class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -142,7 +147,8 @@
 
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.applications-all', ['scenario' => 'weeklydata']) }}" class="card text-center">
+                    <a href="{{ route('admin.applications-all', ['scenario' => 'weeklydata']) }}"
+                        class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -161,7 +167,7 @@
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.applications-all', ['scenario' => 'monthlydata']) }}"
-                        class="card text-center">
+                        class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -180,7 +186,7 @@
 
                 <div class="col-xl-3 col-md-4 col-sm-6">
                     <a href="{{ route('admin.applications-all', ['scenario' => 'dailydata']) }}"
-                        class="card text-center">
+                        class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -201,7 +207,7 @@
 
             @if (in_array('Admin', $userrole) || in_array('supermoderator', $userrole))
                 <div class="col-xl-3 col-md-4 col-sm-6">
-                    <a href="{{ route('admin.moderators') }}" class="card text-center">
+                    <a href="{{ route('admin.moderators') }}" class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -268,7 +274,7 @@
 
 
         </div>
-        @if (in_array('Admin', $userrole))
+        @if (in_array('Admin', $userrole) || in_array('dataoperator', $userrole))
             <h4>Manage</h4>
 
             <div class="row">
@@ -319,8 +325,170 @@
                 </div>
             </div>
         @endif
+
+        <h4>Most Key Word Search</h4>
+        <div class="row">
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+                <a href="{{ route('admin.programs', ['mostkeysearch' => $programNameWithMaxSearchCount->id]) }}"
+                    class="card text-center box">
+                    <div class="card text-center">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                    <div class="avatar-content">
+                                        <i class="fas fa-book-reader text-primary font-medium-5"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-bold-700">{{ $programNameWithMaxSearchCount->name }}</h2>
+                                <p class="mb-0 line-ellipsis">Most Seached Program</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+                <a href="{{ route('admin.universities', ['mostkeysearch' => $universityNameWithMaxSearchCount->id]) }}"
+                    class="card text-center box">
+                    <div class="card text-center">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                    <div class="avatar-content">
+                                        <i class="fas fa-landmark text-primary font-medium-5"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-bold-700">{{ $universityNameWithMaxSearchCount->name }}</h2>
+                                <p class="mb-0 line-ellipsis">Most Seached University</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+                <a @if ($campusNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.campuses', ['mostkeysearch' => $campusNameWithMaxSearchCount->id]) }}" @endif
+                    class="card text-center box">
+                    <div class="card text-center">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                    <div class="avatar-content">
+                                        <i class="fa-solid fa-landmark-dome text-primary font-medium-5"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-bold-700">
+                                    {{ $campusNameWithMaxSearchCount->search_count > 0 ? $campusNameWithMaxSearchCount->name : 'N/A' }}
+                                </h2>
+                                <p class="mb-0 line-ellipsis">Most Seached Campus</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+                <a @if ($studyNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.studies', ['mostkeysearch' => $studyNameWithMaxSearchCount->id]) }}" @endif
+                    class="card text-center box">
+                    <div class="card text-center">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                    <div class="avatar-content">
+                                        <i class="fas fa-book-open text-primary font-medium-5"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-bold-700">
+                                    {{ $studyNameWithMaxSearchCount->search_count > 0 ? $studyNameWithMaxSearchCount->name : 'N/A' }}
+                                </h2>
+                                <p class="mb-0 line-ellipsis">Most Seached Study Area</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+                @if ($countryNameWithMaxSearchCount->search_count > 0)
+                    <a href="{{ route('admin.countries', ['mostkeysearch' => $countryNameWithMaxSearchCount->id]) }}"
+                        @endif
+
+                        class="card text-center box">
+                        <div class="card text-center">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                        <div class="avatar-content">
+                                            <i class="fa fa-globe text-primary font-medium-5"></i>
+                                        </div>
+                                    </div>
+                                    <h2 class="text-bold-700">
+                                        {{ $countryNameWithMaxSearchCount->search_count > 0 ? $countryNameWithMaxSearchCount->name : 'N/A' }}
+                                    </h2>
+                                    <p class="mb-0 line-ellipsis">Most Seached Country </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+            </div>
+
+
+
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+                <a @if ($stateNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.states', ['mostkeysearch' => $stateNameWithMaxSearchCount->id]) }}" @endif
+                    class="card text-center box">
+                    <div class="card text-center">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                    <div class="avatar-content">
+                                        <i class="fa fa-flag text-primary font-medium-5"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-bold-700">
+                                    {{ $stateNameWithMaxSearchCount->search_count > 0 ? $stateNameWithMaxSearchCount->name : 'N/A' }}
+                                </h2>
+                                <p class="mb-0 line-ellipsis">Most Seached State </p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+
+            <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:150px">
+
+                <a @if ($cityNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.cities', ['mostkeysearch' => $cityNameWithMaxSearchCount->id]) }}" @endif
+                    class="card text-center box">
+                    <div class="card text-center">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                                    <div class="avatar-content">
+                                        <i class="fas fa-city text-primary font-medium-5"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-bold-700">
+                                    {{ $cityNameWithMaxSearchCount->search_count > 0 ? $cityNameWithMaxSearchCount->name : 'N/A' }}
+                                </h2>
+                                <p class="mb-0 line-ellipsis">Most Seached City </p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+
+
+
+        </div>
+
+
     </section>
-    <!-- Dashboard Analytics end -->
+    <!-- Dashboard Analytics end stateNameWithMaxSearchCount cityNameWithMaxSearchCountcountryNameWithMaxSearchCount campusNameWithMaxSearchCount studyNameWithMaxSearchCount -->
 @endsection
 
 @section('vendor-script')

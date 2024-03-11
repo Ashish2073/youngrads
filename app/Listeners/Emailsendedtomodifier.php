@@ -24,14 +24,26 @@ class Emailsendedtomodifier
      */
     public function handle(Sendmailmodifier  $event): void
     {
-       
-        $modifiercreadational=[
-       'password'=>json_decode($event->userdata->modifier_password),
-       'username'=>$event->userdata->username,
-       'userroles'=>$event->userdata->roles,
-
-        ]; 
-
+        
+  
+        
+        
+        $modifiercreadational = [
+            'username' => $event->userdata->username,
+            
+        ];
+        
+        if (isset($event->userdata->modifier_password)) {
+            $modifiercreadational['password'] = $event->userdata->modifier_password;
+        }
+         
+        if (isset($event->userdata->roles)) {
+            $modifiercreadational['userroles'] = $event->userdata->roles;
+        }
+         
+      
+        
+     
     
  
         Mail::to($event->userdata->email)->send(new ModifierRoleProfileMail($modifiercreadational));

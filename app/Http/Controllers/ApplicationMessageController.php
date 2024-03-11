@@ -234,7 +234,7 @@ class ApplicationMessageController extends Controller
 
 				$html = "";
 				
-                $overallrole=($row->user_name) ? 'systeam' : 'youngrads_consultant';
+                $overallrole=($row->user_name) ? 'students' : 'youngrads_consultant';
 				$name = ($row->user_name) ? $row->user_name : $row->admin_name;
 				$avtar = $name[0];
 				$userId = ($row->user_id) ? $row->user_id : $row->admin_id;

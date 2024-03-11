@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
+use App\Events\Sendmailmodifier;
 
 class ModeratorController extends Controller
 {
@@ -249,20 +250,30 @@ class ModeratorController extends Controller
            
         
         if($user) {
-            if(in_array('supermoderator',$request->rolename)){
-                $title_role="YGSUPERMOD";
-            }elseif(in_array('moderator',$request->rolename)){
-                $title_role="YGMODER";
-            }else{
-                $title_role="YGMODFIR";
-            }
-            $user->update([
-                'username' => strtoupper( $title_role.$user->id)
-
-            ]);
+          
 
             
             $user->assignRole('moderator');
+
+            if($user->hasRole('moderator')){
+                $title_role="YGMODER";
+                $user->update([
+                    'username' => strtoupper( $title_role.$user->id)
+    
+                ]);
+            }
+
+
+
+            if($user){ 
+                $user->modifier_password=$request->password;
+                event(new Sendmailmodifier($user));
+
+            }
+
+
+
+
 
             activity('Moderator Created')  
             ->causedBy(Auth::guard('admin')->user())
@@ -331,6 +342,12 @@ class ModeratorController extends Controller
             // $user->syncRoles([$request->role]);
               
             $user->syncRoles('moderator');
+
+            if($user){ 
+                $user->modifier_password=$request->password;
+                event(new Sendmailmodifier($user));
+
+            }
 
 
             return response()->json([

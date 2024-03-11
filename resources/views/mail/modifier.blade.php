@@ -95,16 +95,30 @@
                                             </tr>
                                         </table>
                                         <h3>UserName-<strong>{{ $usersCreadential['username'] }}</strong></h3>
-                                        <h3>Password-<strong>{{ $usersCreadential['password'] }}</strong></h3>
-                                        <h3>Roles-
-                                            @foreach ($usersCreadential['userroles'] as $key => $data)
-                                                <strong>{{ $data->name }}</strong>
 
-                                                @if (!$loop->last)
-                                                    , <!-- Add a comma if it's not the last iteration -->
-                                                @endif
-                                            @endforeach
-                                        </h3>
+                                        @if (isset($usersCreadential['password']))
+                                            <h3>Password-<strong>{{ $usersCreadential['password'] }}</strong></h3>
+                                        @else
+                                            <h3>Password Not Change-<strong>"***Please continue with your old
+                                                    password.****"</strong></h3>
+                                        @endif
+
+                                        @if (isset($usersCreadential['userroles']))
+                                            <h3>Roles-
+                                                @foreach ($usersCreadential['userroles'] as $key => $data)
+                                                    <strong>{{ $data->name }}</strong>
+
+                                                    @if (!$loop->last)
+                                                        , <!-- Add a comma if it's not the last iteration -->
+                                                    @endif
+                                                @endforeach
+                                            </h3>
+                                        @else
+                                            <div class="alert alert-primary" role="alert">
+                                                "You don't have any roles for contribution in our Youngrads community."
+
+                                            </div>
+                                        @endif
 
 
                                         <p

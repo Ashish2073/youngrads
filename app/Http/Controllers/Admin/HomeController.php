@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Admin;
 use App\Models\Campus;
 use App\Models\CampusProgram;
+use App\Models\Country;
+use App\Models\City;
+use App\Models\State;
+use App\Models\Study;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +42,33 @@ class HomeController extends Controller
     $campus = Campus::count();
     $campusPrograms = CampusProgram::count();
     $programs = Program::count();
+    $programNameWithMaxSearchCount = Program::where('search_count', Program::max('search_count'))
+    ->select(['id', 'name','search_count'])->first();
+
+    $universityNameWithMaxSearchCount = University::where('search_count', University::max('search_count'))
+    ->select(['id', 'name','search_count'])->first();
+
+    $campusNameWithMaxSearchCount = Campus::where('search_count', Campus::max('search_count'))
+    ->select(['id', 'name','search_count'])->first();
+
+    $studyNameWithMaxSearchCount = Study::where('search_count', Study::max('search_count'))
+    ->select(['id', 'name','search_count'])->first();
+
+    $countryNameWithMaxSearchCount = Country::where('search_count', Country::max('search_count'))
+
+
+    ->select(['id', 'name','search_count'])->first();
+
+    $stateNameWithMaxSearchCount = State::where('search_count', State::max('search_count'))
+    ->select(['id', 'name','search_count'])->first();
+
+
+    $cityNameWithMaxSearchCount = City::where('search_count', City::max('search_count'))
+    ->select(['id', 'name','search_count'])->first();
+
+
+
+
     $systemUsers = Admin::count();
     $students = User::count();
     $applications = UserApplication::count();
@@ -90,7 +121,7 @@ class HomeController extends Controller
     ];
 
     // return $campusProgram;
-    return view('dashboard.home', compact('weeklyenrolledapplication','monthlyenrolledapplication','dailyenrolledapplication','dailyData','monthlyData','weeklyenrolledstudents','unversities','moderators','campus', 'campusPrograms', 'programs', 'pageConfigs', 'students', 'applications', 'systemUsers'));
+    return view('dashboard.home', compact('stateNameWithMaxSearchCount','cityNameWithMaxSearchCount','countryNameWithMaxSearchCount','studyNameWithMaxSearchCount','campusNameWithMaxSearchCount','universityNameWithMaxSearchCount','programNameWithMaxSearchCount','weeklyenrolledapplication','monthlyenrolledapplication','dailyenrolledapplication','dailyData','monthlyData','weeklyenrolledstudents','unversities','moderators','campus', 'campusPrograms', 'programs', 'pageConfigs', 'students', 'applications', 'systemUsers'));
   }
 
   public function excelForm()

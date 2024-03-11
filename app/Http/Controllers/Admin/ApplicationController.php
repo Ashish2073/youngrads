@@ -454,6 +454,10 @@ class ApplicationController extends Controller
 
 		$application_numbers=UserApplication::select('id','application_number')->get();
 
+		if(!in_array('supermoderator',json_decode(auth('admin')->user()->getRoleNames()))&& !in_array('Admin',json_decode(auth('admin')->user()->getRoleNames())) && !in_array('moderator',json_decode(auth('admin')->user()->getRoleNames()))){
+			$moderator=Admin::select('id','username')->role('moderator')->get();;
+		}
+
  
 
 

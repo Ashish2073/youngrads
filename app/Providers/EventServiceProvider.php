@@ -32,7 +32,7 @@ class EventServiceProvider extends ServiceProvider
             App\Listeners\ApplicationUpdated::class 
         ],
         'App\Events\Sendmailmodifier' =>[
-            'App\Listeners\Emailsendedtomodifier'
+            'App\Listeners\Emailsendedtomodifier' 
         ]
     ];
 

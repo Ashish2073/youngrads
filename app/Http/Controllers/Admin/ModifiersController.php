@@ -183,7 +183,7 @@ class ModifiersController extends Controller
 
             
             $user->assignRole($request->rolename);
-
+ 
             if($user->hasRole($request->rolename)){ 
                 $user->modifier_password=$request->password;
                 event(new Sendmailmodifier($user));
@@ -197,7 +197,7 @@ class ModifiersController extends Controller
             return response()->json([
                 'code' => 'success',
                 'title' => 'Congratulations',
-                'message' => 'User added successfully',
+                'message' => 'User added successfully and mail send to users email',
                 'success' => true
             ]);
           } else {
@@ -212,8 +212,8 @@ class ModifiersController extends Controller
 
 
 
-
-    }
+ 
+    } 
 
     public function edit($id)
     {
@@ -284,14 +284,28 @@ class ModifiersController extends Controller
         }
         if($user->save()) {
             // $user->syncRoles([$request->role]);
+
+
               
-            $user->syncRoles($request->rolename);
+            $user->syncRoles($request->rolename); 
+
+            if($user){ 
+                if(isset($request->password) && !empty($request->password)){
+                    $user->modifier_password=$request->password;
+                }
+               
+                event(new Sendmailmodifier($user));
+
+            }
+
+
+
 
 
             return response()->json([
                 'code' => 'success',
                 'title' => 'Congratulations',
-                'message' => 'User updated successfully',
+                'message' => 'User updated successfully and updated credential send to users mail',
                 'success' => true
             ]);
         } else {

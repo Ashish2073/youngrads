@@ -353,6 +353,7 @@
                         equalTo: '#password',
                     },
                     'rolename[]': {
+                        required: true,
                         validUserRole: true,
 
                     }
