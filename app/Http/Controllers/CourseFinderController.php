@@ -46,7 +46,7 @@ class CourseFinderController extends Controller
         $selectedIntake = $request->intake;
         $selectedYear = $request->year;
         $breadcrumbs = [
-            ['link' => "my-account", 'name' => "Dashboard"], ['name' => 'Course Finder']
+             ['link' => "my-account", 'name' => "Dashboard"], ['name' => 'Course Finder']
         ];
 
         $min = CampusProgramFee::select('fee_price')->orderBy('fee_price', 'asc')->first();
@@ -261,9 +261,22 @@ class CourseFinderController extends Controller
                 $query->where('programs.name', 'like', '%' . request()->get('what') . '%');
                 $query->orWhere('study_areas.name', 'like', '%' . request()->get('what') . '%');
 
+                $programExist=Program::where('programs.name', request()->get('what'))->exists();
+                $studyExist=study::where('study_areas.name', request()->get('what'))->exists();
+
                 // Perform the search query
-               $programSearchCount = Program::where('programs.name', 'like', '%' . request()->get('what') . '%')->increment('search_count');
-               $studyareaSearchCount = study::where('study_areas.name', 'like', '%' . request()->get('what') . '%')->increment('search_count');
+                if($programExist){
+                    Program::where('programs.name', request()->get('what'))->increment('search_count');
+                }elseif(!$programExist && !$studyExist){
+                    $programSearchCount = Program::where('programs.name', 'like', '%' . request()->get('what') . '%')->increment('search_count');
+                }
+              
+                if($studyExist){
+                    study::where('study_areas.name', request()->get('what'))->increment('search_count'); 
+                }elseif(!$programExist && !$studyExist){
+                    $studyareaSearchCount = study::where('study_areas.name', 'like', '%' . request()->get('what') . '%')->increment('search_count');
+                }
+             
 
 
 
@@ -275,33 +288,60 @@ class CourseFinderController extends Controller
 
 
         // where do you want to study?
-        if (isset($request->where)) {
+        if (isset($request->where)) { 
             $data->where(function ($query) {
+
+               
+                $countryExist=Country::where('countries.name', request()->get('where'))->exists();          
+                $campusExist=Campus::where('campus.name',request()->get('where'))->exists();
+               $universityExist= University::where('universities.name', request()->get('where'))->exists();
+
 
                 $query->where('countries.name', 'like', '%' . request()->get('where') . '%');
 
-                $countrySearchCount = Country::where('countries.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+                if( $countryExist){
+                    $countrySearchCount = Country::where('countries.name', request()->get('where'))->increment('search_count');     
+                }elseif(!$campusExist && !$universityExist && !$countryExist){
+                    $countrySearchCount = Country::where('countries.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+                }
+
+              
               
 
 
                 $query->orWhere('states.name', 'like', '%' . request()->get('where') . '%');
 
-                $stateSearchCount = State::where('states.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+             
+               
 
 
                 $query->orWhere('cities.name', 'like', '%' . request()->get('where') . '%');
 
-                $citySearchCount = City::where('cities.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+
+
 
                 $query->orWhere('campus.name', 'like', '%' . request()->get('where') . '%');
 
-                $campusSearchCount = Campus::where('campus.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+                 
+                if($campusExist){
+                    Campus::where('campus.name',request()->get('where'))->increment('search_count');  
+                }elseif(!$campusExist && !$universityExist && !$countryExist){
+                    $campusSearchCount = Campus::where('campus.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');       
+
+                }
+               
 
 
 
                 $query->orWhere('universities.name', 'like', '%' . request()->get('where') . '%');
 
-                $universitySearchCount = University::where('universities.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+                if($universityExist){
+                    University::where('universities.name', request()->get('where'))->increment('search_count'); 
+                }elseif( !$campusExist && !$universityExist && !$countryExist){
+                    $universitySearchCount = University::where('universities.name', 'like', '%' . request()->get('where') . '%')->increment('search_count');     
+                }
+
+                
 
 
                 $query->orWhere('addresses.address', 'like', '%' . request()->get('where') . '%');
@@ -355,7 +395,7 @@ class CourseFinderController extends Controller
             //     }
             //     $first++;
             // }
-        }
+        } 
 
         // Special Tests
         if (isset($request->special_tests) && !empty($request->special_tests)) {
@@ -377,20 +417,32 @@ class CourseFinderController extends Controller
         // Country
         if (isset($request->country_id) && !empty($request->country_id)) {
             $data->whereIn('addresses.country_id', $request->country_id);
+            $studyareaSearchCount = Country::whereIn('id',$request->country_id)->increment('search_count');
+
         }
 
         // Study Area
         if (isset($request->study_area)) {
             $data->whereIn('programs.study_area_id', $request->study_area);
+            $studyareaSearchCount = Study::whereIn('id',$request->study_area)->increment('search_count');
         }
 
-        // Discipline
+        // Discipline 
         if (isset($request->discipline)) {
+
             $data->whereIn('program_study_areas.study_area_id', $request->discipline);
+
+          
+            $studyareaSearchCount = Study::whereIn('id',$request->discipline)->increment('search_count');
+
+          
+
+
         }
 
         // Universities
         if (isset($request->univs) && !empty($request->univs)) {
+            $universitySearchCount = University::whereIn('id', $request->univs)->increment('search_count');     
             $data->whereIn('universities.id', $request->univs);
         }
 

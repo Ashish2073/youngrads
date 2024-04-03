@@ -75,8 +75,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
         $sheetError = [];
         $rowNumber = 1;
-
-
+        
+      
         foreach($records as $record){
             if(!isset($record['university'])){
                 Log::debug('University  not given !' . json_encode($record));
@@ -85,7 +85,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+           
             
 
             }else{
@@ -97,11 +97,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
-                    break;
-
-                }else{
-
-                    continue;
+               
 
                 }
 
@@ -111,16 +107,19 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             }
             if(!isset($record['campus'])){
 
+                
+
                 Log::debug('Campus  not given !' . json_encode($record));
                 $sheetError[] = [
                 'message' => 'Campus not given!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+           
 
 
             }else{
+                $univId=(isset($univsNameIdArr[trim(strtolower($record['university']))]))?$univsNameIdArr[trim(strtolower($record['university']))]:0;
 
                 if (!isset($univIdCampusNameArr[$univId . "__" . trim(strtolower($record['campus']))])) {
                     Log::debug('Campus does not exists!'.$record['campus'] . json_encode($record));
@@ -129,11 +128,9 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         'record' => $record,
                         'rowNumber' => $rowNumber,
                     ];
-                    break;
+                 
 
                 
-            }else{
-                continue;
             }
 
 
@@ -147,7 +144,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+          
 
 
             }else{
@@ -163,10 +160,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         'rowNumber' => $rowNumber,
                     ];
 
-                    break;
-
-                }else{
-                    continue;
+                  
                 }
 
 
@@ -181,26 +175,22 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+           
 
 
-            }else{
-                continue;
             }
 
             if(!isset($record['sub_study_area'])){
 
                 Log::debug('Sub Study Area   not given !' . json_encode($record));
                 $sheetError[] = [
-                'message' => 'Country not given!',
+                'message' => 'sub study area not given!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+           
 
 
-            }else{
-                continue;
             }
 
             if(!isset($record['currency_type'])){
@@ -211,7 +201,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+            
 
 
             }else{
@@ -224,12 +214,10 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                 ];
-                break;
+               
 
 
 
-                }else{
-                    continue;
                 }
               
             }
@@ -243,7 +231,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+           
 
 
             }else{
@@ -255,10 +243,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                 ];
-                break;
+              
 
-                }else{
-                    continue;
                 }
 
 
@@ -277,7 +263,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+         
 
 
             }else{
@@ -289,10 +275,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     'record' => $record,
                     'rowNumber' => $rowNumber,
                 ];
-                break;
+               
 
-                }else{
-                    continue;
                 }
 
 
@@ -312,8 +296,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             'record' => $record,
             'rowNumber' => $rowNumber,
         ];
-        break;
-
+       
 
         }else{
 
@@ -324,10 +307,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
-
-            }else{
-                continue;
+           
             }
 
 
@@ -336,19 +316,165 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
         
         }
 
+       
+        ///Entrance Exam name
+
+        if(!isset($record['entrance_exam_name'])){
+
+            Log::debug('Entrance Exam not given !' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'Entrance Exam not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+       
+        }
+
+
+
+        ///Entrance Exam Score ////////////////////// entrance_score_min required_score_for_enterence
+
+
+        if(!isset($record['entrance_score_min'])){
+
+            Log::debug('Entrance score not given !' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'Entrance score not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+      
+
+
+        }
+
+
+        if(!isset($record['entrance_score_max'])){
+
+            Log::debug('Entrance score max not given !' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'Entrance score max not given!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+       
+
+
+        }
+
+
+        if(!isset($record['required_score_for_enterence'])){
+
+            Log::debug('Required  score  not given for entrance !' . json_encode($record));
+            $sheetError[] = [
+            'message' => 'Required  score  not given for entrance!',
+            'record' => $record,
+            'rowNumber' => $rowNumber,
+        ];
+      
+
+
+        }
+
+       
+
+
+//////////////////////score////////////////////////////////////////////////
+       if(isset($record['required_score_for_enterence']) && isset($record['entrance_score_max']) && isset($record['entrance_score_min']) ){
+      
+
+
+        $entrenceExamAllName=explode(',',$record['entrance_exam_name']);
+        $entranceExamRequireScore=explode(',',$record['required_score_for_enterence']);
+
+
+
+     
+
+
+
+        $entranceExamMinNumber=explode(',',$record['entrance_score_min']);
+        $entranceExamMaxNumber=explode(',',$record['entrance_score_max']);
+
+        
+
+        if(count($entranceExamMaxNumber)!=count($entranceExamRequireScore)||count($entranceExamMinNumber)!=count($entranceExamRequireScore)||count($entrenceExamAllName)!=count($entranceExamRequireScore)||count($entrenceExamAllName)!=count($entranceExamMinNumber) || count($entranceExamMinNumber)!= count($entranceExamMaxNumber) || count($entrenceExamAllName)!= count($entranceExamMaxNumber)){
+            Log::debug(json_encode($entrenceExamAllName).'&&'.json_encode($entranceExamMinNumber).'&&'.json_encode($entranceExamMaxNumber).json_encode($entranceExamRequireScore).'Given data not in correct pair!' );
+            $sheetError[] = [
+             'message' => json_encode($entrenceExamAllName).'&&'.json_encode($entranceExamMinNumber).'&&'.json_encode($entranceExamMaxNumber).json_encode($entranceExamRequireScore).'Given data not in correct pair!',
+             'record' => $record,
+             'rowNumber' => $rowNumber,
+          ];
+            
+
+
+        }else{
+            foreach($entrenceExamAllName as $k=>$testName){
+          
+     
+                if(!is_numeric($entranceExamMinNumber[$k])){
+                 Log::debug(json_encode($testName).'Test Score Minimum Validation!' . json_encode($testName));
+                 $sheetError[] = [
+                  'message' => $testName." ".'Test  Minimum Score Not Numeric ! !'."Given Value Is " .$entranceExamMinNumber[$k],
+                  'record' => $record,
+                  'rowNumber' => $rowNumber,
+               ];
+               
+                
+                
+              }
+            if(!is_numeric($entranceExamMaxNumber[$k])){
+              Log::debug(json_encode($testName).'!Test Score Maxmium Validation!' . json_encode($testName));
+              $sheetError[] = [
+                  'message' => $testName." ".'Test  Maximum Score Not Numeric !' ."Given Value Is ". $entranceExamMaxNumber[$k],
+                  'record' => $record,
+                  'rowNumber' => $rowNumber,
+              ];
+            
+             
+            
+          }
+    
+          if(!is_numeric($entranceExamRequireScore[$k])){
+            Log::debug(json_encode($testName).'!Test Score Maxmium Validation!' . json_encode($testName));
+            $sheetError[] = [
+                'message' => $testName." ".'Test  Maximum Score Not Numeric !' ."Given Value Is ". $entranceExamRequireScore[$k],
+                'record' => $record,
+                'rowNumber' => $rowNumber,
+            ];
+          
+           
+          
+        }
+    
+    
+    
+          }
+    
+
+        }
+       
+       
+
+     
+    }
+
+
+
+        
 
 
     }   
 
 
-
+        
 
 
               
           
 
 
-
+      
           
         
 
@@ -422,8 +548,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
              
             if (!isset($studyAreaNameIdArr[trim(strtolower($record['study_area']))])) {
                 $studyArea = new Study;
-                $studyArea->name = $record['study_area'];
-                $studyArea->slug = Str::slug($record['study_area'], "-");
+                $studyArea->name = trim(strtolower($record['study_area']));
+                $studyArea->slug = Str::slug(trim(strtolower($record['study_area'])), "-");
                 $studyArea->save();
                 $studyAreaId = $studyArea->id;
             } else {
@@ -432,13 +558,22 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
              }
             // Program
             if(isset($record['program'])){
+
+               
+
+
+
             if (!isset($programNameIdArr[trim(strtolower($record['program']))])) {
                 $program = new Program;
+               
             } else {
+                
                 $program = Program::find($programNameIdArr[trim(strtolower($record['program']))]);
             }
 
-            $program->name = $record['program'];
+            
+
+            $program->name = trim(strtolower($record['program']));
             $program->program_level_id = $programLevelId;
             $duration = (int) filter_var($record['duration'], FILTER_SANITIZE_NUMBER_INT);
             $program->duration = $duration;
@@ -458,7 +593,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
             if(isset($record['sub_study_area']) && isset($programStudyAreaIdArr)){
             if (!empty($record['sub_study_area'])) {
-                $subStudyArea = explode(",", $record['sub_study_area']);
+                $subStudyArea = explode(",", trim(strtolower($record['sub_study_area'])));
                 foreach ($subStudyArea as $area) {
                     if (isset($subStudyNameIdArr[$studyAreaId . "__" . trim(strtolower($area))])) {
                         $subStudyAreaId = $subStudyNameIdArr[$studyAreaId . "__" . trim(strtolower($area))];

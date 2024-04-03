@@ -886,9 +886,10 @@ class StudentController extends Controller
 	function testScoreStore(Request $request)
 	{
 		
-
+        
 		$subTests = DB::table('special_test_sub')->where('test_id', '=', $request->test_type)->get();
 		$testName = Test::find($request->test_type)->test_name;
+		
 		$testMin=Test::find($request->test_type)->min;
 		$testMax=Test::find($request->test_type)->max;
 		$test_record = Test::find($request->test_type);
@@ -905,12 +906,15 @@ class StudentController extends Controller
 		// 	'exam_date' => 'required',
 		// ]);
 
+		
+
 		$validator = Validator::make($request->all(), [
 			'score' => [
 				'required',
 				'numeric',
 				function ($attribute, $value, $fail) use ($testMin, $testMax, $testName) {
-					if ($value > $testMin && $value < $testMax) {
+					
+					if ($value < $testMin && $value > $testMax) {
 						$fail($testName." " .'score vale should be between ' . $testMin . ' and ' . $testMax);
 					}
 				},

@@ -242,7 +242,7 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     Route::resource('campus', '\App\Http\Controllers\Admin\CampusController', [
         'names' => [
             'index' => 'campuses',
-            'create' => 'campus.create',
+            'create' => 'campus.create',  
             'edit' => 'campus.edit',
             'update' => 'campus.update',
             'store' => 'campus.store',
@@ -259,7 +259,7 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
         'names' => [
             'index' => 'pages',
             'create' => 'page.create',
-            'edit' => 'page.edit',
+            'edit' => 'page.edit', 
             'update' => 'page.update',
             'store' => 'page.store',
             'destroy' => 'page.destroy'
@@ -299,6 +299,10 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     Route::post('study-to-substudy',[\App\Http\Controllers\Admin\StudyController::class,'studytosubstudy'])->name('study-to-substudy');
     //Fee_type
     Route::post('reset-study-area-filter',[\App\Http\Controllers\Admin\StudyController::class,'resetstudyarea'])->name('reset-study-area-filter');
+
+    Route::get('studyarea-data-export', [\App\Http\Controllers\Admin\StudyController::class, 'get_studyarea_data'])->name('get_studyarea_data');
+
+
 
     Route::resource('feetype', '\App\Http\Controllers\Admin\FeeTypeController', [
         'names' => [
@@ -447,10 +451,9 @@ Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class
     Route::post('/excelimport', [HomeController::class, 'importExcel'])->name('storeform');
 
     //address route
-    Route::get('/state/address/{id}', [\App\Http\Controllers\Admin\AddressController::class, 'selectStates'])->name('state');
-    Route::get('/city/address/{id}', [\App\Http\Controllers\Admin\AddressController::class, 'selectCity'])->name('city');
-
-    //application route
+   
+ 
+    //application route 
     Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all');
     
      Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
@@ -504,6 +507,11 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact_stor
 // Contact Entries
 Route::get('admin/contacts', [ContactController::class, 'messageListing'])->name('contact-entries');
 Route::get('admin/contact/{id}', [ContactController::class, 'show'])->name('contact-show');
+
+//state city/////////
+
+Route::get('/state/address/{id}', [\App\Http\Controllers\Admin\AddressController::class, 'selectStates'])->name('state');
+Route::get('/city/address/{id}', [\App\Http\Controllers\Admin\AddressController::class, 'selectCity'])->name('city');
 
 // Search
 Route::get('/course-finder', [CourseFinderController::class, 'index'])->name('course-finder');

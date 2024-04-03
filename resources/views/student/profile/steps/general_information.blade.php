@@ -377,7 +377,7 @@
 
     function updateState(id) {
         getContent({
-            url: "{{ url('admin/state/address') }}" + "/" + id,
+            url: "{{ url('state/address') }}" + "/" + id,
             success: function(data) {
                 let html = '';
                 data.forEach(state => html += `<option value='${state.id}'>${state.name}</option>`);
@@ -390,7 +390,7 @@
 
     function updateCity(id) {
         getContent({
-            url: "{{ url('admin/city/address') }}" + '/' + id,
+            url: "{{ url('city/address') }}" + '/' + id,
             success: function(data) {
                 let html =
                     "<option value=''>--Select City --</option><option value='new-city'>Add New City</option>";

@@ -43,6 +43,13 @@
                                             @foreach ($study as $stddata)
                                                 @if (isset($stddata->id))
                                                     <option {{ $stddata->id == ($usedstudyareaid ?? '') ? 'selected' : '' }}
+                                                        @if (request()->has('studymostkeysearch')) @if (request()->get('studymostkeysearch') == $stddata->id)
+
+                                                        selected @endif
+                                                        @endif
+
+
+
                                                         value="{{ $stddata->id }}">
 
 
@@ -64,7 +71,15 @@
 
                                             @foreach ($substudy as $data)
                                                 @if (isset($data->id))
-                                                    <option value="{{ $data->id }}">{{ $data->name }}</option>
+                                                    <option value="{{ $data->id }}"
+                                                        @if (request()->has('substudymostkeysearch')) @if (request()->get('substudymostkeysearch') == $data->id)
+
+                                                        selected @endif
+                                                        @endif
+
+
+
+                                                        >{{ $data->name }}</option>
                                                 @endif
                                             @endforeach
                                         </select>
@@ -77,7 +92,8 @@
 
                                 </div>
 
-
+                                <a href="{{ route('admin.get_studyarea_data') }}" class="btn btn-primary mt-2">Export
+                                    Study Area Data</a>
 
                             </div>
                             <div class="table-responsive">

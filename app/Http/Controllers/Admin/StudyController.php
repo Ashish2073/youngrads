@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProgramArea;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use App\Exports\studyareaData;
 use Str;
 
 class StudyController extends Controller
@@ -303,4 +305,8 @@ class StudyController extends Controller
         return ['study'=>$study,'substudy'=>$sub_study];
     }
 
+
+    public function get_studyarea_data(){
+		return Excel::download(new studyareaData, 'studyareadata.xlsx');
+	} 
 }

@@ -13,37 +13,37 @@
     <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
     <style>
         /* .select2-results__option .wrap:before{
-                                  font-family:fontAwesome;
-                                  color:#999;
-                                  content:"\f096";
-                                  width:25px;
-                                  height:25px;
-                                  padding-right: 10px;
+                                                          font-family:fontAwesome;
+                                                          color:#999;
+                                                          content:"\f096";
+                                                          width:25px;
+                                                          height:25px;
+                                                          padding-right: 10px;
 
-                              }
-                              .select2-results__option[aria-selected=true] .wrap:before{
-                                  content:"\f14a";
-                              } */
+                                                      }
+                                                      .select2-results__option[aria-selected=true] .wrap:before{
+                                                          content:"\f14a";
+                                                      } */
         tr {
             box-shadow: 0 0.5rem 1rem rgba(34, 41, 47, 0.15) !important;
         }
 
         /* .bs-select-all, .bs-select-all:hover,.bs-deselect-all, .bs-deselect-all:hover  {
-                                background: white!important;
-                                color: black!important;
-                                border: 1px solid #babfc7 !important;
-                              }
-                              .dropdown-header {
-                                  font-weight: bold!important;
-                                  color: #626262;
-                                  cursor: pointer;
-                              }
-                              .dropdown .dropdown-menu::before {
-                                  content: unset!important;
-                              }
-                              .dropdown-toggle:focus {
-                                outline-color: white!important;
-                              } */
+                                                        background: white!important;
+                                                        color: black!important;
+                                                        border: 1px solid #babfc7 !important;
+                                                      }
+                                                      .dropdown-header {
+                                                          font-weight: bold!important;
+                                                          color: #626262;
+                                                          cursor: pointer;
+                                                      }
+                                                      .dropdown .dropdown-menu::before {
+                                                          content: unset!important;
+                                                      }
+                                                      .dropdown-toggle:focus {
+                                                        outline-color: white!important;
+                                                      } */
         ist-view.dataTable tbody tr,
         table.data-thumb-view.dataTable tbody tr {
             cursor: default;
@@ -481,21 +481,21 @@
     <!-- vendor files -->
     <script src="{{ asset(mix('vendors/js/extensions/wNumb.js')) }}"></script>
     <script src="{{ asset(mix('vendors/js/extensions/nouislider.min.js')) }}"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
-    {{-- <script src="{{ asset("js/scripts/select2.multi-checkboxes.js")}}"></script> --}}
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
+    <script src="{{ asset('js/scripts/select2.multi-checkboxes.js') }}"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script>
         // Chat Application
         (function($) {
@@ -629,7 +629,7 @@
                 })
                 // if(id != ''){
                 $.ajax({
-                    url: route('get-sub-areas'),
+                    url: "{{ route('get-sub-areas') }}",
                     type: 'post',
                     data: {
                         _token: "{{ csrf_token() }}",
@@ -803,7 +803,7 @@
                             d.order[0].dir = $("#sort-order").attr('data-val');
                         }
 
-                        console.log("Request", d);
+
                     },
                     beforeSend: function() {
                         $('.filter-title').append("   <i class='fa fa-spin fa-spinner'></i>");
@@ -953,8 +953,8 @@
             $(".univ-box").html(html);
         }
     </script>
-    
-    
+
+
     <script>
         $(document).ready(function() {
 
@@ -1071,10 +1071,10 @@
             }
         });
     </script>
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 @endsection

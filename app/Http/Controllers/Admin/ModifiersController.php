@@ -177,7 +177,7 @@ class ModifiersController extends Controller
                 $title_role="YGMODFIR";
             }
             $user->update([
-                'username' => strtoupper( $title_role.$user->id)
+                'username' => strtoupper($request->first_name.$title_role.$user->id)
 
             ]);
 

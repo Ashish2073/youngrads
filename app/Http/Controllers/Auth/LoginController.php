@@ -93,7 +93,8 @@ class LoginController extends Controller
     }
 
     public function providerCallback($provider)
-    {
+    { 
+
         $user = Socialite::driver($provider)->user();
 
         if ($provider == 'facebook') {
@@ -105,7 +106,7 @@ class LoginController extends Controller
 
         if ($findUser) {
             Auth::login($findUser);
-        } else {
+        } else { 
             
             $user_record = User::where('email', $user->email)->count();
             if($user_record > 0) {

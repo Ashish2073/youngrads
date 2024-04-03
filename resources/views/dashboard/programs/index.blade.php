@@ -31,7 +31,13 @@
                                                 <select id="programeid" name="programeid[]" data-live-search="true" multiple
                                                     class=" select form-control">
                                                     @foreach ($program as $prodata)
-                                                        <option value="{{ $prodata->id }}">{{ $prodata->name }}</option>
+                                                        <option value="{{ $prodata->id }}"
+                                                            @if (request()->has('promostkeysearch')) @if (request()->get('promostkeysearch') == $prodata->id)
+
+                                                              selected @endif
+                                                            @endif
+
+                                                            >{{ $prodata->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

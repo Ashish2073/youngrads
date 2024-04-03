@@ -119,7 +119,7 @@
                         // d.program = $('#program').val();
                         // d.country_id = $("#country").val();
                         console.log(d);
-                        d.what = $('#what').val();
+                        d.what = $('#what').val();  
                         d.where = $('#where').val();
                     }
                 },

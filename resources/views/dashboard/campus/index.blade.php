@@ -42,7 +42,14 @@
                                                 @if (isset($unvdata->id))
                                                     <option
                                                         {{ $unvdata->id == ($usedUniversityId ?? '') ? 'selected' : '' }}
-                                                        value="{{ $unvdata->id }}">{{ $unvdata->name }}</option>
+                                                        value="{{ $unvdata->id }}"
+                                                        @if (request()->has('univmostkeysearch')) @if (request()->get('univmostkeysearch') == $unvdata->id)
+                                                        selected @endif
+                                                        @endif
+
+
+
+                                                        >{{ $unvdata->name }}</option>
                                                 @endif
                                             @endforeach
                                         </select>
@@ -56,7 +63,14 @@
 
                                             @foreach ($campus as $camdata)
                                                 @if (isset($camdata->id))
-                                                    <option value="{{ $camdata->id }}">{{ $camdata->name }}</option>
+                                                    <option value="{{ $camdata->id }}"
+                                                        @if (request()->has('campmostkeysearch')) @if (request()->get('campmostkeysearch') == $camdata->id)
+                                                        selected @endif
+                                                        @endif
+
+
+
+                                                        >{{ $camdata->name }}</option>
                                                 @endif
                                             @endforeach
 
@@ -356,7 +370,7 @@
 
 
 
-                    url: "{{ url('admin/state/address') }}/" + id,
+                    url: "{{ url('state/address') }}/" + id,
                     success: function(data) {
 
                         let html = '';
@@ -376,7 +390,7 @@
                 window.id = $(this).val();
                 getContent({
 
-                    url: "{{ url('admin/city/address') }}/" + id,
+                    url: "{{ url('city/address') }}/" + id,
                     success: function(data) {
 
                         let html =
