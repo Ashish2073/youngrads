@@ -46,15 +46,15 @@ class CampusController extends Controller
     {
 
 
-        if(($request->get('universityid')!=null)|| ($request->get('campusid')!=null) || ($request->get('websitename')!=null)){
+        if(($request->get('universityid')!=null)|| ($request->get('campusname')!=null) || ($request->get('websitename')!=null)){
            
         
            
             $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
             ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
-            ->whereIn('campus.id', $request->get('campusid') ? $request->get('campusid') : [DB::raw('campus.id')])
+            ->whereIn('campus.name', $request->get('campusname') ? $request->get('campusname') : [DB::raw('campus.name')])
             ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
-             ->get();
+             ->get();  
 
             // if(count(json_decode($Campus,true))==0){
             //     $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
@@ -73,6 +73,8 @@ class CampusController extends Controller
             ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
             ->get();
         }
+
+
 
         if (request()->ajax()) {
 
@@ -131,7 +133,9 @@ class CampusController extends Controller
                 ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Campuses"]
             ];
             $university=University::select('id','name')->get(); 
-            $campus=Campus::select('id','name','website')->get();
+            $campus = Campus::select('name', 'id', 'website')
+            ->groupBy('name')
+            ->get();
             return view('dashboard.campus.index', [
                 'breadcrumbs' => $breadcrumbs,'university'=>$university,'campus'=>$campus,
             ]);

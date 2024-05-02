@@ -330,7 +330,7 @@
             <h4>Most Key Word Search</h4>
             <div class="row">
                 <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:120px">
-                    <a @if ($programNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.programs', ['promostkeysearch' => $programNameWithMaxSearchCount->id]) }}" @endif
+                    <a @if (($programNameWithMaxSearchCount->search_count ?? 0) > 0) href="{{ route('admin.programs', ['promostkeysearch' => $programNameWithMaxSearchCount->id]) }}" @endif
                         class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
@@ -341,7 +341,7 @@
                                         </div>
                                     </div>
                                     <h2 class="text-bold-700">
-                                        {{ $programNameWithMaxSearchCount->search_count > 0 ? $programNameWithMaxSearchCount->name : 'N/A' }}
+                                        {{ ($programNameWithMaxSearchCount->search_count ?? 0) > 0 ? $programNameWithMaxSearchCount->name : 'N/A' }}
                                     </h2>
                                     <p class="mb-0 line-ellipsis">Most Seached Program</p>
                                 </div>
@@ -353,7 +353,7 @@
 
 
                 <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:120px">
-                    <a @if ($universityNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.campuses', ['univmostkeysearch' => $universityNameWithMaxSearchCount->id]) }}" @endif
+                    <a @if (($universityNameWithMaxSearchCount->search_count ?? 0) > 0) href="{{ route('admin.campuses', ['univmostkeysearch' => $universityNameWithMaxSearchCount->id]) }}" @endif
                         class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
@@ -364,7 +364,7 @@
                                         </div>
                                     </div>
                                     <h2 class="text-bold-700">
-                                        {{ $universityNameWithMaxSearchCount->search_count > 0 ? $universityNameWithMaxSearchCount->name : 'N/A' }}
+                                        {{ ($universityNameWithMaxSearchCount->search_count ?? 0) > 0 ? $universityNameWithMaxSearchCount->name : 'N/A' }}
                                     </h2>
                                     <p class="mb-0 line-ellipsis">Most Seached University</p>
                                 </div>
@@ -373,7 +373,7 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:120px">
-                    <a @if ($campusNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.campuses', ['campmostkeysearch' => $campusNameWithMaxSearchCount->id]) }}" @endif
+                    <a @if (($campusNameWithMaxSearchCount->search_count ?? 0) > 0) href="{{ route('admin.campuses', ['campmostkeysearch' => $campusNameWithMaxSearchCount->id]) }}" @endif
                         class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
@@ -384,7 +384,7 @@
                                         </div>
                                     </div>
                                     <h2 class="text-bold-700">
-                                        {{ $campusNameWithMaxSearchCount->search_count > 0 ? $campusNameWithMaxSearchCount->name : 'N/A' }}
+                                        {{ ($campusNameWithMaxSearchCount->search_count ?? 0) > 0 ? $campusNameWithMaxSearchCount->name : 'N/A' }}
                                     </h2>
                                     <p class="mb-0 line-ellipsis">Most Seached Campus</p>
                                 </div>
@@ -394,7 +394,7 @@
                 </div>
 
                 <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:120px">
-                    <a @if ($studyNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.studies', ['studymostkeysearch' => $studyNameWithMaxSearchCount->id]) }}" @endif
+                    <a @if ($studyNameWithMaxSearchCount->search_count ?? 0 > 0) href="{{ route('admin.studies', ['studymostkeysearch' => $studyNameWithMaxSearchCount->id]) }}" @endif
                         class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
@@ -405,7 +405,7 @@
                                         </div>
                                     </div>
                                     <h2 class="text-bold-700">
-                                        {{ $studyNameWithMaxSearchCount->search_count > 0 ? $studyNameWithMaxSearchCount->name : 'N/A' }}
+                                        {{ ($studyNameWithMaxSearchCount->search_count ?? 0) > 0 ? $studyNameWithMaxSearchCount->name : 'N/A' }}
                                     </h2>
                                     <p class="mb-0 line-ellipsis">Most Seached Study Area</p>
                                 </div>
@@ -416,7 +416,7 @@
 
 
                 <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:120px">
-                    <a @if ($disciplineAreaNameWithMaxSearchCount->search_count > 0) href="{{ route('admin.studies', ['substudymostkeysearch' => $disciplineAreaNameWithMaxSearchCount->id]) }}" @endif
+                    <a @if (($disciplineAreaNameWithMaxSearchCount->search_count ?? 0) > 0) href="{{ route('admin.studies', ['substudymostkeysearch' => $disciplineAreaNameWithMaxSearchCount->id]) }}" @endif
                         class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
@@ -427,7 +427,7 @@
                                         </div>
                                     </div>
                                     <h2 class="text-bold-700">
-                                        {{ $disciplineAreaNameWithMaxSearchCount->search_count > 0 ? $disciplineAreaNameWithMaxSearchCount->name : 'N/A' }}
+                                        {{ ($disciplineAreaNameWithMaxSearchCount->search_count ?? 0) > 0 ? $disciplineAreaNameWithMaxSearchCount->name : 'N/A' }}
                                     </h2>
                                     <p class="mb-0 line-ellipsis">Most Seached discipline Study Area</p>
                                 </div>
@@ -442,7 +442,7 @@
 
                 <div class="col-xl-3 col-md-4 col-sm-6 " style="margin-bottom:120px">
 
-                    <a @if ($countryNameWithMaxSearchCount->search_count > 0) href="#" @endif class="card text-center box">
+                    <a @if (($countryNameWithMaxSearchCount->search_count ?? 0) > 0) href="#" @endif class="card text-center box">
                         <div class="card text-center">
                             <div class="card-content">
                                 <div class="card-body">
@@ -452,7 +452,7 @@
                                         </div>
                                     </div>
                                     <h2 class="text-bold-700">
-                                        {{ $countryNameWithMaxSearchCount->search_count > 0 ? $countryNameWithMaxSearchCount->name : 'N/A' }}
+                                        {{ ($countryNameWithMaxSearchCount->search_count ?? 0) > 0 ? $countryNameWithMaxSearchCount->name : 'N/A' }}
                                     </h2>
                                     <p class="mb-0 line-ellipsis">Most Seached Country </p>
                                 </div>

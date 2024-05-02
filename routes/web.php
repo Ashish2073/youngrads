@@ -58,7 +58,7 @@ use App\Http\Controllers\Admin\ModeratorController;
 |
 */
 
-
+Route::post('/early-access', [App\Http\Controllers\HomeController::class, 'earlyaccess'])->name('earlyaccess');
 
 Route::group(['middleware' => 'prevent-back-history'], function () {
     Auth::routes(['verify' => true]);
@@ -81,8 +81,8 @@ Route::name('auth.')->namespace('Auth')->group(function () {
 
 
 // Modifiers///
-Route::prefix('/modifier')->name('modifier.')->namespace('Modifier')->group(function (){
-    Route::namespace('Auth')->group(function () { 
+Route::prefix('/modifier')->name('modifier.')->namespace('Modifier')->group(function () {
+    Route::namespace ('Auth')->group(function () {
         Route::get('/login', [App\Http\Controllers\Modifier\Auth\LoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [App\Http\Controllers\Modifier\Auth\LoginController::class, 'login']);
         Route::post('/logout', [App\Http\Controllers\Modifier\Auth\LoginController::class, 'logout'])->name('logout');
@@ -96,8 +96,8 @@ Route::prefix('/modifier')->name('modifier.')->namespace('Modifier')->group(func
  */
 Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     //All the admin routes will be defined here...
-    Route::namespace('Auth')->group(function () { 
-        
+    Route::namespace ('Auth')->group(function () {
+
         //Login Routes
         Route::get('/login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'login']);
@@ -115,384 +115,386 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function () {
     });
     // Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth:admin')->middleware('checkrole');
-  Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin')->middleware('checkrole');
+    Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth:admin')->middleware('checkrole');
 
     // Activities
-    Route::middleware(['checkrole'])->group(function(){
-        
-    
-    Route::resource('/activity', '\App\Http\Controllers\Admin\ActivityController', [
-        'names' => [ 
-            'index' => 'activities',
-            'show' => 'activity.show'
-        ]
-    ]);
-
-    // Import Routes
-    Route::get('import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index')->middleware('userspermission:import_data_view')->middleware('checkrole');
-    Route::post('import/univ-campus', [App\Http\Controllers\Admin\ImportController::class, 'importUnivCampus'])->name('import.univ_campus');
-    Route::post('import/programs', [App\Http\Controllers\Admin\ImportController::class, 'importPrograms'])->name('import.programs');
-  
-    // Profile
-    Route::resource('profile', '\App\Http\Controllers\Admin\ProfileController', [
-        'names' => [
-            'edit' => 'profile',
-            'update' => 'profile.update'
-        ]
-    ]);
-
-    Route::post('/profile', [AdminController::class, 'chageProfilePic'])->name('profilePic');
-
-    // User Management
-    Route::resource('users', '\App\Http\Controllers\Admin\AdminController', [
-        'names' => [
-            'index' => 'users',
-            'create' => 'user.create',
-            'edit' => 'user.edit', 
-            'update' => 'user.update',
-            'store' => 'user.store',
-            'destroy' => 'user.destroy' 
-        ]
-    ]);
-  //Modifiers Mangment
-  Route::resource('modifiers', '\App\Http\Controllers\Admin\ModifiersController',[
-    'names' => [
-        'index' => 'modifiers', 
-        'create' => 'modifier.create',
-        'edit' => 'modifier.edit',
-        'update' => 'modifier.update',
-        'store' => 'modifier.store',
-        'destroy' => 'modifier.destroy'
-    ]
-]);
-
-Route::post('user-roles',[\App\Http\Controllers\Admin\ModifiersController::class,'userRoles'])->name('user-roles');
+    Route::middleware(['checkrole'])->group(function () {
 
 
-  ////// Moderator -supermoderator
+        Route::resource('/activity', '\App\Http\Controllers\Admin\ActivityController', [
+            'names' => [
+                'index' => 'activities',
+                'show' => 'activity.show'
+            ]
+        ]);
 
-  Route::resource('moderators', '\App\Http\Controllers\Admin\ModeratorController',[
-    'names' => [
-        'index' => 'moderators', 
-        'create' => 'moderator.create',
-        'edit' => 'moderator.edit',
-        'update' => 'moderator.update',
-        'store' => 'moderator.store',
-        'destroy' => 'moderator.destroy'
-    ]
-]);
+        // Import Routes
+        Route::get('import', [App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index')->middleware('userspermission:import_data_view')->middleware('checkrole');
+        Route::post('import/univ-campus', [App\Http\Controllers\Admin\ImportController::class, 'importUnivCampus'])->name('import.univ_campus');
+        Route::post('import/programs', [App\Http\Controllers\Admin\ImportController::class, 'importPrograms'])->name('import.programs');
 
+        // Profile
+        Route::resource('profile', '\App\Http\Controllers\Admin\ProfileController', [
+            'names' => [
+                'edit' => 'profile',
+                'update' => 'profile.update'
+            ]
+        ]);
 
+        Route::post('/profile', [AdminController::class, 'chageProfilePic'])->name('profilePic');
 
+        // User Management
+        Route::resource('users', '\App\Http\Controllers\Admin\AdminController', [
+            'names' => [
+                'index' => 'users',
+                'create' => 'user.create',
+                'edit' => 'user.edit',
+                'update' => 'user.update',
+                'store' => 'user.store',
+                'destroy' => 'user.destroy'
+            ]
+        ]);
+        //Modifiers Mangment
+        Route::resource('modifiers', '\App\Http\Controllers\Admin\ModifiersController', [
+            'names' => [
+                'index' => 'modifiers',
+                'create' => 'modifier.create',
+                'edit' => 'modifier.edit',
+                'update' => 'modifier.update',
+                'store' => 'modifier.store',
+                'destroy' => 'modifier.destroy'
+            ]
+        ]);
 
-    Route::resource('roles', '\App\Http\Controllers\Admin\RoleController', [
-        'names' => [
-            'index' => 'roles',
-            'create' => 'role.create',
-            'edit' => 'role.edit',
-            'update' => 'role.update',
-            'store' => 'role.store',
-            'destroy' => 'role.destroy'
-        ]
-    ]);
-
-    // Logs
-    Route::get('/log', 'LogController@index');
-
-    // Student Management
-    Route::resource('students', '\App\Http\Controllers\Admin\StudentController', [
-        'names' => [
-            'index' => 'students',
-            'create' => 'student.create',
-            'edit' => 'student.edit',
-            'update' => 'student.update',
-            'store' => 'student.store',
-            'destroy' => 'student.destroy'
-        ]
-    ]);
-
-    Route::post('moderator-assign-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_assign_to_students'])->name('moderator-assign-students');
-    Route::post('supermoderator-assign-moderators',[\App\Http\Controllers\Admin\ModeratorController::class,'supermoderator_assign_to_moderators'])->name('supermoderator-assign-moderators');
-    
-    
-    Route::post('moderator-dissociate-students',[\App\Http\Controllers\Admin\StudentController::class,'moderator_dissociate_to_students'])->name('moderator-dissociate-students');
- 
-    Route::post('supermoderator-dissociate-moderators',[\App\Http\Controllers\Admin\ModeratorController::class,'supermoderator_dissociate_to_moderators'])->name('supermoderator-dissociate-moderators');
-
-    Route::post('students-data-filter',[\App\Http\Controllers\Admin\StudentController::class,'filterstudentdata'])->name('students-data-filter');
-
-    Route::get('students-data-export', [App\Http\Controllers\Admin\StudentController::class, 'get_student_data'])->name('students-data-export');
-
-    //shortlist
-    Route::get('/shortlist-courses/{id}', [StudentController::class, 'shortlistApplication'])->name('shortlist-courses');
-
-    // Unviersites Management
-    Route::resource('universities', '\App\Http\Controllers\Admin\UniversityController', [
-        'names' => [
-            'index' => 'universities',
-            'create' => 'university.create',
-            'edit' => 'university.edit',
-            'update' => 'university.update',
-            'store' => 'university.store',
-            'destroy' => 'university.destroy'
-        ]
-    ]);
-
-    // Campus Management
-    Route::resource('campus', '\App\Http\Controllers\Admin\CampusController', [
-        'names' => [
-            'index' => 'campuses',
-            'create' => 'campus.create',  
-            'edit' => 'campus.edit',
-            'update' => 'campus.update',
-            'store' => 'campus.store',
-            'destroy' => 'campus.destroy'
-        ]
-    ]);
-    Route::get('/campus-details/{id}', [CampusController::class, 'addDetails'])->name('campus-details');
-    Route::post('/campus-details', [CampusController::class, 'saveDetails'])->name('save-details');
-    Route::get('/getexcel', [CampusController::class, 'excelImport']);
+        Route::post('user-roles', [\App\Http\Controllers\Admin\ModifiersController::class, 'userRoles'])->name('user-roles');
 
 
-    //Pages Management
-    Route::resource('pages', '\App\Http\Controllers\Admin\PageController', [
-        'names' => [
-            'index' => 'pages',
-            'create' => 'page.create',
-            'edit' => 'page.edit', 
-            'update' => 'page.update',
-            'store' => 'page.store',
-            'destroy' => 'page.destroy'
-        ]
-    ]);
+        ////// Moderator -supermoderator
 
-    Route::get('page/{url}', [PageController::class, 'page'])->name('test');
-
-    //Program Level
-
-    Route::resource('programlevel', '\App\Http\Controllers\Admin\ProgramLevelController', [
-        'names' => [
-            'index' => 'programlevels',
-            'create' => 'programlevel.create',
-            'edit' => 'programlevel.edit',
-            'update' => 'programlevel.update',
-            'store' => 'programlevel.store',
-            'destroy' => 'programlevel.destroy'
-        ]
-    ]);
-
-    //Study Area
+        Route::resource('moderators', '\App\Http\Controllers\Admin\ModeratorController', [
+            'names' => [
+                'index' => 'moderators',
+                'create' => 'moderator.create',
+                'edit' => 'moderator.edit',
+                'update' => 'moderator.update',
+                'store' => 'moderator.store',
+                'destroy' => 'moderator.destroy'
+            ]
+        ]);
 
 
 
-    Route::resource('study', '\App\Http\Controllers\Admin\StudyController', [
-        'names' => [
-            'index' => 'studies',
-            'create' => 'study.create',
-            'edit' => 'study.edit',
-            'update' => 'study.update',
-            'store' => 'study.store',
-            'destroy' => 'study.destroy' 
-        ]
-    ]);
 
-    Route::post('study-to-substudy',[\App\Http\Controllers\Admin\StudyController::class,'studytosubstudy'])->name('study-to-substudy');
-    //Fee_type
-    Route::post('reset-study-area-filter',[\App\Http\Controllers\Admin\StudyController::class,'resetstudyarea'])->name('reset-study-area-filter');
+        Route::resource('roles', '\App\Http\Controllers\Admin\RoleController', [
+            'names' => [
+                'index' => 'roles',
+                'create' => 'role.create',
+                'edit' => 'role.edit',
+                'update' => 'role.update',
+                'store' => 'role.store',
+                'destroy' => 'role.destroy'
+            ]
+        ]);
 
-    Route::get('studyarea-data-export', [\App\Http\Controllers\Admin\StudyController::class, 'get_studyarea_data'])->name('get_studyarea_data');
+        // Logs
+        Route::get('/log', 'LogController@index');
 
+        // Student Management
+        Route::resource('students', '\App\Http\Controllers\Admin\StudentController', [
+            'names' => [
+                'index' => 'students',
+                'create' => 'student.create',
+                'edit' => 'student.edit',
+                'update' => 'student.update',
+                'store' => 'student.store',
+                'destroy' => 'student.destroy'
+            ]
+        ]);
 
-
-    Route::resource('feetype', '\App\Http\Controllers\Admin\FeeTypeController', [
-        'names' => [
-            'index' => 'feetypes',
-            'create' => 'feetype.create',
-            'edit' => 'feetype.edit',
-            'update' => 'feetype.update',
-            'store' => 'feetype.store',
-            'destroy' => 'feetype.destroy'
-        ]
-    ]);
-
-    //test
-
-    Route::resource('test', '\App\Http\Controllers\Admin\TestController', [
-        'names' => [
-            'index' => 'tests',
-            'create' => 'test.create',
-            'edit' => 'test.edit',
-            'update' => 'test.update',
-            'store' => 'test.store',
-            'destroy' => 'test.destroy'
-        ]
-    ]);
+        Route::post('moderator-assign-students', [\App\Http\Controllers\Admin\StudentController::class, 'moderator_assign_to_students'])->name('moderator-assign-students');
+        Route::post('supermoderator-assign-moderators', [\App\Http\Controllers\Admin\ModeratorController::class, 'supermoderator_assign_to_moderators'])->name('supermoderator-assign-moderators');
 
 
-    //intake
+        Route::post('moderator-dissociate-students', [\App\Http\Controllers\Admin\StudentController::class, 'moderator_dissociate_to_students'])->name('moderator-dissociate-students');
 
-    Route::resource('intake', '\App\Http\Controllers\Admin\IntakeController', [
-        'names' => [
-            'index' => 'intakes',
-            'create' => 'intake.create',
-            'edit' => 'intake.edit',
-            'update' => 'intake.update',
-            'store' => 'intake.store',
-            'destroy' => 'intake.destroy'
-        ]
-    ]);
+        Route::post('supermoderator-dissociate-moderators', [\App\Http\Controllers\Admin\ModeratorController::class, 'supermoderator_dissociate_to_moderators'])->name('supermoderator-dissociate-moderators');
 
-    //curruncy
+        Route::post('students-data-filter', [\App\Http\Controllers\Admin\StudentController::class, 'filterstudentdata'])->name('students-data-filter');
 
-    Route::resource('currency', '\App\Http\Controllers\Admin\CurrencyController', [
-        'names' => [
-            'index' => 'currencies',
-            'create' => 'currency.create',
-            'edit' => 'currency.edit',
-            'update' => 'currency.update',
-            'store' => 'currency.store',
-            'destroy' => 'currency.destroy'
-        ]
-    ]);
+        Route::get('students-data-export', [App\Http\Controllers\Admin\StudentController::class, 'get_student_data'])->name('students-data-export');
 
-    //program
-    Route::resource('program', '\App\Http\Controllers\Admin\ProgramController', [
-        'names' => [
-            'index' => 'programs',
-            'create' => 'program.create',
-            'edit' => 'program.edit',
-            'update' => 'program.update',
-            'store' => 'program.store',
-            'destroy' => 'program.destroy'
-        ]
-    ]);
+        //shortlist
+        Route::get('/shortlist-courses/{id}', [StudentController::class, 'shortlistApplication'])->name('shortlist-courses');
 
-    //campus program
-    Route::resource('campus-program', '\App\Http\Controllers\Admin\CampusProgramController', [
-        'names' => [
-            'index' => 'campus-programs',
-            'create' => 'campus-program.create',
-            'edit' => 'campus-program.edit',
-            'update' => 'campus-program.update',
-            'store' => 'campus-program.store',
-            'destroy' => 'campus-program.destroy'
-        ]
-    ]);
+        // Unviersites Management
+        Route::resource('universities', '\App\Http\Controllers\Admin\UniversityController', [
+            'names' => [
+                'index' => 'universities',
+                'create' => 'university.create',
+                'edit' => 'university.edit',
+                'update' => 'university.update',
+                'store' => 'university.store',
+                'destroy' => 'university.destroy'
+            ]
+        ]);
 
-    Route::post('university-campus-relation',[\App\Http\Controllers\Admin\CampusProgramController::class,'universitycampus'])->name('university-to-campus');
+        // Campus Management
+        Route::resource('campus', '\App\Http\Controllers\Admin\CampusController', [
+            'names' => [
+                'index' => 'campuses',
+                'create' => 'campus.create',
+                'edit' => 'campus.edit',
+                'update' => 'campus.update',
+                'store' => 'campus.store',
+                'destroy' => 'campus.destroy'
+            ]
+        ]);
+        Route::get('/campus-details/{id}', [CampusController::class, 'addDetails'])->name('campus-details');
+        Route::post('/campus-details', [CampusController::class, 'saveDetails'])->name('save-details');
+        Route::get('/getexcel', [CampusController::class, 'excelImport']);
 
-    Route::post('reset-filter',[\App\Http\Controllers\Admin\CampusProgramController::class,'resetData'])->name('reset-filter');
-    //document type
-    Route::resource('document-type', '\App\Http\Controllers\Admin\DocumentTypeController', [
-        'names' => [
-            'index' => 'document-types',
-            'create' => 'document-type.create',
-            'edit' => 'document-type.edit',
-            'update' => 'document-type.update',
-            'store' => 'document-type.store',
-            'destroy' => 'document-type.destroy'
-        ]
-    ]);
 
-    //country
-    Route::resource('country', '\App\Http\Controllers\Admin\CountryController', [
-        'names' => [
-            'index' => 'countries',
-            'create' => 'country.create',
-            'edit' => 'country.edit',
-            'update' => 'country.update',
-            'store' => 'country.store',
-            'destroy' => 'country.destroy'
-        ]
-    ]);
+        //Pages Management
+        Route::resource('pages', '\App\Http\Controllers\Admin\PageController', [
+            'names' => [
+                'index' => 'pages',
+                'create' => 'page.create',
+                'edit' => 'page.edit',
+                'update' => 'page.update',
+                'store' => 'page.store',
+                'destroy' => 'page.destroy'
+            ]
+        ]);
 
-    //state
-    Route::resource('state', '\App\Http\Controllers\Admin\StateController', [
-        'names' => [
-            'index' => 'states',
-            'create' => 'state.create',
-            'edit' => 'state.edit',
-            'update' => 'state.update',
-            'store' => 'state.store',
-            'destroy' => 'state.destroy'
-        ]
-    ]);
+        Route::get('page/{url}', [PageController::class, 'page'])->name('test');
 
-    //state
-    Route::resource('city', '\App\Http\Controllers\Admin\CityController', [
-        'names' => [
-            'index' => 'cities',
-            'create' => 'city.create',
-            'edit' => 'city.edit',
-            'update' => 'city.update',
-            'store' => 'city.store',
-            'destroy' => 'city.destroy'
-        ]
-    ]);
+        //Program Level
 
-    //ApplicationDocuments
-    Route::resource('application-document', '\App\Http\Controllers\Admin\ApplicationDocumentController', [
-        'names' => [
-            'index' => 'application-documents',
-            'create' => 'application-document.create',
-            'edit' => 'application-document.edit',
-            'update' => 'application-document.update',
-            'store' => 'application-document.store',
-            'destroy' => 'application-document.destroy'
-        ]
-    ]);
+        Route::resource('programlevel', '\App\Http\Controllers\Admin\ProgramLevelController', [
+            'names' => [
+                'index' => 'programlevels',
+                'create' => 'programlevel.create',
+                'edit' => 'programlevel.edit',
+                'update' => 'programlevel.update',
+                'store' => 'programlevel.store',
+                'destroy' => 'programlevel.destroy'
+            ]
+        ]);
+
+        //Study Area
 
 
 
-    Route::get('/get-campus/{id}', [CampusProgramController::class, 'getCampus'])->name('get-campus');
+        Route::resource('study', '\App\Http\Controllers\Admin\StudyController', [
+            'names' => [
+                'index' => 'studies',
+                'create' => 'study.create',
+                'edit' => 'study.edit',
+                'update' => 'study.update',
+                'store' => 'study.store',
+                'destroy' => 'study.destroy'
+            ]
+        ]);
 
-    //excel importing
-    Route::get('/excelimport', [HomeController::class, 'excelForm'])->name('exceform');
-    Route::post('/excelimport', [HomeController::class, 'importExcel'])->name('storeform');
+        Route::post('study-to-substudy', [\App\Http\Controllers\Admin\StudyController::class, 'studytosubstudy'])->name('study-to-substudy');
+        //Fee_type
+        Route::post('reset-study-area-filter', [\App\Http\Controllers\Admin\StudyController::class, 'resetstudyarea'])->name('reset-study-area-filter');
 
-    //address route
-   
- 
-    //application route 
-    Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all');
-    
-     Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
-    
-     Route::get('students-application-export', [ApplicationController::class, 'get_student_application_data'])->name('students-application-export');
-    
-    
-    Route::get('applications-all/favourite', [ApplicationController::class, 'index'])->name('favorite-applicatons');
-    Route::get('applications-all/inactive-application', [ApplicationController::class, 'index'])->name('inactive-applicatons');
-    Route::get('application/{id}/message', [ApplicationController::class, 'applicationMessage'])->name('applicaton-message-admin');
-    Route::get('application-status/{id}', [ApplicationController::class, 'status'])->name('application-status');
-    Route::post('application-status', [ApplicationController::class, 'updateStatus'])->name('update-status');
-    //favorite
-    Route::post('application-favorite', [ApplicationController::class, 'setFavorite'])->name('application-favorite');
-    //priority
-    Route::post('student-priority', [ApplicationController::class, 'setPriority'])->name('student-priority');
-    //delete
-    Route::delete('application-delete/{id}', [ApplicationController::class, 'destroy'])->name('application-delete');
-    Route::get('application-toggle-status/{id}', [ApplicationController::class, 'toggleAdminStatus'])->name('application-toggle-status');
+        Route::get('studyarea-data-export', [\App\Http\Controllers\Admin\StudyController::class, 'get_studyarea_data'])->name('get_studyarea_data');
 
-    //admin notificaton
-    Route::get('/notifications', [AdminNotification::class, 'index'])->name('notifications');
-    Route::post('/notifications', [AdminNotification::class, 'markRead'])->name('mark-read');
 
-    Route::get('/testchat', function () {
 
-        $pageConfigs = [
-            'pageHeader' => false,
-            'contentLayout' => "content-left-sidebar",
-            'bodyClass' => 'chat-application',
-        ];
+        Route::resource('feetype', '\App\Http\Controllers\Admin\FeeTypeController', [
+            'names' => [
+                'index' => 'feetypes',
+                'create' => 'feetype.create',
+                'edit' => 'feetype.edit',
+                'update' => 'feetype.update',
+                'store' => 'feetype.store',
+                'destroy' => 'feetype.destroy'
+            ]
+        ]);
 
-        return view('chat_test', compact('pageConfig'));
+        //test
+
+        Route::resource('test', '\App\Http\Controllers\Admin\TestController', [
+            'names' => [
+                'index' => 'tests',
+                'create' => 'test.create',
+                'edit' => 'test.edit',
+                'update' => 'test.update',
+                'store' => 'test.store',
+                'destroy' => 'test.destroy'
+            ]
+        ]);
+
+
+
+
+        //intake
+
+        Route::resource('intake', '\App\Http\Controllers\Admin\IntakeController', [
+            'names' => [
+                'index' => 'intakes',
+                'create' => 'intake.create',
+                'edit' => 'intake.edit',
+                'update' => 'intake.update',
+                'store' => 'intake.store',
+                'destroy' => 'intake.destroy'
+            ]
+        ]);
+
+        //curruncy
+
+        Route::resource('currency', '\App\Http\Controllers\Admin\CurrencyController', [
+            'names' => [
+                'index' => 'currencies',
+                'create' => 'currency.create',
+                'edit' => 'currency.edit',
+                'update' => 'currency.update',
+                'store' => 'currency.store',
+                'destroy' => 'currency.destroy'
+            ]
+        ]);
+
+        //program
+        Route::resource('program', '\App\Http\Controllers\Admin\ProgramController', [
+            'names' => [
+                'index' => 'programs',
+                'create' => 'program.create',
+                'edit' => 'program.edit',
+                'update' => 'program.update',
+                'store' => 'program.store',
+                'destroy' => 'program.destroy'
+            ]
+        ]);
+
+        //campus program
+        Route::resource('campus-program', '\App\Http\Controllers\Admin\CampusProgramController', [
+            'names' => [
+                'index' => 'campus-programs',
+                'create' => 'campus-program.create',
+                'edit' => 'campus-program.edit',
+                'update' => 'campus-program.update',
+                'store' => 'campus-program.store',
+                'destroy' => 'campus-program.destroy'
+            ]
+        ]);
+
+        Route::post('university-campus-relation', [\App\Http\Controllers\Admin\CampusProgramController::class, 'universitycampus'])->name('university-to-campus');
+
+        Route::post('reset-filter', [\App\Http\Controllers\Admin\CampusProgramController::class, 'resetData'])->name('reset-filter');
+        //document type
+        Route::resource('document-type', '\App\Http\Controllers\Admin\DocumentTypeController', [
+            'names' => [
+                'index' => 'document-types',
+                'create' => 'document-type.create',
+                'edit' => 'document-type.edit',
+                'update' => 'document-type.update',
+                'store' => 'document-type.store',
+                'destroy' => 'document-type.destroy'
+            ]
+        ]);
+
+        //country
+        Route::resource('country', '\App\Http\Controllers\Admin\CountryController', [
+            'names' => [
+                'index' => 'countries',
+                'create' => 'country.create',
+                'edit' => 'country.edit',
+                'update' => 'country.update',
+                'store' => 'country.store',
+                'destroy' => 'country.destroy'
+            ]
+        ]);
+
+        //state
+        Route::resource('state', '\App\Http\Controllers\Admin\StateController', [
+            'names' => [
+                'index' => 'states',
+                'create' => 'state.create',
+                'edit' => 'state.edit',
+                'update' => 'state.update',
+                'store' => 'state.store',
+                'destroy' => 'state.destroy'
+            ]
+        ]);
+
+        //state
+        Route::resource('city', '\App\Http\Controllers\Admin\CityController', [
+            'names' => [
+                'index' => 'cities',
+                'create' => 'city.create',
+                'edit' => 'city.edit',
+                'update' => 'city.update',
+                'store' => 'city.store',
+                'destroy' => 'city.destroy'
+            ]
+        ]);
+
+        //ApplicationDocuments
+        Route::resource('application-document', '\App\Http\Controllers\Admin\ApplicationDocumentController', [
+            'names' => [
+                'index' => 'application-documents',
+                'create' => 'application-document.create',
+                'edit' => 'application-document.edit',
+                'update' => 'application-document.update',
+                'store' => 'application-document.store',
+                'destroy' => 'application-document.destroy'
+            ]
+        ]);
+
+
+
+        Route::get('/get-campus/{id}', [CampusProgramController::class, 'getCampus'])->name('get-campus');
+
+        //excel importing
+        Route::get('/excelimport', [HomeController::class, 'excelForm'])->name('exceform');
+        Route::post('/excelimport', [HomeController::class, 'importExcel'])->name('storeform');
+
+        //address route
+
+
+        //application route 
+        Route::get('applications-all', [ApplicationController::class, 'index'])->name('applications-all');
+
+        Route::post('number-application-allow', [ApplicationController::class, 'applicationallow'])->name('number-application-allow');
+
+        Route::get('students-application-export', [ApplicationController::class, 'get_student_application_data'])->name('students-application-export');
+
+
+        Route::get('applications-all/favourite', [ApplicationController::class, 'index'])->name('favorite-applicatons');
+        Route::get('applications-all/inactive-application', [ApplicationController::class, 'index'])->name('inactive-applicatons');
+        Route::get('application/{id}/message', [ApplicationController::class, 'applicationMessage'])->name('applicaton-message-admin');
+        Route::get('application-status/{id}', [ApplicationController::class, 'status'])->name('application-status');
+        Route::post('application-status', [ApplicationController::class, 'updateStatus'])->name('update-status');
+        //favorite
+        Route::post('application-favorite', [ApplicationController::class, 'setFavorite'])->name('application-favorite');
+        //priority
+        Route::post('student-priority', [ApplicationController::class, 'setPriority'])->name('student-priority');
+        //delete
+        Route::delete('application-delete/{id}', [ApplicationController::class, 'destroy'])->name('application-delete');
+        Route::get('application-toggle-status/{id}', [ApplicationController::class, 'toggleAdminStatus'])->name('application-toggle-status');
+
+        //admin notificaton
+        Route::get('/notifications', [AdminNotification::class, 'index'])->name('notifications');
+        Route::post('/notifications', [AdminNotification::class, 'markRead'])->name('mark-read');
+
+        Route::get('/testchat', function () {
+
+            $pageConfigs = [
+                'pageHeader' => false,
+                'contentLayout' => "content-left-sidebar",
+                'bodyClass' => 'chat-application',
+            ];
+
+            return view('chat_test', compact('pageConfig'));
+        });
+
+        Route::get('/test-campus', function () {
+            return view('dashboard.campus.campus_details');
+        });
     });
-
-    Route::get('/test-campus', function () {
-        return view('dashboard.campus.campus_details');
-    });
-});
 
 });
 
@@ -594,7 +596,7 @@ Route::resource('other-document', '\App\Http\Controllers\OtherDocumentController
 Route::get('shortlist-programs', [UserShortlistProgramController::class, 'index'])->name('shortlist-programs');
 Route::post('shortlist-programs-add', [UserShortlistProgramController::class, 'addProgram'])->name('shortlist-programs-add');
 Route::post('shortlist-programs-remove', [UserShortlistProgramController::class, 'removeProgram'])->name('shortlist-programs-remove');
- 
+
 
 
 //auto complete ajax

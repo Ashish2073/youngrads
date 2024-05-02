@@ -26,6 +26,17 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
     public function collection(Collection $records)
     {
 
+    
+
+        // remove those item which have hole value is null////
+        $records = $records->reject(function ($item) {
+            return empty(array_filter($item->all(), function ($value) {
+                return !is_null($value);
+            }));
+        });
+
+    
+      
         $userrole=json_decode(auth('admin')->user()->getRoleNames(),true);
 
 
@@ -34,6 +45,7 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
 
         $univsNameIdArr = University::getNameIdIndexedArray();
        
+ 
         $univIdCampusNameArr = Campus::getUnivIdCampusNameArr(); 
         $countryNameIdArr = Country::getCountryIdNameArr();
         $stateNameIdArr = State::getStateNameIdArr();  
@@ -43,33 +55,33 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
         $rowNumber = 1;
 
        
+           
            foreach($records as $record){
+        
+            $rowNumber++;
             if(!isset($record['university'])){
+                
                 Log::debug('University  not given !' . json_encode($record));
                 $sheetError[] = [
                 'message' => 'University not given!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+            
             
 
-            }else{
-               continue; 
             }
             if(!isset($record['campus'])){
 
-                Log::debug('University  not given !' . json_encode($record));
+                Log::debug('campus  not given !' . json_encode($record));
                 $sheetError[] = [
-                'message' => 'University not given!',
+                'message' => 'campus not given!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
 
 
-            }else{
-                continue;
+
             }
 
             if(!isset($record['country'])){
@@ -80,13 +92,10 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+            
 
 
-            }else{
-                continue;
             }
-
             if(!isset($record['country'])){
 
                 Log::debug('Country  not given !' . json_encode($record));
@@ -95,59 +104,47 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+    
 
 
-            }else{
-                continue;
             }
-
             if(!isset($record['city'])){
 
                 Log::debug('City  not given !' . json_encode($record));
                 $sheetError[] = [
-                'message' => 'Country not given!',
+                'message' => 'City not given!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
 
 
-            }else{
-                continue;
+
             }
-
             if(!isset($record['postcode'])){
 
-                Log::debug('State  not given !' . json_encode($record));
+                Log::debug('postcode  not given !' . json_encode($record));
                 $sheetError[] = [
-                'message' => 'Country not given!',
+                'message' => 'postcode not given!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
+    
 
 
-            }else{
-                continue;
             }
-
             
             if(!isset($record['state'])){
 
                 Log::debug('State  not given !' . json_encode($record));
                 $sheetError[] = [
-                'message' => 'Country not given!',
+                'message' => 'state not givennnnn!',
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
 
 
-            }else{
-                continue;
+
             }
-
               
             if(!isset($record['address'])){
 
@@ -157,36 +154,36 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 'record' => $record,
                 'rowNumber' => $rowNumber,
             ];
-            break;
 
 
-            }else{
-                continue;
+
             }
-
 
 
            }
         
-          
+    
        if(empty($sheetError)){
-        $rowNumber=1;
+        $sheetError = []; 
+        $rowNumber = 1;
+        
        
         foreach ($records as $record) {
-             // University Record
+             
              $rowNumber++;
 
-
-
             if(isset($record['university'])){
-            if (!isset($univsNameIdArr[trim(strtolower($record['university']))])) {
+
+              
+
+            if (!isset($univsNameIdArr[stripslashes(trim(strtolower($record['university'])))])) {
                 $university = new University;
             } else {
-                $university = University::find($univsNameIdArr[trim(strtolower($record['university']))]);
+                $university = University::find($univsNameIdArr[stripslashes(trim(strtolower($record['university'])))]);
             }
 
-            $university->name = $record['university'];
-            $university->type = $record['type'];
+            $university->name = stripslashes(trim(($record['university'])));
+            $university->type = $record['type']?? null;
             $university->save();
             
             $univsNameIdArr[strtolower($university->name)] = $university->id;
@@ -204,29 +201,29 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
         
             // Campus Record
             if(isset($universityId) && isset($record['campus'])){
-            if (!isset($univIdCampusNameArr[$universityId . "__" . trim(strtolower($record['campus']))])) {
+            if (!isset($univIdCampusNameArr[$universityId . "__" . stripslashes(trim(strtolower($record['campus'])))])) {
                 $campus = new Campus;
             } else {
-                $campus = Campus::find($univIdCampusNameArr[$universityId . "__" . trim(strtolower($record['campus']))]);
+                $campus = Campus::find($univIdCampusNameArr[$universityId . "__" . stripslashes(trim(strtolower($record['campus'])))]);
             }
 
-            $campus->name = $record['campus'];
+            $campus->name = stripslashes(trim(($record['campus'])));
             $campus->university_id = $universityId;
 
            
 
 
-             $campus->website = (isset($record['website']) && (!empty($record['website'])))?$record['website']:null;
+             $campus->website = (isset($record['website']) && (!empty($record['website'])))?trim($record['website']):null;
             $distance = str_replace("km", "", $record['distance']);
             $distance = str_replace("Km", "", $distance);
             $campus->distance = trim($distance);
-            $campus->nearest_major_city =(isset($record['nearest_major_city']) && (!empty($record['nearest_major_city'])))?$record['nearest_major_city']:null;
-            $campus->latitude = (isset($record['latitude']) && (!empty($record['latitude'])))?$record['latitude']:null;
-            $campus->longitude = (isset($record['longitude']) && (!empty($record['longitude'])))?$record['longitude']:null;;
+            $campus->nearest_major_city =(isset($record['nearest_major_city']) && (!empty($record['nearest_major_city'])))?stripslashes(trim($record['nearest_major_city'])):null;
+            $campus->latitude = (isset($record['latitude']) && (!empty($record['latitude'])))?stripslashes(trim($record['latitude'])):null;
+            $campus->longitude = (isset($record['longitude']) && (!empty($record['longitude'])))?stripslashes(trim($record['longitude'])):null;;
             $campus->save();
 
             $campusId = $campus->id;
-            $univIdCampusNameArr[$universityId . "__" . trim(strtolower($record['campus']))] = $campusId;
+            $univIdCampusNameArr[$universityId . "__" . stripslashes(trim(strtolower($record['campus'])))] = $campusId;
         }else{
             Log::debug('campus  not given!' . json_encode($record));
             $sheetError[] = [
@@ -240,14 +237,14 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
             // Campus Address
             // Country
             if(isset($record['country'])){
-            if (isset($countryNameIdArr[trim(strtolower($record['country']))])) {
-                $countryId = $countryNameIdArr[trim(strtolower($record['country']))];
+            if (isset($countryNameIdArr[stripslashes(trim(strtolower($record['country'])))])) {
+                $countryId = $countryNameIdArr[stripslashes(trim(strtolower($record['country'])))];
             } else {
                 $country = Country::create([
-                    'name' => $record['country']
+                    'name' => stripslashes(trim(($record['country'])))
                 ]);
                 $countryId = $country->id;
-                $countryNameIdArr[trim(strtolower($record['country']))] = $countryId;
+                $countryNameIdArr[stripslashes(trim(strtolower($record['country'])))] = $countryId;
             }
              }else{
                 Log::debug('country  not given!' . json_encode($record));
@@ -259,23 +256,29 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
             continue;
 
         }
+
+        
             // State
             if(isset($countryId) && isset($record['state'])){
-            if (isset($stateNameIdArr[$countryId . "__" . trim(strtolower($record['state']))])) {
-                $stateId = $stateNameIdArr[$countryId . "__" . trim(strtolower($record['state']))];
+
+
+            if (isset($stateNameIdArr[$countryId . "__" . stripslashes(trim(strtolower($record['state'])))])) {
+                $stateId = $stateNameIdArr[$countryId . "__" . stripslashes(trim(strtolower($record['state'])))];
             } else {
                 $state = State::create([
-                    'name' => $record['state'],
+                    'name' => stripslashes(trim(($record['state']))),
                     'country_id' => $countryId
                 ]);
                 $stateId = $state->id;
-                $stateNameIdArr[$countryId . "__" . trim(strtolower($record['state']))] = $stateId;
+                $stateNameIdArr[$countryId . "__" . stripslashes(trim(strtolower($record['state'])))] = $stateId;
             }
 
         }else{
-            Log::debug('University  not given!' . json_encode($record));
+
+            
+            Log::debug('state  not given!' . json_encode($record));
             $sheetError[] = [
-            'message' => 'state not given!',
+            'message' => 'state not givenmmmmm!',
             'record' => $record,
             'rowNumber' => $rowNumber,
         ];
@@ -284,20 +287,20 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
     }   
          ////city
          if(isset($stateId) && isset($record['city'])){
-            if (isset($cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))])) {
+            if (isset($cityNameIdArr[$countryId . "__" . $stateId . "__" . stripslashes(trim(strtolower($record['city'])))])) {
               
                 
                
 
-                $cityId = $cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))];
+                $cityId = $cityNameIdArr[$countryId . "__" . $stateId . "__" . stripslashes(trim(strtolower($record['city'])))];
              
             } else {
                 $city = City::create([
-                    'name' => $record['city'],
+                    'name' => stripslashes(trim(($record['city']))),
                     'state_id' => $stateId
                 ]);
                 $cityId = $city->id;
-                $cityNameIdArr[$countryId . "__" . $stateId . "__" . trim(strtolower($record['city']))] = $cityId;
+                $cityNameIdArr[$countryId . "__" . $stateId . "__" . stripslashes(trim(strtolower($record['city'])))] = $cityId;
             }
         }else{
             Log::debug('city  not given!' . json_encode($record));
@@ -318,11 +321,11 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
                 $address = Address::find($campus->address_id);
             }
 
-            $address->address = (isset($record['address']) && !empty($record['address']))?$record['address']:null;
+            $address->address = (isset($record['address']) && !empty($record['address']))?stripslashes(trim(($record['address']))):null;
             $address->country_id = $countryId;
             $address->state_id = $stateId;
             $address->city_id = $cityId;
-            $address->post_code=(isset($record['postcode']) && !empty($record['postcode']))?$record['postcode']:null;
+            $address->post_code=(isset($record['postcode']) && !empty($record['postcode']))?stripslashes(trim(($record['postcode']))):null;
             $address->save();
 
             $campus->address_id = $address->id;
@@ -337,7 +340,7 @@ class UnivCampusImport implements ToCollection, WithHeadingRow
         continue;
 
     }
-            $rowNumber++;
+           
         }
       
     }

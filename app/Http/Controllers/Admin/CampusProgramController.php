@@ -19,7 +19,7 @@ use App\Models\Test;
 use App\Models\CampusProgramTest;
 use Illuminate\Validation\Rule;
 use CampusProgramFees;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 
 class CampusProgramController extends Controller
 {
@@ -28,11 +28,11 @@ class CampusProgramController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
-        $this->middleware('userspermission:campus_program_view',['only'=>['index']]);
+        $this->middleware('userspermission:campus_program_view', ['only' => ['index']]);
 
-        $this->middleware('userspermission:campus_program_add',['only'=>['create','store']]);
-        $this->middleware('userspermission:campus_program_edit',['only'=>['edit','update']]);
-        $this->middleware('userspermission:campus_program_delete',['only'=>['destroy']]); 
+        $this->middleware('userspermission:campus_program_add', ['only' => ['create', 'store']]);
+        $this->middleware('userspermission:campus_program_edit', ['only' => ['edit', 'update']]);
+        $this->middleware('userspermission:campus_program_delete', ['only' => ['destroy']]);
 
 
 
@@ -67,50 +67,51 @@ class CampusProgramController extends Controller
      * @return \Illuminate\Http\Response \DB::raw("CONCAT(COALESCE(users.name,''), 
      */
 
-     public function universitycampus(Request $request){
-    
-       
-        $camupusdata=Campus::select('id','name','university_id')->whereIn('university_id',($request->universityid)?($request->universityid):[DB::raw('university_id')])->get();
-       
+    public function universitycampus(Request $request)
+    {
+
+
+        $camupusdata = Campus::select('id', 'name', 'university_id')->whereIn('university_id', ($request->universityid) ? ($request->universityid) : [DB::raw('university_id')])->get();
+
         return $camupusdata;
 
-     }
+    }
     public function index(Request $request)
     {
 
-        if(($request->get('campusid')!=null) ||($request->get('universityid')!=null)||($request->get('programid')!=null)) {
+        if (($request->get('campusname') != null) || ($request->get('universityid') != null) || ($request->get('programid') != null)) {
 
-          
-            $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
-            ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
-             ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
-            ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
-            ->whereIn('campus.id', $request->get('campusid') ? $request->get('campusid') : [DB::raw('campus.id')])
-            ->whereIn('programs.id', $request->get('programid') ? $request->get('programid') : [DB::raw('programs.id')])
-            ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
-            ->get();
 
-        }else{
             $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
-            ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
-            ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
-            ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
-            ->get();
+                ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
+                ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
+                ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
+                ->whereIn('campus.name', $request->get('campusname') ? $request->get('campusname') : [DB::raw('campus.name')])
+                ->whereIn('programs.id', $request->get('programid') ? $request->get('programid') : [DB::raw('programs.id')])
+                ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
+                ->get();
+
+        } else {
+            $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
+                ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
+                ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
+                ->select('campus_programs.id', 'campus_programs.website as website', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
+                ->get();
         }
- 
 
 
 
 
-       
+
+
         if (request()->ajax()) {
 
 
-            if((session('permissionerror'))){
-               
-           
-                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
-              
+            if ((session('permissionerror'))) {
+
+
+                return response()->json(['errorpermissionmessage' => session('permissionerror')]);
+
 
 
             }
@@ -118,9 +119,9 @@ class CampusProgramController extends Controller
 
 
 
- 
 
-              return Datatables::of($campusPrograms)
+
+            return Datatables::of($campusPrograms)
                 ->addColumn('action', function ($row) {
                     session()->forget('used_program');
                     session()->forget('used_campus');
@@ -131,12 +132,16 @@ class CampusProgramController extends Controller
                     return $row->university;
                 })
                 ->addColumn('campus', function ($row) {
-                    return $row->campus; 
+                    return $row->campus;
                 })
-                
+
                 ->addColumn('program', function ($row) {
                     return $row->program;
                 })
+                ->addColumn('website', function ($row) {
+                    return "<a target='blank' href=" . $row->website . ">$row->website</a>";
+                    ;
+                })
 
 
 
@@ -145,21 +150,27 @@ class CampusProgramController extends Controller
 
 
 
-                ->rawColumns(['action','university','campus','program'])
+                ->rawColumns(['action', 'university', 'campus', 'program', 'website'])
                 ->make(true);
         } else {
-            $university=University::select('id','name')->get();
+            $university = University::select('id', 'name')->get();
             $breadcrumbs = [
-                ['link' => "admin.home", 'name' => "Dashboard"], ['name' => 'Campus Program']
+                ['link' => "admin.home", 'name' => "Dashboard"],
+                ['name' => 'Campus Program']
             ];
 
-            $university=University::select('id','name')->get(); 
-            $campus=Campus::select('id','name')->get();
-            
-            $program=Program::select('id','name')->get();
+            $university = University::select('id', 'name')->get();
+            $campus = Campus::select('name', 'id', 'website')
+                ->groupBy('name')
+                ->get();
+
+            $program = Program::select('id', 'name')->get();
 
             return view('dashboard.campus_program.index', [
-                'breadcrumbs' => $breadcrumbs,'university'=>$university,'campus'=>$campus,'program'=>$program
+                'breadcrumbs' => $breadcrumbs,
+                'university' => $university,
+                'campus' => $campus,
+                'program' => $program
             ]);
         }
     }
@@ -199,9 +210,12 @@ class CampusProgramController extends Controller
         }
         $request->validate([
             'campus' => 'required',
-            'program' => ['required', Rule::unique('campus_programs', 'program_id')->where(function ($query) use ($campus, $program) {
-                return $query->where('campus_id', '=', $campus);
-            })],
+            'program' => [
+                'required',
+                Rule::unique('campus_programs', 'program_id')->where(function ($query) use ($campus, $program) {
+                    return $query->where('campus_id', '=', $campus);
+                })
+            ],
             'intakes' => 'required|array|min:1',
             'campus_program_duration' => 'required|numeric',
         ], ['program.unique' => "Program already exists in the Campus."]);
@@ -281,7 +295,9 @@ class CampusProgramController extends Controller
         $this->templateData['campusProgram'] = $campus_program;
 
         $breadcrumbs = [
-            ['link' => "admin.home", 'name' => "Dashboard"], ['link' => 'admin.campus-programs', 'name' => 'Campus Program'], ['name' => 'Create Campus Program']
+            ['link' => "admin.home", 'name' => "Dashboard"],
+            ['link' => 'admin.campus-programs', 'name' => 'Campus Program'],
+            ['name' => 'Create Campus Program']
         ];
         $this->templateData['breadcrumbs'] = $breadcrumbs;
         $this->templateData['intakeIds'] = CampusProgramIntake::where('campus_program_id', '=', $id)->pluck('intake_id')->toArray();
@@ -342,9 +358,12 @@ class CampusProgramController extends Controller
         $campus = $request->campus;
         $request->validate([
             'campus' => 'required',
-            'program' => ['required', Rule::unique('campus_programs', 'program_id')->where(function ($query) use ($campus) {
-                return $query->where('campus_id', '=', $campus);
-            })->ignore($id)],
+            'program' => [
+                'required',
+                Rule::unique('campus_programs', 'program_id')->where(function ($query) use ($campus) {
+                    return $query->where('campus_id', '=', $campus);
+                })->ignore($id)
+            ],
 
             'intakes' => 'required|array|min:1',
             'campus_program_duration' => 'required|numeric',
@@ -395,7 +414,7 @@ class CampusProgramController extends Controller
         } else {
             return back()->with('error', 'Something Went Wrong');
         }
-    } 
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -453,14 +472,17 @@ class CampusProgramController extends Controller
         return Campus::select('name', 'id')->where('university_id', '=', $id)->get();
     }
 
-    public function resetData(){
-        $university=University::select('id','name')->get(); 
-        $campus=Campus::select('id','name')->get();
-        
-        $program=Program::select('id','name')->get();
+    public function resetData()
+    {
+        $university = University::select('id', 'name')->get();
+        $campus = Campus::select('id', 'name')->get();
+
+        $program = Program::select('id', 'name')->get();
 
         return [
-            'university'=> $university,'campus'=>$campus,'program'=>$program
+            'university' => $university,
+            'campus' => $campus,
+            'program' => $program
         ];
 
     }

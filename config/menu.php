@@ -135,12 +135,12 @@ return [
                 'icon_class' => 'fa fa-book',
                 'permission' => 'study_view'
             ],
-            // [
-            //     'menu_name' => 'Specialized Tests',
-            //     'route' => 'admin.tests',
-            //     'icon_class' => 'fa fa-file-text',
-            //     'permission' => 'test_view'
-            // ],
+            [
+                'menu_name' => 'Specialized Tests',
+                'route' => 'admin.tests',
+                'icon_class' => 'fa fa-file-text',
+                'permission' => 'test_view'
+            ],
             [
                 'menu_name' => 'Mandatory Document',
                 'route' => 'admin.document-types',

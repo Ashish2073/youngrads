@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use App\Exports\studyareaData;
 use Str;
-
+ 
 class StudyController extends Controller
 {
     public function __construct()

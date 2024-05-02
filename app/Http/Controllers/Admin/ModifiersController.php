@@ -137,7 +137,7 @@ class ModifiersController extends Controller
             'password' => 'required|min:6|confirmed',
             'rolename'=>'required',
            
-        ];
+        ]; 
 
         $validator = Validator::make($request->all(), $validations_arr);
 

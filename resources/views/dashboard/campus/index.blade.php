@@ -63,7 +63,7 @@
 
                                             @foreach ($campus as $camdata)
                                                 @if (isset($camdata->id))
-                                                    <option value="{{ $camdata->id }}"
+                                                    <option value="{{ $camdata->name }}"
                                                         @if (request()->has('campmostkeysearch')) @if (request()->get('campmostkeysearch') == $camdata->id)
                                                         selected @endif
                                                         @endif
@@ -170,11 +170,12 @@
                             let univLength = data.length;
 
                             if (univLength > 0) {
-                                var univHTML = `<option value="${data[0].id}">${data[0].name}</option>`;
+                                var univHTML =
+                                    `<option value="${data[0].name}">${data[0].name}</option>`;
                                 for (let i = 1; i < univLength; i++) {
 
                                     var univHTML = univHTML +
-                                        `<option value="${data[i].id}">${data[i].name}</option>`
+                                        `<option value="${data[i].name}">${data[i].name}</option>`
 
 
                                 }
@@ -213,7 +214,7 @@
                 ajax: {
                     url: "{{ route('admin.campuses') }}",
                     data: function(d) {
-                        d.campusid = $("#campusid").val();
+                        d.campusname = $("#campusid").val();
                         d.universityid = $('#universityid').val();
                         d.websitename = $('#websitename').val();
                     }

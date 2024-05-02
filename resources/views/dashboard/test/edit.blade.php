@@ -16,24 +16,55 @@
                 'classes' => '',
             ])
 
+
+            <input type="hidden" name="parent_id" id="parent_id" value="{{ $test->id }}" />
+            @include('dashboard.common.fields.text', [
+                'label_name' => ' Test Max Number',
+                'id' => 'test_number_max',
+                'name' => 'test_number_max',
+                'placeholder' => 'Enter maximum number',
+                'input_attribute' => [
+                    'type' => 'number',
+                    'value' => $test->max,
+                ],
+                'classes' => '',
+            ])
+
+
+            @foreach ($childtest as $data)
+                <input type="hidden" name="child_id" id="child_id" value="{{ $data->id }}" />
+
+                @include('dashboard.common.fields.text', [
+                    'label_name' => 'sub Test',
+                    'id' => 'sub_test_name',
+                    'name' => 'sub_test_name',
+                    'placeholder' => 'Enter Sub Test Name',
+                    'input_attribute' => [
+                        'type' => 'text',
+                        'value' => old('sub_test_name', $data->name),
+                    ],
+                    'classes' => '',
+                ])
+
+                @include('dashboard.common.fields.text', [
+                    'label_name' => 'Sub  Test Max Number',
+                    'id' => 'sub_test_number_max',
+                    'name' => 'sub_test_number_max',
+                    'placeholder' => 'Enter Sub maximum number',
+                    'input_attribute' => [
+                        'type' => 'number',
+                        'value' => $data->max,
+                    ],
+                    'classes' => '',
+                ])
+            @endforeach
+
+
             <div class="form-group">
                 <button type="submit" id="submit-btn" class="btn btn-primary">Update</button>
             </div>
     </div>
     </form>
-    @if($test->campusProgramTest->count() > 0)
-        <div class="col-md-12">
-            <p>{{ config('setting.delete_notice') }}</p>
-        </div>
-    
-    @else
-        <div class="form-group delete" style="margin-top:1%">
-            <form  id="delete-form" method="POST" action="{{ route('admin.feetype.destroy', $feetype->id) }}" >
-                @csrf
-                @method('DELETE')
-            <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete Program</button>
-            </form>
-        </div>
-    @endif
+
 </div>
 </div>

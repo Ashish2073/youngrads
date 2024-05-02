@@ -192,7 +192,7 @@
                     },
                     {
                         data: 'sub_study_area',
-                        name: 'sub_stydy_area',
+                        name: 'sub_study_area',
 
                     },
 

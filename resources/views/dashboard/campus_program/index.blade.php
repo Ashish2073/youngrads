@@ -75,7 +75,7 @@
                                             @foreach ($campus as $camdata)
                                                 @if (isset($camdata->id))
                                                     <option {{ $camdata->id == ($usedCampusId ?? '') ? 'selected' : '' }}
-                                                        value="{{ $camdata->id }}">{{ $camdata->name }}</option>
+                                                        value="{{ $camdata->name }}">{{ $camdata->name }}</option>
                                                 @endif
                                             @endforeach
 
@@ -117,6 +117,7 @@
                                             <th>University</th>
                                             <th>Campus</th>
                                             <th>Program</th>
+                                            <th>Website</th>
                                             <th>Action</th>
                                         </tr>
                                         </tr>
@@ -223,7 +224,7 @@
                 ajax: {
                     url: "{{ route('admin.campus-programs') }}",
                     data: function(d) {
-                        d.campusid = $("#campusid").val();
+                        d.campusname = $("#campusid").val();
                         d.universityid = $('#universityid').val();
                         d.programid = $('#programid').val();
                     }
@@ -240,6 +241,10 @@
                     {
                         name: 'program',
                         data: 'program'
+                    },
+                    {
+                        name: 'website',
+                        data: 'website'
                     },
                     {
                         data: 'action'
@@ -310,11 +315,11 @@
 
                     if (campusLength > 0) {
                         var campusDataHTML =
-                            `<option value="${campusData[0].id}">${ campusData[0].name}</option>`;
+                            `<option value="${campusData[0].name}">${ campusData[0].name}</option>`;
                         for (let m = 1; m < campusLength; m++) {
 
                             var campusDataHTML = campusDataHTML +
-                                `<option value="${campusData[m].id}">${campusData[m].name}</option>`
+                                `<option value="${campusData[m].name}">${campusData[m].name}</option>`
 
 
                         }

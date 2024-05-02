@@ -34,8 +34,8 @@ class ImportController extends Controller
         $import = new  UnivCampusImport();
         Excel::import($import, request()->file('univ_campus_file'));
 
-       
-  
+        
+   
         
         return response()->json($import->response); 
     }
@@ -49,4 +49,6 @@ class ImportController extends Controller
         
         return response()->json($import->response);
     }
+
+    
 }
