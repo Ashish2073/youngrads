@@ -25,4 +25,26 @@ class Test extends Model
     //use Spatie\Activitylog\LogOptions
     return LogOptions::defaults();
   }
+
+  public static function getTestNameIdArr()
+  {
+    $records = Test::all();
+    $nameIdArr = [];
+    foreach ($records as $record) {
+      $nameIdArr[stripslashes(trim(strtolower($record->test_name)))] = $record->id;
+    }
+    return $nameIdArr;
+  }
+
+  public static function getTestMaxScore()
+  {
+
+    $records = Test::all();
+    $maxScoreIdArr = [];
+    foreach ($records as $record) {
+      $maxScoreIdArr[stripslashes(trim(strtolower($record->test_name)))] = $record->max;
+    }
+    return $maxScoreIdArr;
+
+  }
 }

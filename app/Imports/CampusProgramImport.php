@@ -66,6 +66,11 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
             $subStudyNameIdArr = Study::getsubStudyNameIdArr();
             $campusProgramsArr = CampusProgram::getCampusProgramNameIdArr();
             $intakeIdNameArr = Intake::getIdNameArr();
+            $testNameIdArr = Test::getTestNameIdArr();
+            $testMaxScore = Test::getTestMaxScore();
+
+
+
             $feeType['program_admission_fee'] = 2;
             $feeType['tuition_fee'] = 3;
             $feeType['application_fee'] = 4;
@@ -256,6 +261,132 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
                 }
 
+
+                if (isset($record['entrance_exam_name'])) {
+
+
+                    $entrenceExamAllName = explode('/', stripslashes(trim($record['entrance_exam_name'])));
+
+                    $entrenceExamAllTestScore = explode('/', stripslashes(trim($record['required_score_for_enterence'])));
+
+                    $entrenceExamindividualScore = explode('/', stripslashes(trim($record['required_individual_score_each_part_of_exam'])));
+
+
+                    $examNameDatalength = count($entrenceExamAllName);
+
+                    $examScoreDatalength = count($entrenceExamAllTestScore);
+
+                    $examindividualScorelength = count($entrenceExamindividualScore);
+
+                    if ($examNameDatalength != $examScoreDatalength) {
+                        Log::debug('Exam name and given score not correct pair !' . json_encode($record));
+                        $sheetError[] = [
+                            'message' => 'Exam name and given score not correct pair!' . '(' . $record['entrance_exam_name'] . ')' . '(' . $record['required_score_for_enterence'] . ')',
+                            'record' => $record['entrance_exam_name'] . '||' . $record['required_score_for_enterence'],
+                            'rowNumber' => $rowNumber,
+                        ];
+
+
+                    } elseif ($examNameDatalength != $examindividualScorelength) {
+
+                        Log::debug('Exam name and given score not correct pair !' . json_encode($record));
+                        $sheetError[] = [
+                            'message' => 'Exam name and given individual not correct pair!' . '(' . $record['entrance_exam_name'] . ')' . '(' . $record['required_individual_score_each_part_of_exam'] . ')',
+                            'record' => $record['entrance_exam_name'] . '||' . $record['required_individual_score_each_part_of_exam'],
+                            'rowNumber' => $rowNumber,
+                        ];
+
+                    } else {
+
+                        for ($i = 0; $i < $examNameDatalength; $i++) {
+
+                            if (!isset($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))])) {
+
+
+
+                                Log::debug('Exam name not matched with our records !' . json_encode($record));
+                                $sheetError[] = [
+                                    'message' => 'Exam not matched with our records!' . $entrenceExamAllName[$i],
+                                    'record' => $entrenceExamAllName[$i],
+                                    'rowNumber' => $rowNumber,
+                                ];
+
+
+                            } elseif ($entrenceExamAllTestScore[$i] > $testMaxScore[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) {
+
+                                Log::debug('Given score of exam is more than its maximum limit !' . json_encode($record));
+                                $sheetError[] = [
+                                    'message' => 'Given overall score.' . $entrenceExamAllName[$i] . '. of exam is more than its maximum limit! its maximum limit is ' . $testMaxScore[stripslashes(trim(strtolower($entrenceExamAllName[$i])))],
+                                    'record' => $testMaxScore[stripslashes(trim(strtolower($entrenceExamAllName[$i])))],
+                                    'rowNumber' => $rowNumber,
+                                ];
+
+
+
+
+
+                            } elseif ($entrenceExamindividualScore[$i] > $testMaxScore[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) {
+                                Log::debug('Given score of exam is more than its maximum limit !' . json_encode($record));
+                                $sheetError[] = [
+                                    'message' => 'Given individual score of each exam score. ' . $entrenceExamAllName[$i] . '. of exam is more than its maximum limit! its maximum limit is ' . $testMaxScore[stripslashes(trim(strtolower($entrenceExamAllName[$i])))],
+                                    'record' => $testMaxScore[stripslashes(trim(strtolower($entrenceExamAllName[$i])))],
+                                    'rowNumber' => $rowNumber,
+                                ];
+
+                            }
+
+
+
+
+
+
+
+
+                        }
+
+
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                }
+
+
+
+                if (!isset($record['waiver_in_english'])) {
+
+
+                    Log::debug('wavier option not  given !' . json_encode($record));
+                    $sheetError[] = [
+                        'message' => 'wavier option not  given !',
+                        'record' => $record,
+                        'rowNumber' => $rowNumber,
+                    ];
+
+                }
+
+
+                if (!isset($record['intake'])) {
+                    Log::debug('intake not   given !' . json_encode($record));
+                    $sheetError[] = [
+                        'message' => 'Intake not Given !',
+                        'record' => $record,
+                        'rowNumber' => $rowNumber,
+                    ];
+
+
+                }
 
                 // if(!isset($record['app_fee'])){
 
@@ -627,7 +758,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
                     if (isset($record['sub_study_area']) && isset($programStudyAreaIdArr)) {
                         if (!empty($record['sub_study_area'])) {
-                            $subStudyArea = explode(",", stripslashes(trim(strtolower($record['sub_study_area']))));
+                            $subStudyArea = explode("/", stripslashes(trim(strtolower($record['sub_study_area']))));
                             foreach ($subStudyArea as $area) {
                                 if (isset($subStudyNameIdArr[$studyAreaId . "__" . stripslashes(trim(strtolower($area)))])) {
                                     $subStudyAreaId = $subStudyNameIdArr[$studyAreaId . "__" . stripslashes(trim(strtolower($area)))];
@@ -666,6 +797,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         $campusProgram->entry_requirment = stripslashes(trim(($record['entry_requirements']))) ?? null;
                         $campusProgram->campus_program_duration = $duration;
                         $campusProgram->website = stripslashes(trim($record['website'])) ?? null;
+                        $campusProgram->waiver_in_english = stripslashes(trim($record['waiver_in_english'])) ?? null;
+                        $campusProgram->waiver_requirement_detail = stripslashes(trim($record['waiver_requirement_detail'])) ?? null;
                         $campusProgram->save();
 
                         $campusProgramId = $campusProgram->id;
@@ -678,125 +811,102 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
                         if (isset($record['entrance_exam_name']) && !empty($record['entrance_exam_name'])) {
 
-                            $entrenceExamAllName = explode(',', stripslashes(trim($record['entrance_exam_name'])));
-                            $entranceExamMinNumber = explode(',', stripslashes(trim($record['entrance_score_min'])));
-                            $entranceExamMaxNumber = explode(',', stripslashes(trim($record['entrance_score_max'])));
-                            $entrenceExamAllTestScore = explode(',', stripslashes(trim($record['required_score_for_enterence'])));
-                            $testValues = [];
-                            $testBoolean = true;
-                            foreach ($entrenceExamAllName as $k => $testName) {
-                                $testValues[$k]['test_name'] = $testName;
+                            $entrenceExamAllName = explode('/', stripslashes(trim($record['entrance_exam_name'])));
 
 
-                                if (!is_numeric($entranceExamMinNumber[$k])) {
-                                    Log::debug(json_encode($testName) . 'Test Score Minimum Validation!' . json_encode($testName));
-                                    $sheetError[] = [
-                                        'message' => $testName . " " . 'Test  Minimum Score Not Numeric ! !' . "Given Value Is" . $entranceExamMinNumber[$k],
-                                        'record' => $record,
-                                        'rowNumber' => $rowNumber,
-                                    ];
-                                    $testBoolean = false;
-                                    continue;
-
-                                } else {
-                                    $testValues[$k]['min'] = (isset($entranceExamMinNumber[$k]) && !empty($entranceExamMinNumber[$k]) ? (int) $entranceExamMinNumber[$k] : null);
-
-                                }
-
-                                if (!is_numeric($entranceExamMaxNumber[$k])) {
-                                    Log::debug(json_encode($testName) . '!Test Score Maxmium Validation!' . json_encode($testName));
-                                    $sheetError[] = [
-                                        'message' => $testName . " " . 'Test  Maximum Score Not Numeric !' . "Given Value Is" . $entranceExamMaxNumber[$k],
-                                        'record' => $record,
-                                        'rowNumber' => $rowNumber,
-                                    ];
-                                    $testBoolean = false;
-                                    continue;
-                                } else {
-                                    $testValues[$k]['max'] = (isset($entranceExamMaxNumber[$k]) && !empty($entranceExamMaxNumber[$k]) ? (int) $entranceExamMaxNumber[$k] : null);
+                            $entrenceExamAllTestScore = explode('/', stripslashes(trim($record['required_score_for_enterence'])));
 
 
-                                }
+                            $entrenceExamindividualScore = explode('/', stripslashes(trim($record['required_individual_score_each_part_of_exam'])));
 
-                            }
+
+                            $campusProgramTest = [];
+
+                            for ($i = 0; $i < $examNameDatalength; $i++) {
+
+                                $campusProgramTest[] = [
+
+                                    'campus_program_id' => $campusProgramId,
+                                    'test_id' => (isset($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) && !empty($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) ? $testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))] : null),
+                                    'score' => (isset($entrenceExamAllTestScore[$i]) && !empty($entrenceExamAllTestScore[$i]) ? $entrenceExamAllTestScore[$i] : null),
+                                    'nlt_score' => (isset($entrenceExamindividualScore[$i]) && !empty($entrenceExamindividualScore[$i])) ? $entrenceExamindividualScore[$i] : null,
+                                    'show_in_front' => 1,
+
+                                ];
 
 
 
 
 
-
-                            if ($testBoolean) {
-                                $TestInput = Test::upsert($testValues, 'test_name', ['min', 'max']);
-                            }
-
-
-
-                            $TestAll = Test::whereIn('test_name', $entrenceExamAllName)->pluck('id')->toArray();
-
-
-
-
-
-
-
-                            $TestSocreNlt = (isset($record['required_nlt_score_for_enterence']) && !empty($record['required_nlt_score_for_enterence'])) ? $record['required_nlt_score_for_enterence'] : null;
-
-                            if (isset($record['required_score_for_enterence']) && !empty($record['required_score_for_enterence'])) {
-                                $entrenceExamAllTestScore = explode(',', $record['required_score_for_enterence']);
-
-                            } else {
-                                $entrenceExamAllTestScore = null;
-                            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            $Campusrecords = [];
-                            $testScoreBoolean = true;
-
-
-                            foreach ($TestAll as $k => $testId) {
-
-
-                                if (!is_numeric($entrenceExamAllTestScore[$k])) {
-
-                                    Log::debug(json_encode($testName) . 'Test Score Validation!' . json_encode($testName));
-                                    $sheetError[] = [
-                                        'message' => $testName . " " . 'Test Score Not Numeric!' . "Given Value Is" . $entrenceExamAllTestScore[$k],
-                                        'record' => $record,
-                                        'rowNumber' => $rowNumber,
-                                    ];
-                                    $testScoreBoolean = false;
-                                    continue;
-
-
-                                } else {
-                                    $Campusrecords[] = [
-                                        'campus_program_id' => $campusProgramId,
-                                        'test_id' => (isset($testId) && !empty($testId) ? $testId : null),
-                                        'score' => (isset($entrenceExamAllTestScore[$k]) && !empty($entrenceExamAllTestScore[$k]) ? $entrenceExamAllTestScore[$k] : null),
-                                        'nlt_score' => $TestSocreNlt,
-                                        'show_in_front' => 1,
-                                    ];
-
-                                }
 
 
 
                             }
 
-                            if ($testScoreBoolean) {
-                                CampusProgramTest::insert($Campusrecords);
-                            }
+
+                            CampusProgramTest::insert($campusProgramTest);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            // foreach ($TestAll as $k => $testId) {
+
+
+                            //     if (!is_numeric($entrenceExamAllTestScore[$k])) {
+
+                            //         Log::debug(json_encode($testName) . 'Test Score Validation!' . json_encode($testName));
+                            //         $sheetError[] = [
+                            //             'message' => $testName . " " . 'Test Score Not Numeric!' . "Given Value Is" . $entrenceExamAllTestScore[$k],
+                            //             'record' => $record,
+                            //             'rowNumber' => $rowNumber,
+                            //         ];
+                            //         $testScoreBoolean = false;
+                            //         continue;
+
+
+                            //     } else {
+                            //         $Campusrecords[] = [
+                            //             'campus_program_id' => $campusProgramId,
+                            //             'test_id' => (isset($testId) && !empty($testId) ? $testId : null),
+                            //             'score' => (isset($entrenceExamAllTestScore[$k]) && !empty($entrenceExamAllTestScore[$k]) ? $entrenceExamAllTestScore[$k] : null),
+                            //             'nlt_score' => $TestSocreNlt,
+                            //             'show_in_front' => 1,
+                            //         ];
+
+                            //     }
+
+
+
+                            // }
+
+                            // if ($testScoreBoolean) {
+                            //     CampusProgramTest::insert($Campusrecords);
+                            // }
 
 
 
@@ -934,7 +1044,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
                         // Campus Program Intakes
                         if (!empty($record['intake']) && isset($record['intake'])) {
-                            $intakes = explode(",", stripslashes(trim($record['intake'])));
+                            $intakes = explode("/", stripslashes(trim($record['intake'])));
                             CampusProgramIntake::where('campus_program_id', $campusProgramId)->delete();
                             foreach ($intakes as $intake) {
                                 if (isset($intakeIdNameArr[trim(strtolower($intake))])) {
