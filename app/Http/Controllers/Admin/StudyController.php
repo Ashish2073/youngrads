@@ -13,19 +13,19 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use App\Exports\studyareaData;
 use Str;
- 
+
 class StudyController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth:admin');
-        $this->middleware('userspermission:study_view',['only'=>['index']]);
+        $this->middleware('userspermission:study_view', ['only' => ['index']]);
 
-        $this->middleware('userspermission:study_add',['only'=>['create','store']]);
-        $this->middleware('userspermission:study_edit',['only'=>['edit','update']]);
-        $this->middleware('userspermission:study_delete',['only'=>['destroy']]); 
+        $this->middleware('userspermission:study_add', ['only' => ['create', 'store']]);
+        $this->middleware('userspermission:study_edit', ['only' => ['edit', 'update']]);
+        $this->middleware('userspermission:study_delete', ['only' => ['destroy']]);
 
- 
+
 
 
         $study_areas = Study::where('parent_id', 0)->get();
@@ -33,7 +33,7 @@ class StudyController extends Controller
             'study_areas' => $study_areas
         ]);
 
-        $this->middleware('userspermission:study_view',['only'=>['index']]);
+        $this->middleware('userspermission:study_view', ['only' => ['index']]);
     }
     /**
      * Display a listing of the resource.
@@ -43,87 +43,98 @@ class StudyController extends Controller
     public function index(Request $request)
     {
 
-    //     $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
-        
-    //     ->select('study_areas.*', "parent_study.name as parent_name"
-       
-    //      )->get();
+        //     $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
+
+        //     ->select('study_areas.*', "parent_study.name as parent_name"
+
+        //      )->get();
 
 
 
-        
 
-    //  dd(json_decode($records));
 
-        
+        //  dd(json_decode($records));
 
-   
+
+
+
 
         if (request()->ajax()) {
 
-            if((session('permissionerror'))){
-               
-           
-                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
-              
+            if ((session('permissionerror'))) {
+
+
+                return response()->json(['errorpermissionmessage' => session('permissionerror')]);
+
 
 
             }
 
 
 
-              if(($request->get('studyid')!=null) || ($request->get('substudyid')!=null)){
+            if (($request->get('studyid') != null) || ($request->get('substudyid') != null)) {
 
                 $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
-                ->select('study_areas.*', "parent_study.name as parent_name")
-                ->whereIn('parent_study.id',($request->get('studyid'))?$request->get('studyid'):[DB::raw('parent_study.id')])
-                ->whereIn('study_areas.id',($request->get('substudyid'))?$request->get('substudyid'):[DB::raw('study_areas.id')])
-                ->get();
+                    ->select('study_areas.*', "parent_study.name as parent_name", \DB::raw("DATE_FORMAT(study_areas.created_at ,'%d/%m/%Y') AS created_date"), \DB::raw("DATE_FORMAT(study_areas.updated_at ,'%d/%m/%Y') AS updated_date"))
+                    ->whereIn('parent_study.id', ($request->get('studyid')) ? $request->get('studyid') : [DB::raw('parent_study.id')])
+                    ->whereIn('study_areas.id', ($request->get('substudyid')) ? $request->get('substudyid') : [DB::raw('study_areas.id')])
+                    ->get();
 
 
-              }else{
+            } else {
 
                 $records = Study::leftJoin('study_areas as parent_study', 'study_areas.parent_id', '=', 'parent_study.id')
-                ->select('study_areas.*', "parent_study.name as parent_name")->get();
+                    ->select('study_areas.*', "parent_study.name as parent_name", \DB::raw("DATE_FORMAT(study_areas.created_at ,'%d/%m/%Y') AS created_date"), \DB::raw("DATE_FORMAT(study_areas.updated_at ,'%d/%m/%Y') AS updated_date"))->get();
 
-              }
+            }
 
 
 
-           
+
             return DataTables::of($records)
                 ->addColumn('study_area', function ($row) {
-                     session()->forget('used_study_area');
-                    if ($row->parent_id == 0 ) {
+                    session()->forget('used_study_area');
+                    if ($row->parent_id == 0) {
                         return \Str::limit($row->name, 50, "...");
-                    }else{
+                    } else {
                         return \Str::limit($row->parent_name, 50, "...");
                     }
-                   
+
                 })->addIndexColumn()
                 ->addColumn('sub_study_area', function ($row) {
-                    if($row->parent_id==0){
+                    if ($row->parent_id == 0) {
                         return "N/A";
                         // return \Str::limit($row->name." "."(Study-Area)", 50, "...");
-                    }else{
+                    } else {
                         return \Str::limit($row->name, 50, "...");
-                       
+
                     }
- 
-                    
+
+
                 })->addIndexColumn()
-                
+                ->addColumn('created_at', function ($row) {
+                    return $row->created_date;
+
+                })
+                ->addColumn('updated_at', function ($row) {
+                    return $row->updated_date;
+
+                })
+
                 ->make(true);
 
         } else {
             $breadcrumbs = [
-                ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Study Areas"]
+                ['link' => "admin.home", 'name' => "Dashboard"],
+                ['name' => "Study Areas"]
             ];
 
-            $study=Study::select('id','name')->where('parent_id',0)->get();
-            $substudy=Study::select('id','name')->where('parent_id','!=',0)->get();
+            $study = Study::select('id', 'name')->where('parent_id', 0)->get();
+            $substudy = Study::select('id', 'name')->where('parent_id', '!=', 0)->get();
             return view('dashboard.study_area.index', [
-                'breadcrumbs' => $breadcrumbs,'study'=>$study,'substudy'=>$substudy
+                'breadcrumbs' => $breadcrumbs,
+                'study' => $study,
+                'substudy' => $substudy
             ]);
         }
 
@@ -290,23 +301,26 @@ class StudyController extends Controller
     }
 
 
-    public function studytosubstudy(Request $request){
-     
-        return Study::select('id','name')->where('parent_id','!=',0)->whereIn('parent_id', ($request->studyid)?($request->studyid):[DB::raw('parent_id')])
-        ->get();
-    }
+    public function studytosubstudy(Request $request)
+    {
 
-    
-
-    public function resetstudyarea(){
-        $study=Study::select('id','name')->where('parent_id', 0)->get();
-        $sub_study=Study::select('id','name')->where('parent_id','!=',0)->get();
-
-        return ['study'=>$study,'substudy'=>$sub_study];
+        return Study::select('id', 'name')->where('parent_id', '!=', 0)->whereIn('parent_id', ($request->studyid) ? ($request->studyid) : [DB::raw('parent_id')])
+            ->get();
     }
 
 
-    public function get_studyarea_data(){
-		return Excel::download(new studyareaData, 'studyareadata.xlsx');
-	} 
+
+    public function resetstudyarea()
+    {
+        $study = Study::select('id', 'name')->where('parent_id', 0)->get();
+        $sub_study = Study::select('id', 'name')->where('parent_id', '!=', 0)->get();
+
+        return ['study' => $study, 'substudy' => $sub_study];
+    }
+
+
+    public function get_studyarea_data()
+    {
+        return Excel::download(new studyareaData, 'studyareadata.xlsx');
+    }
 }

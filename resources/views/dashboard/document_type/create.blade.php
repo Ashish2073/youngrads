@@ -16,32 +16,34 @@
             ])
 
 
-            <div class="form-group d-none">
+            <div class="form-group">
                 <label for="document_limit">Document Limit</label>
-                <select class='form-control select @error('document_limit') {{ errCls() }} @enderror' name="document_limit" data-live-search="true" id="document_limit  ">
-                     <option value="">--Select Document--</option>
-                     <option value="1" selected>1</option>
-                    {{-- @foreach ($documentLimits as $documentLimit)
-                      <option value="{{ $documentLimit }}">{{ $documentLimit }}</option>
-                    @endforeach --}}
+                <select class='form-control select @error('document_limit') {{ errCls() }} @enderror'
+                    name="document_limit" data-live-search="true" id="document_limit  ">
+                    <option value="">--Select Document--</option>
+
+                    @foreach ($documentLimits as $documentLimit)
+                        <option value="{{ $documentLimit }}">{{ $documentLimit }}</option>
+                    @endforeach
                 </select>
                 @error('document_limit')
-                <p class="text-danger">{{ $message }}</p>
+                    <p class="text-danger">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-group d-none">
-              <label>Document Required</label>
-              <div class="form-check-inline">
-                <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="document_required" value="1">Yes
-                </label>
-              </div>
-              <div class="form-check-inline">
-                <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="document_required" value="0" checked>No
-                </label>
-              </div>
+            <div class="form-group">
+                <label>Document Required</label>
+                <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="document_required" value="1">Yes
+                    </label>
+                </div>
+                <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="document_required" value="0"
+                            checked>No
+                    </label>
+                </div>
             </div>
 
             <div class="form-group">

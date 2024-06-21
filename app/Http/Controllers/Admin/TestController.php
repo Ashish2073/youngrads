@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TEST;
-use App\Models\SubTest;
+use App\Models\TestSub;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Validator;
@@ -90,7 +90,7 @@ class TestController extends Controller
         $validator = Validator::make($request->all(), [
             'test_name' => 'required',
             function ($attribute, $value, $fail) {
-                $records = SubTest::where(['name' => $value, 'test_id' => request()->get('parent_id')])
+                $records = TestSub::where(['name' => $value, 'test_id' => request()->get('parent_id')])
                     ->get();
                 if ($records->count() > 0) {
                     $fail("This {$attribute} has already been taken.");
@@ -111,7 +111,7 @@ class TestController extends Controller
             $test->save();
 
         } else {
-            $test = new SubTest;
+            $test = new TestSub;
             $test->name = $request->test_name;
             $test->test_id = $request->parent_id;
             $test->max = $request->test_number;
@@ -120,7 +120,7 @@ class TestController extends Controller
 
 
 
-        // $childtest=new SubTest;
+        // $childtest=new TestSub;
         // $childtest->name
 
 
@@ -163,7 +163,7 @@ class TestController extends Controller
         $array[1] = substr($str, -1);
 
         $test = TEST::findOrFail($array[1]);
-        $childtest = SubTest::where('name', $array[0])->where('test_id', $array[1])->get();
+        $childtest = TestSub::where('name', $array[0])->where('test_id', $array[1])->get();
 
 
 
@@ -207,7 +207,7 @@ class TestController extends Controller
         ]);
 
         if ($testnew) {
-            $childtest = SubTest::where('id', $request->child_id)->where('test_id', $request->parent_id)->update([
+            $childtest = TestSub::where('id', $request->child_id)->where('test_id', $request->parent_id)->update([
                 'name' => $request->sub_test_name,
                 'max' => $request->sub_test_number_max
             ]);

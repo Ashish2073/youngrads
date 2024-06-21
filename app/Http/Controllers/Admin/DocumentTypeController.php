@@ -15,10 +15,10 @@ class DocumentTypeController extends Controller
   public function __construct()
   {
     $this->middleware('auth:admin');
-    $this->middleware('userspermission:mandatory_document_view',['only'=>['index']]);
-    $this->middleware('userspermission:mandatory_document_add',['only'=>['create','store']]);
-    $this->middleware('userspermission:mandatory_document_edit',['only'=>['edit','update']]);
-    $this->middleware('userspermission:mandatory_document_delete',['only'=>['destroy']]);
+    $this->middleware('userspermission:mandatory_document_view', ['only' => ['index']]);
+    $this->middleware('userspermission:mandatory_document_add', ['only' => ['create', 'store']]);
+    $this->middleware('userspermission:mandatory_document_edit', ['only' => ['edit', 'update']]);
+    $this->middleware('userspermission:mandatory_document_delete', ['only' => ['destroy']]);
 
   }
   /**
@@ -31,14 +31,14 @@ class DocumentTypeController extends Controller
     $documentTyps = DocumentType::all();
     if (request()->ajax()) {
 
-      if((session('permissionerror'))){
-               
-           
-        return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
-      
+      if ((session('permissionerror'))) {
 
 
-    }
+        return response()->json(['errorpermissionmessage' => session('permissionerror')]);
+
+
+
+      }
 
 
       return Datatables::of($documentTyps)
@@ -53,9 +53,10 @@ class DocumentTypeController extends Controller
         ->make(true);
     } else {
       $breadcrumbs = [
-        ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Document Type"]
+        ['link' => "admin.home", 'name' => "Dashboard"],
+        ['name' => "Document Type"]
       ];
-      return view('dashboard.document_type.index', [ 
+      return view('dashboard.document_type.index', [
         'breadcrumbs' => $breadcrumbs
       ]);
     }
@@ -89,8 +90,8 @@ class DocumentTypeController extends Controller
 
     $documentType = new DocumentType;
     $documentType->title = $request->title;
-    // $documentType->is_required = $request->document_required;
-    // $documentType->document_limit = $request->document_limit;
+    $documentType->is_required = $request->document_required;
+    $documentType->document_limit = $request->document_limit;
     if ($documentType->save()) {
       return response()->json([
         'code' => 'success',
@@ -133,8 +134,10 @@ class DocumentTypeController extends Controller
    * @param  \App\DocumentType  $documentType
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $id)   
+  public function update(Request $request, $id)
   {
+
+
 
     $documentType = DocumentType::find($id);
     $validator = Validator::make($request->all(), ['title' => 'required']);
@@ -147,8 +150,8 @@ class DocumentTypeController extends Controller
 
 
     $documentType->title = $request->title;
-    // $documentType->is_required = $request->document_required[0];
-    // $documentType->document_limit = $request->document_limit;
+    $documentType->is_required = $request->document_required[0];
+    $documentType->document_limit = $request->document_limit;
     if ($documentType->save()) {
       return response()->json([
         'code' => 'success',

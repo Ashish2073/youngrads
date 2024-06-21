@@ -25,7 +25,6 @@
                                 name="university" id="university" data-live-search="true">
                                 <option value="">--Select University --</option>
                                 @foreach (config('universties') as $unversity)
-                                   
                                     <option
                                         {{ $unversity->id == old('university', $campusProgram->university_id) ? 'selected' : '' }}
                                         value={{ $unversity->id }}>{{ $unversity->name }}</option>
@@ -41,11 +40,7 @@
                                 name="campus" id="campus" data-live-search="true"
                                 data-value="{{ old('campus', $campusProgram->campus_id) }}">
                                 @foreach (config('campuses') as $campus)
-
-                              
-                      
-
-                                    <option {{ $campus->id == old('campus', $campusProgram->campus_id)? 'selected' : ''  }}
+                                    <option {{ $campus->id == old('campus', $campusProgram->campus_id) ? 'selected' : '' }}
                                         value={{ $campus->id }}>{{ $campus->name }}</option>
                                 @endforeach
                             </select>
@@ -118,6 +113,7 @@
                                 @php
                                     $i = 0;
                                     $j = 0;
+                                    $l = 0;
                                 @endphp
                                 @foreach ($feeTypes as $feetype)
                                     <div class="form-group mb-0">
@@ -151,14 +147,14 @@
 
                         <div class="row">
                             <div class="col">
-                                <h4>Test Scores</h4>
+                                <h4>Over All Test Scores</h4>
                                 <hr>
                                 <div class="row">
                                     @foreach ($tests as $test)
                                         <div class="form-group col-6">
                                             <label>{{ $test->test_name }}</label>
-                                            <input min="{{$test->min}}" max="{{$test->max}}" type="text" class="form-control"
-                                                name="test[{{ $j }}][score]"
+                                            <input min="{{ $test->min }}" max="{{ $test->max }}" type="text"
+                                                class="form-control" name="test[{{ $j }}][score]"
                                                 value="{{ old("test.$j.score", $campusProgramTest[$test->id]['score']) }}" />
                                             <input type="hidden" name="test[{{ $j }}][type]"
                                                 value="{{ $test->id }}" />
@@ -180,6 +176,38 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <h4>NLT Score (Not less than Score in each part of a exam)</h4>
+                                <hr>
+                                <div class="row">
+                                    @foreach ($tests as $test)
+                                        <div class="form-group col-6">
+                                            <label>{{ $test->test_name }}</label>
+                                            <input min="{{ $test->min }}" max="{{ $test->max }}" type="text"
+                                                class="form-control" name="test[{{ $l }}][nlt_score]"
+                                                value="{{ old("test.$l.nlt_score", $campusProgramTest[$test->id]['nlt_score']) }}" />
+                                            <input type="hidden" name="test[{{ $l }}][type]"
+                                                value="{{ $test->id }}" />
+                                            <div class="vs-checkbox-con vs-checkbox-primary mt-1">
+                                                <input type="checkbox" value="1"
+                                                    name="test[{{ $l }}][show]"
+                                                    {{ old("test.$l.show", $campusProgramTest[$test->id]['show_in_front']) == 1 ? 'checked' : '' }} />
+                                                <span class="vs-checkbox">
+                                                    <span class="vs-checkbox--check">
+                                                        <i class="vs-icon feather icon-check"></i>
+                                                    </span>
+                                                </span>
+                                                <span class="">Show</span>
+                                            </div>
+                                        </div>
+
+                                        @php $l++ @endphp
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -195,12 +223,13 @@
                 <div class="col-md-12">
                     <p>{{ config('setting.delete_notice') }}</p>
                     @php session()->put('used_campus_program',[$campusProgram->university_id,$campusProgram->campus_id, $campusProgram->program_id]); @endphp
-                    <a href="{{url('admin/applications-all')}}"><p> click Here to Show Uses</p><a>
+                    <a href="{{ url('admin/applications-all') }}">
+                        <p> click Here to Show Uses</p><a>
                 </div>
             @else
                 <div class="form-group delete" style="margin-top:1%">
                     <form id="delete-form" method="POST"
-                         action="{{ route('admin.campus-program.destroy', $campusProgram->id) }}">
+                        action="{{ route('admin.campus-program.destroy', $campusProgram->id) }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit" id="submit-btn-delete" class="btn btn-danger">Delete</button>

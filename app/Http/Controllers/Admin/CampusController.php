@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request, Response;  
+use Illuminate\Http\Request, Response;
 use \Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
 use Yajra\Datatables\Datatables;
@@ -25,13 +25,13 @@ class CampusController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin')->except('selectCampus');
-        $this->middleware('userspermission:campus_view',['only'=>['index']]);
+        $this->middleware('userspermission:campus_view', ['only' => ['index']]);
 
-        $this->middleware('userspermission:campus_add',['only'=>['create','store']]);
-        $this->middleware('userspermission:campus_edit',['only'=>['edit','update']]);
-        $this->middleware('userspermission:campus_delete',['only'=>['destroy']]); 
-        $this->middleware('userspermission:campus_details_view',['only'=>['addDetails']]); 
-        $this->middleware('userspermission:campus_details_add',['only'=>['saveDetails']]); 
+        $this->middleware('userspermission:campus_add', ['only' => ['create', 'store']]);
+        $this->middleware('userspermission:campus_edit', ['only' => ['edit', 'update']]);
+        $this->middleware('userspermission:campus_delete', ['only' => ['destroy']]);
+        $this->middleware('userspermission:campus_details_view', ['only' => ['addDetails']]);
+        $this->middleware('userspermission:campus_details_add', ['only' => ['saveDetails']]);
 
 
 
@@ -46,15 +46,15 @@ class CampusController extends Controller
     {
 
 
-        if(($request->get('universityid')!=null)|| ($request->get('campusname')!=null) || ($request->get('websitename')!=null)){
-           
-        
-           
+        if (($request->get('universityid') != null) || ($request->get('campusname') != null) || ($request->get('websitename') != null)) {
+
+
+
             $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
-            ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
-            ->whereIn('campus.name', $request->get('campusname') ? $request->get('campusname') : [DB::raw('campus.name')])
-            ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
-             ->get();  
+                ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website', \DB::raw("DATE_FORMAT(campus.created_at ,'%d/%m/%Y') AS created_date"), \DB::raw("DATE_FORMAT(campus.updated_at ,'%d/%m/%Y') AS updated_date"))
+                ->whereIn('campus.name', $request->get('campusname') ? $request->get('campusname') : [DB::raw('campus.name')])
+                ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
+                ->get();
 
             // if(count(json_decode($Campus,true))==0){
             //     $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
@@ -65,13 +65,13 @@ class CampusController extends Controller
 
             // }
 
-           
 
-          
-        }else{ 
-        $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
-            ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website')
-            ->get();
+
+
+        } else {
+            $Campus = Campus::join('universities', 'campus.university_id', '=', 'universities.id')
+                ->select('campus.id', 'campus.name as campus', 'universities.name as university', 'campus.logo', 'campus.cover', 'campus.website', \DB::raw("DATE_FORMAT(campus.created_at ,'%d/%m/%Y') AS created_date"), \DB::raw("DATE_FORMAT(campus.updated_at ,'%d/%m/%Y') AS updated_date"))
+                ->get();
         }
 
 
@@ -79,11 +79,11 @@ class CampusController extends Controller
         if (request()->ajax()) {
 
 
-            if((session('permissionerror'))){
-               
-           
-                return response()->json(['errorpermissionmessage'=>session('permissionerror')]);
-              
+            if ((session('permissionerror'))) {
+
+
+                return response()->json(['errorpermissionmessage' => session('permissionerror')]);
+
 
 
             }
@@ -118,26 +118,39 @@ class CampusController extends Controller
 
                         return "<a href='" . $row->website . "' class='a-link' target='blank'> $row->website</a>";
                     }
-                }) 
+                })
 
-                ->addColumn('action', function ($row) { 
+                ->addColumn('action', function ($row) {
 
 
 
                     return "<a class='btn btn-primary btn-sm a-link' href=" . route('admin.campus-details', $row->id) . ">Add Details</a>";
                 })
+                ->addColumn('created_date', function ($row) {
+                    return $row->created_date;
+                })
+
+                ->addColumn('updated_date', function ($row) {
+                    return $row->updated_date;
+
+                })
+
+
                 ->rawColumns(['logo', 'cover', 'website', 'action'])
                 ->make(true);
         } else {
             $breadcrumbs = [
-                ['link' => "admin.home", 'name' => "Dashboard"], ['name' => "Campuses"]
+                ['link' => "admin.home", 'name' => "Dashboard"],
+                ['name' => "Campuses"]
             ];
-            $university=University::select('id','name')->get(); 
+            $university = University::select('id', 'name')->get();
             $campus = Campus::select('name', 'id', 'website')
-            ->groupBy('name')
-            ->get();
+                ->groupBy('name')
+                ->get();
             return view('dashboard.campus.index', [
-                'breadcrumbs' => $breadcrumbs,'university'=>$university,'campus'=>$campus,
+                'breadcrumbs' => $breadcrumbs,
+                'university' => $university,
+                'campus' => $campus,
             ]);
         }
     }
@@ -435,7 +448,8 @@ class CampusController extends Controller
     public function addDetails($id)
     {
         $breadcrumbs = [
-            ['link' => "admin.campuses", 'name' => "Campus"], ['name' => "Add Details"]
+            ['link' => "admin.campuses", 'name' => "Campus"],
+            ['name' => "Add Details"]
         ];
         $campus = Campus::select('about_us', 'feature', 'name')->find($id);
         return view('dashboard.campus.campus_details', compact('campus', 'id', 'breadcrumbs'));

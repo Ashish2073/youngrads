@@ -34,7 +34,22 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'last_name', 'email', 'username', 'password', 'contact_number', 'bio', 'address', 'hotel_name', 'city', 'state', 'country', 'paypal_email', 'provider_id', 'profile_img', 'email_verified_at'
+        'name',
+        'last_name',
+        'email',
+        'username',
+        'password',
+        'contact_number',
+        'bio',
+        'address',
+        'hotel_name',
+        'city',
+        'state',
+        'country',
+        'paypal_email',
+        'provider_id',
+        'profile_img',
+        'email_verified_at'
     ];
 
     /**
@@ -46,8 +61,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return LogOptions::defaults();
     }
-    protected $hidden = [ 
-        'password', 'remember_token',
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -177,7 +193,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         return $this->email;
     }
- 
+
     public function getprofileImg()
     {
         if ($this->profile_img) {
@@ -187,7 +203,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
-   
+
 
     public function meta($key)
     {
@@ -269,7 +285,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ];
         }
 
-        
+
         $tests = Test::join('user_special_tests', 'user_special_tests.test_type_id', '=', 'tests.id')
             ->where('user_special_tests.user_id', $user->id)
             ->select('tests.*')->get();
@@ -278,9 +294,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         foreach ($tests as $test) {
             $main_docs = Test::where('parent_id', $test->id)->select('tests.*', 'test_name as name')->get();
-            $main_test= Test::select('tests.*', 'test_name as name')->where('id',$test->id)->get();
+            $main_test = Test::select('tests.*', 'test_name as name')->where('id', $test->id)->get();
 
-        
+
 
             foreach (($main_test) as $main_doc) {
                 $user_document = UserDocument::where([
@@ -297,7 +313,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 'document_list' => $main_test
             ];
 
-          
+
 
             // foreach (($main_docs) as $main_doc) {
             //     $user_document = UserDocument::where([
@@ -315,7 +331,7 @@ class User extends Authenticatable implements MustVerifyEmail
             // ];
         }
         // dd($document_lists);
-        $documents = DocumentType::select('document_types.*', 'title as name')->get();
+        $documents = DocumentType::select('document_types.*', 'title as name')->where('is_required', 1)->get();
         $document_lists['Document']['group_name'] = 'Mandatory Documents';
         $document_lists['Document']['document_type'] = 'document_types';
         foreach ($documents as $document) {
@@ -333,8 +349,8 @@ class User extends Authenticatable implements MustVerifyEmail
                 'document_list' => [$document]
             ];
         }
-        
-     
+
+
         return $document_lists;
     }
 
@@ -414,8 +430,18 @@ class User extends Authenticatable implements MustVerifyEmail
             'upload_documents' => ['status' => true]
         ];
         $fields = [
-            'name', 'last_name', 'email', 'language', 'personal_number', 'gender', 'maritial_status', 'dob', 'country',
-            'passport', 'postal', 'address_id'
+            'name',
+            'last_name',
+            'email',
+            'language',
+            'personal_number',
+            'gender',
+            'maritial_status',
+            'dob',
+            'country',
+            'passport',
+            'postal',
+            'address_id'
         ];
         // Check for General information
         foreach ($fields as $field) {
@@ -498,52 +524,56 @@ class User extends Authenticatable implements MustVerifyEmail
                     continue;
                 }
                 foreach ($list['document_list'] ?? [] as $list_doc) {
-                    if(isset($list_doc->documents)){
-                    if ($list_doc->documents->count() == 0) {
-                        $profile['upload_documents']['status'] = false;
+                    if (isset($list_doc->documents)) {
+                        if ($list_doc->documents->count() == 0) {
+                            $profile['upload_documents']['status'] = false;
+                        }
                     }
-                   }
                 }
             }
-        } 
-        return $profile;  
+        }
+        return $profile;
     }
 
-    public static  function getunreadmessage()
+    public static function getunreadmessage()
     {
-    
 
-        
+
+
         if (auth('admin')->check()) {
-			if(auth('admin')->user()->getRoleNames()[0]=="Admin"){
-               $userid=auth('admin')->user()->username;
-			   $message_status_type="admin_message_status";
-			   $role="admin" ;
-			}else{
-				$userid=auth('admin')->user()->username;
-				$message_status_type="moderator_message_status";
-				$role="moderator";
-			}
-			
-		} elseif(auth('web')->check()) {
-			$userid=Auth::id();
-			$message_status_type="user_message_status";
-			
-			$role="user";
-		}
-       
-       
-       $userunreadMessage=ApplicationMessage::join('users_applications','users_applications.id','=','application_message.application_id')
-       ->select('users_applications.id as application_id','users_applications.application_number as application_number','application_message.created_at as time','application_message.message as message', 
-       DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "'&& application_message.user_message_status = 'unread' && application_id = users_applications.id && message_scenario='0' )) as count"),
-       )->where('users_applications.user_id', '=', $userid)
-       ->where('role_name','!=','user')
-       ->where('application_message.user_message_status','unread')
-       ->where('message_scenario','0')
-       ->get();
-       
-     
-    
+            if (auth('admin')->user()->getRoleNames()[0] == "Admin") {
+                $userid = auth('admin')->user()->username;
+                $message_status_type = "admin_message_status";
+                $role = "admin";
+            } else {
+                $userid = auth('admin')->user()->username;
+                $message_status_type = "moderator_message_status";
+                $role = "moderator";
+            }
+
+        } elseif (auth('web')->check()) {
+            $userid = Auth::id();
+            $message_status_type = "user_message_status";
+
+            $role = "user";
+        }
+
+
+        $userunreadMessage = ApplicationMessage::join('users_applications', 'users_applications.id', '=', 'application_message.application_id')
+            ->select(
+                'users_applications.id as application_id',
+                'users_applications.application_number as application_number',
+                'application_message.created_at as time',
+                'application_message.message as message',
+                DB::raw("(SELECT count(*) FROM application_message WHERE (application_message.user_id != '" . $userid . "'&& application_message.user_message_status = 'unread' && application_id = users_applications.id && message_scenario='0' )) as count"),
+            )->where('users_applications.user_id', '=', $userid)
+            ->where('role_name', '!=', 'user')
+            ->where('application_message.user_message_status', 'unread')
+            ->where('message_scenario', '0')
+            ->get();
+
+
+
         return $userunreadMessage;
     }
 

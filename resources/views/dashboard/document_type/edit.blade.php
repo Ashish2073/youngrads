@@ -15,22 +15,23 @@
                 ],
                 'classes' => '',
             ])
-            <div class="form-group d-none">
+            <div class="form-group ">
                 <label for="document_limit">Document Limit</label>
                 <select class='form-control select @error('document_limit') {{ errCls() }} @enderror'
                     name="document_limit" data-live-search="true" id="document_limit">
                     <option value="">--Select Document--</option>
-                    <option value="1">1</option>
-                    {{-- @foreach ($documentLimits as $documentLimit)
-                    <option @if ($documentType->document_limit == $documentLimit) selected @endIf value="{{ $documentLimit }}">{{ $documentLimit }}</option>
-                  @endforeach --}}
+                    {{-- <option value="1">1</option> --}}
+                    @foreach ($documentLimits as $documentLimit)
+                        <option @if ($documentType->document_limit == $documentLimit) selected @endIf value="{{ $documentLimit }}">
+                            {{ $documentLimit }}</option>
+                    @endforeach
                 </select>
                 @error('document_limit')
                     <p class="text-danger">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-group d-none">
+            <div class="form-group ">
                 <label>Document Required</label>
                 <div class="form-check-inline">
                     <label class="form-check-label">

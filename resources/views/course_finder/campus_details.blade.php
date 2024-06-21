@@ -107,7 +107,7 @@
                 "processing": true,
                 "serverSide": true,
                 ajax: {
-                    url: "{{ route('campus-search') }}" + "/" + id,
+                    url: "{{ url('campus-search') }}" + "/" + id,
                     data: function(d) {
 
                     }

@@ -93,7 +93,8 @@ class LoginController extends Controller
     }
 
     public function providerCallback($provider)
-    { 
+    {
+
 
         $user = Socialite::driver($provider)->user();
 
@@ -106,10 +107,10 @@ class LoginController extends Controller
 
         if ($findUser) {
             Auth::login($findUser);
-        } else { 
-            
+        } else {
+
             $user_record = User::where('email', $user->email)->count();
-            if($user_record > 0) {
+            if ($user_record > 0) {
                 return redirect(route('login'))->with([
                     'code' => 'danger',
                     'title' => 'Oops!',
@@ -118,8 +119,8 @@ class LoginController extends Controller
             }
 
             $name = $user->name;
-            $name = explode(" " , $name);
-            if(count($name) == 2) {
+            $name = explode(" ", $name);
+            if (count($name) == 2) {
                 $first = $name[0];
                 $last = $name[1];
             } else {
@@ -157,7 +158,7 @@ class LoginController extends Controller
     {
         if (!$user->hasVerifiedEmail()) {
             $verification_link = URL::signedRoute('verification.resend', ['user' => auth()->user()->id]);
-            
+
             Auth::logout();
             return back()->with([
                 'unverified' => true,

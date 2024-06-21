@@ -130,7 +130,7 @@
         });
 
         function runScript() {
-            $(".select").selectpicker();
+            $(".select").selectpicker(); 
             $(".select2").selectpicker();
 
             validateForm($('#test-create-form'), {

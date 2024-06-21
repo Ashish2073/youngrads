@@ -47,9 +47,11 @@ class UniversityController extends Controller
           
 
             return Datatables::of($universities)
+            
         
             
                 ->rawColumns(['name'])
+
                 ->make(true);
 
 

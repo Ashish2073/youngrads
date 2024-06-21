@@ -118,6 +118,8 @@
                                             <th>Campus</th>
                                             <th>Program</th>
                                             <th>Website</th>
+                                            <th>Created Date </th>
+                                            <th>Updated Date </th>
                                             <th>Action</th>
                                         </tr>
                                         </tr>
@@ -245,6 +247,14 @@
                     {
                         name: 'website',
                         data: 'website'
+                    },
+                    {
+                        name: 'created_date',
+                        data: 'created_date'
+                    },
+                    {
+                        name: 'updated_date',
+                        data: 'updated_date'
                     },
                     {
                         data: 'action'

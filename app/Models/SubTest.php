@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubTest extends Model
 {
-  protected $table = "special_test_sub";
+  protected $table = "user_sub_test_score";
   protected $guarded = [];
 }

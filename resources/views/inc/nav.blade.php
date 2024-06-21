@@ -1,9 +1,25 @@
+<style>
+    @media screen and (max-width: 992px) {
+        .laptop {
+            display: none !important;
+        }
+    }
+
+    @media screen and (min-width: 992px) {
+        .mobile {
+            display: none !important;
+        }
+    }
+</style>
+
+
+
 <nav class="navbar navbar-expand-lg">
     <div class="col-md-10">
         <a class="navbar-brand" href="{{ route('/') }}"><img class="img-fluid" src="{{ asset('images/site-logo.png') }}"
                 alt="{{ config('app.name') }}"></a>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 laptop ">
         <a href="#access_form" class="btn btn-info p-2 btn btn-warning" style="font-size: 25px;"><strong> Contact
                 Us</strong></a>
     </div>
@@ -14,6 +30,8 @@
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+    <a href="#access_form" class="btn btn-info p-2 btn btn-warning mobile" style="font-size: 25px;"><strong> Contact
+            Us</strong></a>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav m-auto">

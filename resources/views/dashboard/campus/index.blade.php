@@ -118,6 +118,8 @@
                                                     <th>Campus Name</th>
 
                                                     <th>Website</th>
+                                                    <th>Created at </th>
+                                                    <th> Updated at </th>
                                                     {{-- <th>Logo</th> --}}
                                                     <th>Cover</th>
                                                     <th>Action</th>
@@ -231,10 +233,14 @@
                         data: 'website',
                         name: 'website'
                     },
-                    // {
-                    //     data: 'logo',
-                    //     name: 'logo'
-                    // },
+                    {
+                        data: 'created_date',
+                        name: 'created_date'
+                    },
+                    {
+                        data: 'updated_date',
+                        name: 'updated_date'
+                    },
                     {
                         data: 'cover',
                         name: 'cover',

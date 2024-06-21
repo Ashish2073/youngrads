@@ -162,7 +162,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
                 } else {
 
-                    if (!isset($programLevelIdArr[stripslashes(trim(strtolower($record['level'])))])) {
+                    if (!isset($programLevelIdArr[str_replace(' ', '', stripslashes(trim(strtolower($record['level']))))])) {
 
 
 
@@ -297,6 +297,8 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                         ];
 
                     } else {
+
+
 
                         for ($i = 0; $i < $examNameDatalength; $i++) {
 
@@ -695,7 +697,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                     // Program Level ID
 
                     if (isset($record['level'])) {
-                        if (!isset($programLevelIdArr[stripslashes(trim(strtolower($record['level'])))])) {
+                        if (!isset($programLevelIdArr[str_replace(' ', '', stripslashes(trim(strtolower($record['level']))))])) {
 
 
 
@@ -707,38 +709,48 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                             ];
                             continue;
                         } else {
-                            $programLevelId = $programLevelIdArr[stripslashes(trim(strtolower($record['level'])))];
+                            $programLevelId = $programLevelIdArr[str_replace(' ', '', stripslashes(trim(strtolower($record['level']))))];
                         }
                     }
                     // Study Area ID
                     if (isset($record['study_area'])) {
 
-                        if (!isset($studyAreaNameIdArr[stripslashes(trim(strtolower($record['study_area'])))])) {
+                        // if (!isset($studyAreaNameIdArr[stripslashes(trim(strtolower($record['study_area'])))])) {
+                        $studyArea = Study::where('name', stripslashes(trim(($record['study_area']))))->first();
+
+                        if ($studyArea) {
+                            $studyAreaId = $studyArea->id;
+
+                        } else {
                             $studyArea = new Study;
-                            $studyArea->name = stripslashes(trim(strtolower($record['study_area'])));
+                            $studyArea->name = stripslashes(trim(($record['study_area'])));
                             $studyArea->slug = Str::slug(stripslashes(trim(strtolower($record['study_area']))), "-");
                             $studyArea->save();
                             $studyAreaId = $studyArea->id;
-                        } else {
-                            $studyAreaId = $studyAreaNameIdArr[stripslashes(trim(strtolower($record['study_area'])))];
+
                         }
+
+                        // } else {
+                        //     $studyAreaId = $studyAreaNameIdArr[stripslashes(trim(strtolower($record['study_area'])))];
+                        // }
                     }
                     // Program
                     if (isset($record['program'])) {
 
 
 
-                        if (!isset($programNameIdArr[trim(strtolower($record['program']))])) {
+                        if (!isset($programNameIdArr[stripslashes(trim(strtolower($record['program'])))])) {
                             $program = new Program;
+
 
                         } else {
 
-                            $program = Program::find($programNameIdArr[trim(strtolower($record['program']))]);
+                            $program = Program::find($programNameIdArr[stripslashes(trim(strtolower($record['program'])))]);
                         }
 
 
 
-                        $program->name = trim(strtolower($record['program']));
+                        $program->name = trim(($record['program']));
                         $program->program_level_id = $programLevelId;
                         $duration = (int) filter_var($record['duration'], FILTER_SANITIZE_NUMBER_INT);
                         $program->duration = $duration;
@@ -763,12 +775,16 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                                 if (isset($subStudyNameIdArr[$studyAreaId . "__" . stripslashes(trim(strtolower($area)))])) {
                                     $subStudyAreaId = $subStudyNameIdArr[$studyAreaId . "__" . stripslashes(trim(strtolower($area)))];
                                 } else {
+
+
+
                                     $subStudyAreaRecord = Study::create([
                                         'name' => $area,
                                         'slug' => Str::slug($area, "-"),
                                         'parent_id' => $studyAreaId
                                     ]);
                                     $subStudyAreaId = $subStudyAreaRecord->id;
+                                    $subStudyNameIdArr[$studyAreaId . "__" . stripslashes(trim(strtolower($area)))] = $subStudyAreaId;
                                 }
 
                                 if (!isset($programStudyAreaIdArr["program_" . $programId . "__" . "study_area_" . $subStudyAreaId])) {
@@ -822,13 +838,21 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
                             $campusProgramTest = [];
 
-                            for ($i = 0; $i < $examNameDatalength; $i++) {
+
+
+                            for ($i = 0; $i < count($entrenceExamAllName); $i++) {
+
+                                // dd($i, $rowNumber, $entrenceExamAllName);
+
+                                // if (!isset($entrenceExamAllName[$i])) {
+                                //     dd($i, $rowNumber, $entrenceExamAllName);
+                                // }
 
                                 $campusProgramTest[] = [
 
                                     'campus_program_id' => $campusProgramId,
-                                    'test_id' => (isset($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) && !empty($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) ? $testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))] : null),
-                                    'score' => (isset($entrenceExamAllTestScore[$i]) && !empty($entrenceExamAllTestScore[$i]) ? $entrenceExamAllTestScore[$i] : null),
+                                    'test_id' => isset($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) && !empty($testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))]) ? $testNameIdArr[stripslashes(trim(strtolower($entrenceExamAllName[$i])))] : null,
+                                    'score' => isset($entrenceExamAllTestScore[$i]) && !empty($entrenceExamAllTestScore[$i]) ? $entrenceExamAllTestScore[$i] : null,
                                     'nlt_score' => (isset($entrenceExamindividualScore[$i]) && !empty($entrenceExamindividualScore[$i])) ? $entrenceExamindividualScore[$i] : null,
                                     'show_in_front' => 1,
 
@@ -842,6 +866,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
 
 
                             }
+
 
 
                             CampusProgramTest::insert($campusProgramTest);
@@ -1017,7 +1042,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                             }
                         }
 
-                        if (!empty(($record['app_fee'])) && isset($record['app_fee'])) {
+                        if (isset($record['app_fee'])) {
                             $price = $record['app_fee'];
                             $currencyType = $record['currency_type'];
 
@@ -1028,7 +1053,7 @@ class CampusProgramImport implements ToCollection, WithHeadingRow
                                 CampusProgramFee::create([
                                     'campus_program_id' => $campusProgramId,
                                     'fee_type_id' => $feeType['application_fee'],
-                                    'fee_price' => $price,
+                                    'fee_price' => stripslashes(trim($price)),
                                     'fee_currency' => $currencyId
                                 ]);
                             } else {

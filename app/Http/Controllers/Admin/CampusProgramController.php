@@ -85,7 +85,7 @@ class CampusProgramController extends Controller
             $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
                 ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
                 ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
-                ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
+                ->select('campus_programs.id', 'universities.name as university', 'campus.name as campus', 'programs.name as program', \DB::raw("DATE_FORMAT(campus_programs.created_at ,'%d/%m/%Y') AS created_date"), \DB::raw("DATE_FORMAT(campus_programs.updated_at ,'%d/%m/%Y') AS updated_date"))
                 ->whereIn('campus.name', $request->get('campusname') ? $request->get('campusname') : [DB::raw('campus.name')])
                 ->whereIn('programs.id', $request->get('programid') ? $request->get('programid') : [DB::raw('programs.id')])
                 ->whereIn('universities.id', $request->get('universityid') ? $request->get('universityid') : [DB::raw('universities.id')])
@@ -95,7 +95,7 @@ class CampusProgramController extends Controller
             $campusPrograms = CampusProgram::join('campus', 'campus_programs.campus_id', '=', 'campus.id')
                 ->join('programs', 'campus_programs.program_id', '=', 'programs.id')
                 ->leftJoin('universities', 'universities.id', '=', 'campus.university_id')
-                ->select('campus_programs.id', 'campus_programs.website as website', 'universities.name as university', 'campus.name as campus', 'programs.name as program')
+                ->select('campus_programs.id', 'campus_programs.website as website', 'universities.name as university', 'campus.name as campus', 'programs.name as program', \DB::raw("DATE_FORMAT(campus_programs.created_at ,'%d/%m/%Y') AS created_date"), \DB::raw("DATE_FORMAT(campus_programs.updated_at ,'%d/%m/%Y') AS updated_date"))
                 ->get();
         }
 
@@ -143,6 +143,13 @@ class CampusProgramController extends Controller
                     ;
                 })
 
+                ->addColumn('created_date', function ($row) {
+                    return $row->created_date;
+                })
+
+                ->addColumn('updated_date', function ($row) {
+                    return $row->updated_date;
+                })
 
 
 
@@ -150,7 +157,8 @@ class CampusProgramController extends Controller
 
 
 
-                ->rawColumns(['action', 'university', 'campus', 'program', 'website'])
+
+                ->rawColumns(['action', 'university', 'campus', 'program', 'website', 'created_date', 'updated_date'])
                 ->make(true);
         } else {
             $university = University::select('id', 'name')->get();
@@ -256,7 +264,8 @@ class CampusProgramController extends Controller
                 CampusProgramTest::create([
                     'campus_program_id' => $campusProgram->id,
                     'test_id' => $test['type'],
-                    'score' => $test['score'],
+                    'score' => $test['score'] ?? null,
+                    'nlt_score' => $test['nlt_score'] ?? null,
                     'show_in_front' => $test['show'] ?? 0
                 ]);
             }
@@ -325,7 +334,7 @@ class CampusProgramController extends Controller
             if ($score)
                 $campusProgramTest[$test->id] = $score->toArray();
             else
-                $campusProgramTest[$test->id] = ['type' => '', 'score' => '', 'show_in_front' => ''];
+                $campusProgramTest[$test->id] = ['type' => '', 'score' => '', 'nlt_score' => '', 'show_in_front' => ''];
         }
 
         $this->templateData['campusProgramFees'] = $campusProgramFee;
@@ -396,15 +405,20 @@ class CampusProgramController extends Controller
 
             CampusProgramTest::where('campus_program_id', $campusProgram->id)->delete();
 
+
+
             foreach ($request->test as $test) {
 
-                if (empty($test['score']))
-                    continue;
+                // if (empty($test['score']))
+                //     continue;
+                // if (empty($test['nlt_score']))
+                //     continue;
 
                 CampusProgramTest::create([
                     'campus_program_id' => $campusProgram->id,
                     'test_id' => $test['type'],
-                    'score' => $test['score'],
+                    'score' => $test['score'] ?? 0,
+                    'nlt_score' => $test['nlt_score'] ?? 0,
                     'show_in_front' => $test['show'] ?? 0
                 ]);
             }

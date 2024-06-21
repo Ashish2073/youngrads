@@ -67,22 +67,24 @@ class CourseFinderController extends Controller
             'program_levels' => ProgramLevel::all()
         ]);
 
-        return view('course_finder.index', compact(
-            'programLevels',
-            'countries',
-            'studyAreas',
-            'intakes',
-            'selectedProgram',
-            'selectedIntake',
-            'selectedYear',
-            'programs',
-            'breadcrumbs',
-            'max',
-            'min',
-            'feeTypes',
-            'slugs',
-            'special_tests'
-        )
+        return view(
+            'course_finder.index',
+            compact(
+                'programLevels',
+                'countries',
+                'studyAreas',
+                'intakes',
+                'selectedProgram',
+                'selectedIntake',
+                'selectedYear',
+                'programs',
+                'breadcrumbs',
+                'max',
+                'min',
+                'feeTypes',
+                'slugs',
+                'special_tests'
+            )
         );
     }
 
@@ -477,6 +479,8 @@ class CourseFinderController extends Controller
         $totalCount = count($data->get());
         $result = $data->skip($start)->limit($length);
 
+
+
         $dataTable = Datatables::of($result)
             ->addColumn('row', function ($row) {
                 return view('course_finder.result', compact('row'))->render();
@@ -511,8 +515,8 @@ class CourseFinderController extends Controller
         $data2 = DB::table('study_areas')->where('name', 'LIKE', "%{$request['query']}%")->select('name')->groupBy('name')->get()->toArray();
         $data = array_merge($data1, $data2);
         return response()->json($data);
-    }
-
+    } 
+ 
     function autocompleteCountries(Request $request)
     {
         $data1 = Country::where('name', 'LIKE', "%{$request['query']}%")->select('name')->groupBy('name')->get()->toArray();
@@ -564,7 +568,7 @@ class CourseFinderController extends Controller
 
         $testScores = CampusProgramTest::where('campus_program_id', '=', $id)->where('show_in_front', '=', 1)
             ->join('tests', 'campus_program_test.test_id', '=', 'tests.id')
-            ->select('tests.test_name as test', 'campus_program_test.score as score')
+            ->select('tests.test_name as test', 'campus_program_test.score as score', 'campus_program_test.nlt_score as nlt_score')
             ->get();
 
         return view('course_finder.full_details', compact('campus', 'campusProgram', 'program', 'intakes', 'testScores', 'campusIntakesFees', 'breadcrumbs', 'id', 'countryName'));

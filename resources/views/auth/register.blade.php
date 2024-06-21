@@ -37,17 +37,38 @@
                                         @csrf
                                         <div class="form-label-group">
                                             <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
-                                            <input id="name" type="text"
-                                                class="form-control @error('name') is-invalid @enderror" name="name"
-                                                placeholder="Name" value="{{ old('name') }}" required autocomplete="name"
-                                                autofocus>
-                                            <label for="name">Name</label>
-                                            @error('name')
+                                            <input id="first_name" type="text"
+                                                class="form-control @error('first_name') is-invalid @enderror"
+                                                name="first_name" placeholder="First Name" value="{{ old('first_name') }}"
+                                                required autocomplete="first_name" autofocus>
+                                            <label for="name">First Name</label>
+                                            @error('first_name')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
                                                 </span>
                                             @enderror
                                         </div>
+
+                                        <div class="form-label-group">
+                                            <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
+                                            <input id="last_name" type="text"
+                                                class="form-control @error('last_name') is-invalid @enderror"
+                                                name="last_name" placeholder="Last Name" value="{{ old('last_name') }}"
+                                                required autocomplete="last_name" autofocus>
+                                            <label for="last">Last Name</label>
+                                            @error('last_name')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+
+
+
+
+
+
+
                                         <div class="form-label-group">
                                             <!-- <input type="email" id="inputEmail" class="form-control" placeholder="Email" required> -->
                                             <input id="email" type="email"

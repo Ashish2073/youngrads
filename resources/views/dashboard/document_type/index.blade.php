@@ -29,8 +29,8 @@
                                     <thead>
                                         <tr>
                                             <th>Title</th>
-                                            {{-- <th>Required</th>
-                                            <th>Document Limit</th> --}}
+                                            <th>Required</th>
+                                            <th>Document Limit</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -66,14 +66,14 @@
                         data: 'title',
                         name: 'title'
                     },
-                    // {
-                    //data: 'is_required',
-                    //name: 'is_required'
-                    //},
-                    //{
-                    // data: 'document_limit',
-                    //name: 'document_limit'
-                    //}
+                    {
+                        data: 'is_required',
+                        name: 'is_required'
+                    },
+                    {
+                        data: 'document_limit',
+                        name: 'document_limit'
+                    }
                 ],
 
                 'createdRow': function(row, data, dataIndex) {

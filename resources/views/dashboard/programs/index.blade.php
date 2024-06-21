@@ -94,7 +94,7 @@
                                 </div>
 
 
-
+ 
                             </div>
                             <div class="card-content">
                                 <div class="card-body card-dashboard">
@@ -108,6 +108,8 @@
                                                     <th>Program Level</th>
                                                     <th>Study Area</th>
                                                     <th>Duration</th>
+                                                    <th> Created Date </th>
+                                                    <th> Updated Date </th>
                                                 </tr>
                                                 </tr>
                                             </thead>
@@ -169,6 +171,14 @@
                     {
                         data: 'duration',
                         name: 'duration'
+                    },
+                    {
+                        data: 'created_date',
+                        name: 'created_date'
+                    },
+                    {
+                        data: 'updated_date',
+                        name: 'updated_date'
                     }
 
                 ],

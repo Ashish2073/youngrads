@@ -21,7 +21,6 @@
     <section id="dashboard-analytics" class="d-flex flex-column">
 
         @if (session('verified'))
-
             <div class="alert alert-success fade container show" id="success-alert">
                 <strong>Congratulations!</strong> Email address verified successfully!
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -33,7 +32,8 @@
         <div class="item flex-fill">
             <div class=" row justify-content-center">
                 <div class="col-xl-2 col-md-4 col-sm-6">
-                    <div class="card h-100 text-center" data-url="{{ route('shortlist-programs') }}" style="cursor: pointer;">
+                    <div class="card h-100 text-center" data-url="{{ route('shortlist-programs') }}"
+                        style="cursor: pointer;">
                         <div class="card-content">
                             <div class="card-body">
                                 <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
@@ -78,7 +78,8 @@
                     </div>
                 </div>
                 <div class="col-xl-2 col-md-4 col-sm-6 mt-1 mt-md-0">
-                    <div class="card h-100 text-center" data-url="{{ route('student.edit-profile') }}" style="cursor: pointer;">
+                    <div class="card h-100 text-center" data-url="{{ route('student.edit-profile') }}"
+                        style="cursor: pointer;">
                         <div class="card-content">
                             <div class="card-body">
                                 <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
@@ -87,8 +88,9 @@
                                     </div>
                                 </div>
                                 <p class="text-bold-700">
-                                    @if(!auth()->user()->isCompleted())
-                                        <i data-toggle='tooltip' title='Please complete your profile' class="fa fa-warning text-primary"></i>
+                                    @if (!auth()->user()->isCompleted())
+                                        <i data-toggle='tooltip' title='Please complete your profile'
+                                            class="fa fa-warning text-primary"></i>
                                     @endif
                                     Complete your profile
                                 </p>
@@ -115,8 +117,8 @@
                     </div>
                     <div class="col-md-4 col-sm-12 mt-1 mt-md-0">
                         <label class="h5 text-primary font-weight-bold">Year</label>
-                        <select name="year[]" data-style="bg-white border-light" class="form-control select" id="ygrad_year"
-                            name="ygrad_year" multiple>
+                        <select name="year[]" data-style="bg-white border-light" class="form-control select"
+                            id="ygrad_year" name="ygrad_year" multiple>
                             @for ($i = date('Y'); $i < date('Y') + 3; $i++)
                                 <option value="{{ $i }}">{{ $i }}</option>
                             @endfor
@@ -148,7 +150,7 @@
     <script src="{{ asset(mix('vendors/js/charts/apexcharts.min.js')) }}"></script>
     <script src="{{ asset(mix('vendors/js/extensions/tether.min.js')) }}"></script>
     <script src="{{ asset(mix('vendors/js/extensions/shepherd.min.js')) }}"></script>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
     <!-- {{-- <script src="{{ asset('js/scripts/select2.multi-checkboxes.js')}}"></script> --}} -->
     <script>
         $(document).ready(function() {
@@ -290,6 +292,5 @@
                 }
             })
         })
-
     </script>
 @endsection

@@ -32,7 +32,7 @@
 
             <div class="form-group">
                 <label for="parent_id">Parent</label>
-                <select class="select2 form-control" name="parent_id" id="parent_id">
+                <select class="select2 form-control" data-live-search="true" name="parent_id" id="parent_id">
                     <option value="0">Parent</option>
                     @foreach (config('parent_test') as $test)
                         <option {{ $test->id == old('parent_id') ? 'selected' : '' }} value="{{ $test->id }}">

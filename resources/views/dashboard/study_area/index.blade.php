@@ -103,6 +103,8 @@
                                         <tr>
                                             <th>Study Area Name</th>
                                             <th> Sub Study Area Name</th>
+                                            <th>Created Date </th>
+                                            <th>Updated Date </th>
                                         </tr>
                                         </tr>
                                     </thead>
@@ -195,6 +197,15 @@
                         name: 'sub_study_area',
 
                     },
+
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                    },
+                    {
+                        data: 'updated_at',
+                        name: 'updated_at',
+                    }
 
                 ],
 

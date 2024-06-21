@@ -811,8 +811,8 @@ class StudentController extends Controller
 	public function educationListing()
 	{
 		$education = UserAcademic::join('study_levels', 'user_academics.study_levels_id', '=', 'study_levels.id')
-		    ->join('countries','user_academics.country','=','countries.id')
-			->where('user_id', '=', Auth::id())->select('study_levels.name as study_level', 'user_academics.*','countries.name as country_name')
+			->join('countries', 'user_academics.country', '=', 'countries.id')
+			->where('user_id', '=', Auth::id())->select('study_levels.name as study_level', 'user_academics.*', 'countries.name as country_name')
 			->get();
 
 		return Datatables::of($education)
@@ -849,7 +849,7 @@ class StudentController extends Controller
 				$html .= "</div>";
 				return $html;
 			})
-			->rawColumns(['action','language','country','marks','study_level','start_date','end_date'])
+			->rawColumns(['action', 'language', 'country', 'marks', 'study_level', 'start_date', 'end_date'])
 			->make(true);
 	}
 
@@ -885,13 +885,13 @@ class StudentController extends Controller
 
 	function testScoreStore(Request $request)
 	{
-		
-        
+
+
 		$subTests = DB::table('special_test_sub')->where('test_id', '=', $request->test_type)->get();
 		$testName = Test::find($request->test_type)->test_name;
-		
-		$testMin=Test::find($request->test_type)->min;
-		$testMax=Test::find($request->test_type)->max;
+
+		$testMin = Test::find($request->test_type)->min;
+		$testMax = Test::find($request->test_type)->max;
 		$test_record = Test::find($request->test_type);
 
 		// $validator = Validator::make($request->all(), [
@@ -906,16 +906,16 @@ class StudentController extends Controller
 		// 	'exam_date' => 'required',
 		// ]);
 
-		
+
 
 		$validator = Validator::make($request->all(), [
 			'score' => [
 				'required',
 				'numeric',
 				function ($attribute, $value, $fail) use ($testMin, $testMax, $testName) {
-					
+
 					if ($value < $testMin && $value > $testMax) {
-						$fail($testName." " .'score vale should be between ' . $testMin . ' and ' . $testMax);
+						$fail($testName . " " . 'score vale should be between ' . $testMin . ' and ' . $testMax);
 					}
 				},
 			],
@@ -937,19 +937,19 @@ class StudentController extends Controller
 		$userTest->score = $request->score;
 
 		$i = 0;
-		if(isset($request->subscore)){
-		foreach ($request->subscore as $subTest) {
-			if ($subTest != "") {
-				SubTest::create([
-					'user_id' => Auth::id(),
-					'test_id' => $request->test_type,
-					'sub_id' => $request->subtype[$i],
-					'score' => $subTest
-				]);
+		if (isset($request->subscore)) {
+			foreach ($request->subscore as $subTest) {
+				if ($subTest != "") {
+					SubTest::create([
+						'user_id' => Auth::id(),
+						'test_id' => $request->test_type,
+						'sub_id' => $request->subtype[$i],
+						'score' => $subTest
+					]);
+				}
+				$i++;
 			}
-			$i++;
 		}
-	}
 		if ($userTest->save()) {
 			return response()->json([
 				'code' => 'success',
@@ -1067,7 +1067,7 @@ class StudentController extends Controller
 
 	function userDocumentStore(Request $request)
 	{
-		
+
 		$tableName = $request->table_name;
 		$tableId = $request->table_id;
 
@@ -1103,7 +1103,7 @@ class StudentController extends Controller
 			]);
 
 			$document->move(public_path('user_documents'), $fileName);
-			chmod(public_path('user_documents'.'/'.$fileName), 0755);
+			chmod(public_path('user_documents' . '/' . $fileName), 0755);
 
 			$i++;
 		}
@@ -1128,7 +1128,7 @@ class StudentController extends Controller
 				$i = 0;
 				$html = "";
 				$files = UserDocumentFiles::where('table_id', '=', $row->table_id)->get();
-				
+
 				//echo $row->table."-".$row->table_id;
 				$documentNames = $this->documentName($row->table, $row->doc_id);
 				foreach ($files as $file) {
@@ -1167,7 +1167,7 @@ class StudentController extends Controller
 	function documentUpdate($id, Request $request)
 	{
 
-		
+
 		$files = UserDocumentFiles::where('table_id', '=', $request->id)
 			->join('user_documents', 'user_document_files.user_document_id', '=', 'user_documents.id')
 			->select('user_documents.document_type_id as doc_id', 'user_document_files.*')
@@ -1239,7 +1239,7 @@ class StudentController extends Controller
 
 	public function uploadDocument(Request $request)
 	{
-		
+
 		// NOTES
 		// Steps to upload
 		// 1. Upload file and get file_id - file_id
@@ -1254,7 +1254,7 @@ class StudentController extends Controller
 
 		// Form validation
 
-		
+
 
 		$validation_arr = [
 			'document_type' => 'required',
@@ -1555,7 +1555,7 @@ class StudentController extends Controller
 				else
 					return "N/A";
 			})
-			->rawColumns(['action']) 
+			->rawColumns(['action'])
 			->make(true);
 	}
 

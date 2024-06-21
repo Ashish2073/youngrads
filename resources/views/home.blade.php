@@ -94,13 +94,33 @@
                 flex-direction: column;
             }
 
+            @media screen and (max-width: 992px) {
+                .heading {
+                    font-size: 2.5rem !important;
+                }
+            }
+
+
+
             /* .india-card .img-txt-row img {
-                                                                                                                                                                                                                                                                                                                                                                                                                                            width: 167px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                            height: 184px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            width: 167px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            height: 184px;
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
 
 
+        }
+
+        @media screen and (max-width: 992px) {
+            .ceoimage {
+                padding: unset !important;
+            }
+        }
+
+        @media screen and (min-width: 992px) {
+            .ceoimage {
+                padding: 106px !important;
+            }
         }
     </style>
 @section('content')
@@ -419,13 +439,13 @@
                     <div class="our-process-heading">
                         <h2 class="site-title">Anuj Gupta <span>CEO of Youngrads</span></h2>
                         <span><a target="blank" href="https://www.linkedin.com/in/anuj-gupta-962169a"><img width="50"
-                                    height="50" src="{{ asset('media/linkedin.png') }}" alt="linkedin"></a></span>
+                                    class="mb-2" height="50" src="{{ asset('media/linkedin.png') }}"
+                                    alt="linkedin"></a></span>
                     </div>
                 </div>
                 <div class="col-md-7">
-                    <div class="our-process-video">
-                        <img width="400" height="400" src={{ asset('foundingmember/founder1.jpeg') }}
-                            alt="" />
+                    <div class="our-process-video ceoimage">
+                        <img class="img-fluid" src={{ asset('foundingmember/founder1.jpeg') }} alt="" />
                     </div>
                 </div>
             </div>
@@ -477,9 +497,9 @@
             <h2 class="site-title">Early Access</h2>
         </div>
 
-        <div class="container">
+        <div class="container shadow">
 
-            <form class="" action="{{ route('earlyaccess') }}" method="post">
+            <form class="p-2" action="{{ route('earlyaccess') }}" method="post">
                 @csrf
                 <div class="">
                     <div class="mb-3">
@@ -561,9 +581,9 @@
         // JavaScript for changing the content of the banner every 5 seconds with random content
         const banner = document.getElementById('headingbanner');
         const contents = [
-            '<div class="left-text" style="margin-left:50px" ><h3 style="font-weight: 400 ;font-size:3.5rem "> <span style="color: orange; font-weight: 700; font-size: 4rem" >55,000+</span>Cources<span style="color: orange; font-weight: 700; font-size: 4rem"></span></h3><p style="text-transform: capitalize;font-weight:500;font-size:1.5rem; color:#000"><br /></p></div>',
-            '<div class="left-text" style="margin-left:50px" ><h3 style="font-weight: 400 ;font-size:3.5rem "><br />  <span style="color: orange; font-weight: 700; font-size: 6rem;margin-top:80px">200+</span><br/>Universities!</h3></div>',
-            '<div class="left-text" style="margin-left:50px" ><h3 style="font-weight: 400 ;font-size:3.5rem "> <br /><span style="color: orange; font-weight: 700; font-size: 6rem;margin-top:80px">20+</span><br/>Destination!</h3></div>'
+            '<div class="left-text" style="margin-left:50px" ><h3 class="heading" style="font-weight: 400 ;font-size:3.5rem "> <span style="color: orange; font-weight: 700; font-size: 4rem" >55,000+</span>Cources<span style="color: orange; font-weight: 700; font-size: 4rem"></span></h3><p style="text-transform: capitalize;font-weight:500;font-size:1.5rem; color:#000"><br /></p></div>',
+            '<div class="left-text" style="margin-left:50px" ><h3 class="heading" style="font-weight: 400 ;font-size:3.5rem "><br />  <span style="color: orange; font-weight: 700; font-size: 6rem;margin-top:80px">200+</span><br/>Universities!</h3></div>',
+            '<div class="left-text" style="margin-left:50px" ><h3 class="heading" style="font-weight: 400 ;font-size:3.5rem "> <br /><span style="color: orange; font-weight: 700; font-size: 6rem;margin-top:80px">20+</span><br/>Destination!</h3></div>'
         ]; // Array of contents
 
         function getRandomContent() {

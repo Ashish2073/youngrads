@@ -68,31 +68,61 @@
                                             </table>
 
                                         </div>
-                                        <div class="col-md-6 col-12">
-                                            <p><strong>Test Scores:</strong></p>
-                                            <table class="table table-sm">
-                                                <tbody>
-                                                    @forelse ($testScores as $testScore)
-                                                        <tr>
-                                                            <td>{{ $testScore->test }}</td>
-                                                            <td>{{ $testScore->score }}</td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="2"><strong>N/A</strong></td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <p><strong>Entry Requirement</strong></p>
+                                                <p>{{ $campusProgram->entry_requirment }}</p>
+                                            </div>
+
+
+                                            @if ($campusProgram->waiver_in_english == 'yes')
+                                                <div class="col-12">
+                                                    <p><strong>English Waiver Requirment</strong></p>
+                                                    <p>{{ $campusProgram->waiver_requirement_detail }}</p>
+                                                </div>
+                                            @endif
+
+                                            @if ($campusProgram->waiver_in_english == 'no')
+                                                <div class="col-12">
+                                                    <p><strong>English Waiver</strong></p>
+                                                    <p>No</p>
+                                                </div>
+                                            @endif
+
+
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <p><strong>Entry Requirement</strong></p>
-                                            <p>{{ $campusProgram->entry_requirment }}</p>
-                                        </div>
+
+
+                                    <div class="col-md-6 col-12">
+                                        <p><strong>Required Test Details:</strong></p>
+                                        <table class="table table-sm">
+                                            <tbody>
+                                                @forelse ($testScores as $testScore)
+                                                    <tr>
+                                                        <td>TestName</td>
+                                                        <td>{{ strtoupper($testScore->test) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Required OverAll Score</td>
+                                                        <td>{{ $testScore->score }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Individual Required Score In Each Part Of
+                                                            Exam</td>
+                                                        <td>{{ $testScore->nlt_score }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="2"><strong>N/A</strong></td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
+
                                 <div class="col-md-3 col-12 text-md-right text-md-left">
                                     @if (auth()->check())
                                         <button type="button" class="btn btn-icon btn-primary apply mb-1"

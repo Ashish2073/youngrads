@@ -20,10 +20,13 @@
                 <div class="">
                     <div class="">
                         <div class="row ">
+
                             @forelse ($document['document_lists'] ?? [] as $list)
                                 @if ($document_type == 'study_levels' && $list['name'] == 'Other')
                                     @continue
                                 @endif
+
+
                                 <div class="col-md-4">
                                     <div class="p-1 mb-1 shadow border"
                                         style="border-radius: 0.5rem; box-shadow: unset;">
@@ -42,6 +45,7 @@
                                                             class="document-upload-form mb-2" method="post"
                                                             action="{{ route('student.document.upload') }}">
                                                             @csrf
+
                                                             <input type="hidden" name="document_type_id"
                                                                 value="{{ $list->id }}">
                                                             <input type="hidden" name="document_type"
@@ -70,7 +74,8 @@
                                                             </div>
                                                             <div class="form-group progress-indicator d-none">
                                                                 <div class="progress progress-bar-primary progress-xl">
-                                                                    <div class="progress-bar" style="width:0%">0%</div>
+                                                                    <div class="progress-bar" style="width:0%">0%
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             @foreach ($list->documents ?? [] as $doc)
@@ -102,6 +107,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             @empty
                                 <div class="col-md-4">
                                     <span>N/A</span>
